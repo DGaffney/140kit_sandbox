@@ -1,0 +1,90 @@
+#!/usr/bin/env ruby
+
+gem 'rake', '>= 0.7.3'
+require 'rake'
+
+Rake.application.init('server')
+
+desc "Setup your environment"
+task :setup do
+  sh "bundle install"
+  sh "rake db:up"
+end
+
+namespace :db do
+  
+  desc "Create a new migration by passing in a name variable"
+  task :new_migrate do 
+    migration_name = ENV['name']||ENV['NAME']||ENV['Name']||nil
+    if migration_name
+      time = Time.now.strftime("%Y%m%d%H%M%S")
+      m = File.new("#{File.dirname(__FILE__)}/migrations/#{migration_name}_#{time}.rb", "w+")
+      migration_count = `ls #{File.dirname(__FILE__)}/migrations`.split("\n").length+1
+      m.write("migration #{migration_count}, :#{migration_name}_#{time} do\r\n\tup do\r\n\tend\r\n\r\n\tdown do\r\n\tend\r\nend\r\n")
+      m.close
+    else raise "Can't generate migration without a name!"
+    end
+  end
+  
+  desc "Migrate the database up from current location to either specified migration or to latest"
+  task :up do
+    migrations_to_run.each do |migration|
+      load "#{File.dirname(__FILE__)}/migrations/#{migration}"
+      migrate_up!
+    end
+  end
+
+  desc "Migrate the database down from current location to either specified migration or to earliest (nothing)"
+  task :down do
+
+  end
+end
+
+task :default do
+  puts "140kit Rake Tasks"
+  Rake.application.tasks.each do |task|
+    debugger
+    puts "#{task.send("name")}: DESCRIPTION: #{task.send("full_comment")} : ARG NAMES: #{task.send("arg_names")} : ARGS: #{task.send("arg_description")}"
+  end
+end
+
+def migrate(up=true)
+  version = ENV['version']||ENV['VERSION']||ENV['Version']||nil
+  puts "No version specified, migrating from initial..." if version.nil?
+  load_environment
+  tables = DataMapper.repository(:default).adapter.select("show tables")
+  raise "Can't migrate up to specified place if migration hasn't been run yet!" if !tables.include?("migration_info")
+  DataMapper::Logger.new(STDOUT, :debug)
+  DataMapper.logger.debug( "Starting Migration" )
+  migrations = `ls #{File.dirname(__FILE__)}/migrations`.split("\n")
+  tables = DataMapper.repository(:default).adapter.select("select * from migrations")
+  if up
+    migrations_to_run = (migrations-tables)
+    migrations_to_run = migrations_to_run[0..migrations_to_run.index(version)] if version
+  else
+    migrations_to_run = (tables-migrations).reverse
+    migrations_to_run = migrations_to_run[0..migrations_to_run.index(version)] if version
+  end
+  return migrations_to_run
+end
+
+def load_environment
+  require 'rubygems'
+  require 'dm-migrations'
+  require 'dm-core'
+  require 'dm-migrations/migration_runner'
+
+  env = ARGV.first || "development"
+  db = YAML.load(File.read(ENV['PWD']+'/config/database.yml'))
+  if !db.has_key?(env)
+    puts "No such environment #{env}."
+    env = "development"
+  end
+  puts "Booting #{env} environment."
+  db = db[env]
+  DataMapper.finalize
+  DataMapper.setup(:default, "#{db["adapter"]}://#{db["username"]}:#{db["password"]}@#{db["host"]}/#{db["database"]}")
+end
+# [... more task defintions go here ...]
+
+Rake.application.top_level

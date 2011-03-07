@@ -253,7 +253,7 @@ module TweetStream
         when Class
           parser
         when Symbol
-          require PATH+"/parsers/#{parser.to_s}"
+          require ENV['PWD']+"/parsers/#{parser.to_s}"
           eval("TweetStream::Parsers::#{parser.to_s.split('_').map{|s| s.capitalize}.join('')}")
       end
     end

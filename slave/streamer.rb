@@ -27,7 +27,7 @@ require 'lib/tweetstream'
 require 'eventmachine'
 require 'em-http'
 require 'json'
-PATH =  ENV['PWD']
+
 class Streamer < Instance
 
   MAX_TRACK_IDS = 10000

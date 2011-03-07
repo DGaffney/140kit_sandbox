@@ -30,7 +30,7 @@ class Instance
   
   def connect_to_db
     env = ARGV.first || "development"
-    db = YAML.load(File.read(PATH+'config/database.yml'))
+    db = YAML.load(File.read(ENV['PWD']+'/config/database.yml'))
     if !db.has_key?(env)
       puts "No such environment #{env}."
       env = "development"

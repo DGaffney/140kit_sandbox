@@ -1,4 +1,5 @@
 *.log
+*.yml
 *.DS_Store
 *.zip
 

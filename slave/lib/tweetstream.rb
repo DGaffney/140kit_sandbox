@@ -4,11 +4,11 @@
 # require 'tweetstream/user'
 # require 'tweetstream/daemon'
 
-require PATH+'/tweetstream/client'
-require PATH+'/tweetstream/hash'
-require PATH+'/tweetstream/status'
-require PATH+'/tweetstream/user'
-require PATH+'/tweetstream/daemon'
+require File.dirname(__FILE__)+'/tweetstream/client'
+require File.dirname(__FILE__)+'/tweetstream/hash'
+require File.dirname(__FILE__)+'/tweetstream/status'
+require File.dirname(__FILE__)+'/tweetstream/user'
+require File.dirname(__FILE__)+'/tweetstream/daemon'
 
 module TweetStream
   class Terminated < ::StandardError; end
