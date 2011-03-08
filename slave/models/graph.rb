@@ -1,0 +1,13 @@
+class Graph
+  include DataMapper::Resource
+  property :id, Serial
+  property :title, String, :unique_index => [:unique_graph], :index => [:title_graph]
+  property :style, String, :unique_index => [:unique_graph], :index => [:style_graph]
+  property :year, Integer, :unique_index => [:unique_graph], :index => [:year_graph, :year_month_date_hour_graph, :year_month_date_graph, :year_month_graph, :year_month_date_hour, :year_month_date, :year_month, :year]
+  property :month, Integer, :unique_index => [:unique_graph], :index => [:month_graph, :year_month_date_hour_graph, :year_month_date_graph, :year_month_graph, :month_date_hour_graph, :month_date_graph, :year_month_date_hour, :year_month_date, :year_month, :month_date_hour, :month_date, :month]
+  property :date, Integer, :unique_index => [:unique_graph], :index => [:date_graph, :year_month_date_hour_graph, :year_month_date_graph, :month_date_hour_graph, :date_hour_graph, :month_date_graph, :year_month_date_hour, :year_month_date, :month_date_hour, :month_date, :date_hour, :date]
+  property :hour, Integer, :unique_index => [:unique_graph], :index => [:hour_graph, :year_month_date_hour_graph, :month_date_hour_graph, :date_hour_graph, :year_month_date_hour, :month_date_hour, :date_hour, :hour]
+  property :written, Boolean
+  property :time_slice, DateTime, :unique_index => [:unique_graph], :index => [:time_slice_graph]
+  belongs_to :curation, :unique_index => [:unique_graph], :index => [:curation_id_graph, :year_month_date_hour_graph, :year_month_date_graph, :year_month_graph, :month_date_hour_graph, :month_date_graph, :date_hour_graph, :year_graph, :month_graph, :date_graph, :hour_graph]
+end

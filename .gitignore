@@ -2,6 +2,8 @@
 *.yml
 *.DS_Store
 *.zip
+*.sqlite
+*.sql
 
 api/script/*
 front-end/public/images/0000/*

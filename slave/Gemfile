@@ -1,10 +1,10 @@
 source 'http://rubygems.org'
-gem 'dm-core'
-gem 'dm-aggregates'
-gem 'dm-migrations'
-gem 'dm-validations'
-gem 'dm-mysql-adapter'
-gem 'dm-sqlite-adapter'
+gem 'dm-core'#, '1.1.0.rc2', :git => "git://github.com/datamapper/dm-core.git"
+gem 'dm-aggregates'#, '1.1.0.rc2', :git => "git://github.com/datamapper/dm-aggregates.git"
+gem 'dm-migrations'#, '1.1.0.rc2', :git => "git://github.com/datamapper/dm-migrations.git"
+gem 'dm-validations'#, '1.1.0.rc2', :git => "git://github.com/datamapper/dm-validations.git"
+gem 'dm-mysql-adapter'#, '1.1.0.rc2', :git => "git://github.com/datamapper/dm-mysql-adapter.git"
+gem 'dm-sqlite-adapter'#, '1.1.0.rc2', :git => "git://github.com/datamapper/dm-sqlite-adapter.git"
 gem 'eventmachine'
 gem 'em-http-request', :require => 'em-http'
 gem 'jeweler'

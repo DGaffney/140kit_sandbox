@@ -1,33 +1,4 @@
-require 'rubygems'
-require 'bundler/setup'
-require 'dm-core'
-require 'dm-aggregates'
-require 'dm-validations'
-
-require 'extensions/dm-extensions'
-require 'extensions/array'
-require 'extensions/string'
-require 'extensions/hash'
-require 'extensions/time'
-require 'extensions/date'
-
-require 'models/instance'
-require 'models/whitelisting'
-require 'models/auth_user'
-require 'models/lock'
-require 'models/dataset'
-require 'models/curation'
-require 'models/tweet'
-require 'models/user'
-
-require 'utils/tweet_helper'
-require 'utils/u'
-require 'lib/tweetstream'
-
-require 'eventmachine'
-require 'em-http'
-require 'json'
-
+require 'environment'
 class Streamer < Instance
 
   MAX_TRACK_IDS = 10000
@@ -91,7 +62,31 @@ class Streamer < Instance
         @password = user.password
         puts "Assigned #{@username}."
       else
-        puts "No user accounts available." if message
+        puts "No twitter accounts available. Add one now? (y/n)" if message
+        answer = Sh::clean_gets
+        if answer=="y"
+          first_attempt = true
+          while answer!="y" || first_attempt
+            first_attempt = false
+            puts "Enter your username:"
+            user_name = Sh::clean_gets
+            puts "Enter your password:"
+            password = Sh::clean_gets
+            puts "We got the username '#{user_name}' and a password that was #{password.length} characters long. Sound right-ish? (y/n)"
+            answer = Sh::clean_gets
+          end
+          puts "Creating new AuthUser..."
+          user = AuthUser.new(:user_name => user_name, :password => password)
+          user.save
+          user = AuthUser.unlocked(:first)
+          @user_account = user
+          @username = user.user_name
+          @password = user.password
+          puts "Assigned #{@username}."
+        else
+          puts "Then I can't do anything for you. May god have mercy on your data"
+          exit!
+        end
         message = false
       end
       sleep(5)

@@ -6,10 +6,10 @@ class Instance
   include DataMapper::Resource
   property :id,             Serial
   property :instance_id,    String, :length => 40
-  property :hostname,       String
-  property :pid,            Integer
+  property :hostname,       String, :unique_index => [:unique_instance]
+  property :pid,            Integer, :unique_index => [:unique_instance]
   property :killed,         Boolean
-  property :instance_type,  String
+  property :instance_type,  String, :unique_index => [:unique_instance]
   
   # validates_presence_of :instance_type
   # validates_presence_of :instance_id
@@ -20,7 +20,7 @@ class Instance
   def initialize
     super
     connect_to_db
-    self.hostname = `hostname`.strip
+    self.hostname = Sh::hostname
     self.rest_allowed = whitelisted?
     self.pid = Process.pid
     self.tmp_data = {}
@@ -47,7 +47,7 @@ class Instance
   
   def whitelisted?
     # return Whitelisting.first(:conditions => {:hostname => self.hostname}).nil? ? false : Whitelisting.first(:conditions => {:hostname => self.hostname}).whitelisted
-    wl = Whitelisting.first(:hostname => self.hostname)
+    wl = Whitelisting.first({:hostname => self.hostname})
     return false if wl.nil?
     return Whitelisting.first(:hostname => self.hostname).whitelisted
   end

@@ -1,29 +1,4 @@
-require 'rubygems'
-
-require 'dm-core'
-require 'dm-aggregates'
-require 'dm-validations'
-
-require 'extensions/dm-extensions'
-# require 'extensions/array'
-require 'extensions/string'
-# require 'extensions/hash'
-# require 'extensions/time'
-# require 'extensions/date'
-
-require 'models/instance'
-require 'models/lock'
-require 'models/whitelisting'
-require 'models/curation'
-require 'models/dataset'
-require 'models/tweet'
-require 'models/user'
-require 'models/analytical_offering'
-require 'models/analysis_metadata'
-
-require 'utils/u'
-require 'json'
-
+require 'environment'
 class Worker < Instance
   
   # attr_accessor :user_account, :username, :password, :start_time, :next_dataset_ends, :queue, :params, :datasets
