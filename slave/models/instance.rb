@@ -6,9 +6,9 @@ class Instance
   include DataMapper::Resource
   property :id,             Serial
   property :instance_id,    String, :length => 40
-  property :hostname,       String, :unique_index => [:unique_instance]
-  property :pid,            Integer, :unique_index => [:unique_instance]
-  property :killed,         Boolean
+  property :hostname,       String, :unique_index => [:unique_instance], :default => Sh::hostname
+  property :pid,            Integer, :unique_index => [:unique_instance], :default => Process.pid
+  property :killed,         Boolean, :default => false
   property :instance_type,  String, :unique_index => [:unique_instance]
   
   # validates_presence_of :instance_type
@@ -20,9 +20,7 @@ class Instance
   def initialize
     super
     connect_to_db
-    self.hostname = Sh::hostname
     self.rest_allowed = whitelisted?
-    self.pid = Process.pid
     self.tmp_data = {}
     self.instance_id = Digest::SHA1.hexdigest("#{self.hostname}#{self.pid}")
     puts "Hello, my name is #{self.instance_id}."

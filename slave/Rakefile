@@ -21,18 +21,58 @@ task :set_up do
   sh "rake db:migrate"
 end
 
+namespace :curation do
+  desc "Create a new curation."
+  task :new do
+    load_environment
+    researcher = load_researcher
+    puts "What type of curation will this be? (Can choose from: #{Dataset.scrape_types.inspect})"
+    answer = Sh::clean_gets
+    while !Dataset.scrape_types.include?(answer)
+      puts "Sorry, that wasn't one of the options. Type the exact name please."
+      answer = Sh::clean_gets
+    end
+    dataset = Dataset.new
+    dataset.scrape_type = answer
+    clean_params = validate_params(answer)
+    dataset.params = clean_params
+    puts "How long would you like to have this collection run? (Enter in number of seconds. I know, that's annoying.)"
+    answer = Sh::clean_gets
+    while answer.to_i==0
+      puts "Sorry, we couldn't parse that value. Just numbers, please, you know, like '300'."
+      answer = Sh::clean_gets
+    end
+    dataset.length = answer
+    dataset.save
+    curation = create_curation(dataset, researcher)
+    select_analysis_metadata(curation)
+  end
+end
+
+namespace :researchers do 
+  desc "Create a researcher account"
+  task :new do 
+    load_environment
+  end
+end
 namespace :db do
-    
+  require 'utils/sh'
+  
   desc "Migrate the database up from current location to either \n specified migration or to latest"
   task :migrate do
-    puts "Warning! A migrate will drop all current tables, and refresh the system. It is good to do this on first run, \n or if something horrible has happened. Otherwise, please, for your own sake, run `rake db:export` before doing this.\n That said, do you want to continue? (y/n)"
-    answer = Sh::clean_gets
-    if answer.downcase == "y"
+    load_environment
+    answer = Sh::clean_gets_yes_no("Warning! A migrate will drop all current tables, and refresh the system. It is good to do this on first run, \n or if something horrible has happened. Otherwise, please, for your own sake, run `rake db:export` before doing this.\n That said, do you want to continue?")
+    if answer
       load_environment
       DataMapper.auto_migrate!
     end
   end
 
+  desc "Seed database with core data that you'll probably want"
+  task :seed do
+    load_environment
+    load 'config/seed.rb'
+  end
   desc "Attempt to upgrade database. Note: this will possibly not add indexes added to the new models, do to ORM limitations."
   task :upgrade do
     load_environment
@@ -42,13 +82,12 @@ namespace :db do
   desc "Dump all tables into a set of sql dump files, and, in turn, \n dump the files into a large zip directory. Pass in location via EXPORT_PATH \n (default is 'dump.sql'). Get it out of your system so you can cleanly start fresh without \n necessarily losing the data. WARNING: Currently only supported for mysql."
   task :export do
     file = ENV['EXPORT_PATH']||ENV['export_path']||ENV['Export_path']||"dump.sql"
-    mysqldump_path = sh "which mysqldump"
+    mysqldump_path = Sh::sh("which mysqldump")
     if mysqldump_path.empty?
       puts "Cannot run process until you install mysqldump itself. Exiting."
     else
-      puts "This will run mysqldump on your environment's database, which may take time, depending on how much Twitter junk you've collected. Proceed? (y/n)"
-      answer = Sh::clean_gets
-      if answer.downcase == "y"
+      answer = Sh::clean_gets_yes_no("This will run mysqldump on your environment's database, which may take time, depending on how much Twitter junk you've collected. Proceed?")
+      if answer
         db = load_settings
         puts "Running export now... Promise."
         sh "mysqldump -h #{db["host"]} -u #{db["username"]} --password=#{db["password"]} #{db["database"]} > #{file}"
@@ -59,13 +98,12 @@ namespace :db do
   desc "Import a dataset from your local file system. Pass in location \n via IMPORT_PATH variable (default is 'dump.sql'). Expects this to be a \n directory of dump files. WARNING: Currently only supported for mysql."
   task :import do
     file = ENV['EXPORT_PATH']||ENV['export_path']||ENV['Export_path']||"dump.sql"
-    mysqldump_path = sh "which mysqldump"
+    mysqldump_path = Sh::sh("which mysql")
     if mysqldump_path.empty?
-      puts "Cannot run process until you install mysqldump itself. Exiting."
+      puts "Cannot run process until you install mysql itself. Exiting."
     else
-      puts "This will run mysqldump on your environment's database, which may take time, depending on how much Twitter junk you've collected. Proceed? (y/n)"
-      answer = Sh::clean_gets
-      if answer.downcase == "y"
+      answer = Sh::clean_gets_yes_no("This will run mysql on your environment's database, which may take time, depending on how much Twitter junk you've collected. Proceed?")
+      if answer
         db = load_settings
         puts "Running import now... Promise."
         sh "mysql -h #{db["host"]} -u #{db["username"]} --password=#{db["password"]} #{db["database"]} < #{file}"
@@ -86,6 +124,170 @@ def sh(command)
   Sh::sh command
 end
 
+def create_researcher
+  researcher = Researcher.new
+  puts "What is the username for this account?"
+  answer = Sh::clean_gets
+  researcher.user_name = answer
+  while !researcher.validate_on_create.first
+    answer = Sh::clean_gets
+    researcher.user_name = answer
+    researcher.validate_on_create.last
+  end
+  puts "What is the password for this account?"
+  answer = Sh::clean_gets
+  researcher.password = answer
+  researcher.send("encrypt_password")
+  researcher.save
+  researcher
+end
+
+def load_researcher
+  researcher = nil
+  if Researcher.count==0
+    puts "There are no researchers currently set up. You will need to do this first."
+    researcher = create_researcher
+  else
+    puts "Under which researcher will this curation be created? Enter username for researcher."
+    answer = Sh::clean_gets
+    researcher = Researcher.first(:user_name => answer)
+    while researcher.nil?
+      puts "Sorry, no researcher found for name #{answer}. Try again, or type 'new' to create new researcher"
+      answer = Sh::clean_gets
+      if answer == "new"
+        researcher = create_researcher
+      else
+        researcher = Researcher.first(:user_name => answer)
+      end
+    end
+  end
+  return researcher
+end
+
+def create_curation(dataset, researcher)
+  name = dataset.params
+  answer = Sh::clean_gets_yes_no("Currently, the curation will be named: #{dataset.params}. Change this?", "Sorry, one more time:")
+  if answer
+    puts "Enter name:"
+    name = Sh::clean_gets
+    answer = Sh::clean_gets_yes_no("Currently, the curation will be named: #{name}. Change this?", "Sorry, one more time:")
+    while answer
+      answer = Sh::clean_gets_yes_no("Currently, the curation will be named: #{name}. Change this?", "Sorry, one more time:")
+      puts "Enter name:"
+      name = Sh::clean_gets
+    end
+  end
+  curation = Curation.new
+  curation.name = name
+  curation.researcher = researcher
+  curation.datasets << dataset
+  curation.save
+  curation
+end
+
+def select_analysis_metadata(curation)
+  answer = Sh::clean_gets_yes_no("Currently there are #{AnalyticalOffering.count} Analytical processes available. See names?", "Sorry, one more time:")
+  if answer
+    puts "Analytical Processes: #{AnalyticalOffering.all.collect{|ao| "#{ao.title} (function: #{ao.function})"}.sort.join("\n")}"
+    puts "To see a description of a process, enter the function name like this: 'man function_name'"
+    puts "To add a process, enter the function name like this: 'add function_name'"
+    puts "To complete the process, type 'finish'"
+  end
+  answer = Sh::clean_gets
+  while answer!="finish"
+    if answer[0..2]=="man"
+      analytical_offering = AnalyticalOffering.first(:function => answer.gsub("man ", ""))
+      if analytical_offering
+        puts analytical_offering.description
+      else
+        puts "Sorry, something was screwy in finding that function. Try again."
+      end
+    elsif answer[0..2]=="add"
+      analytical_offering = AnalyticalOffering.first(:function => answer.gsub("add ", ""))
+      if analytical_offering
+        analysis_metadata = AnalysisMetadata.new
+        analysis_metadata.function = analytical_offering.function
+        analysis_metadata.curation = curation
+        analysis_metadata.save
+        create_analysis_metadata(analysis_metadata, curation)
+        puts "Added #{answer} to curation. #{curation.analysis_metadatas.length} total analytics now tacked on. To remove, type 'remove function_name'"
+      else
+        puts "Sorry, something was screwy in finding that function. Try again."
+      end
+    elsif answer[0..5]=="remove"
+      analytical_offering = AnalyticalOffering.first(:function => answer.gsub("remove ", ""))
+      if analytical_offering
+        analysis_metadata = AnalysisMetadata.first(:curation_id => curation.id, :function => analytical_offering.function)
+        analysis_metadata.destroy
+        curation.analysis_metadatas = curation.analysis_metadatas-[analysis_metadata]
+        puts "Removed #{answer} from curation. #{curation.analysis_metadatas.length} total analytics now tacked on. To add, type 'add function_name'"
+      else
+        puts "Sorry, something was screwy in finding that function. Try again."
+      end
+    else puts "Command not recognized. Try again."
+    end
+    answer = Sh::clean_gets
+  end
+end
+
+def create_analysis_metadata(analysis_metadata, curation)
+  analysis_metadata.analytical_offering_variable_descriptions.each do |variable|
+    puts "Name: "+variable[:variable_name]
+    puts "Description: "+variable[:description]
+    puts "Example: "+variable[:example]
+    puts "Enter your variable now, or type 'cancel' to cancel adding this analytical process."
+    answer = Sh::clean_gets
+    if answer!="cancel"
+      response = analysis_metadata.verify_variable(variable[:variable_name], answer, curation)
+      while !response[:reason].empty?
+        response = analysis_metadata.verify_variable(variable[:variable_name], answer, curation)
+      end
+      analytical_offering_variable = AnalyticalOfferingVariable.new
+      analytical_offering_variable.value = response[:variable]
+      analytical_offering_variable.position = variable[:position]
+      analytical_offering_variable.analysis_metadata = analysis_metadata
+      analytical_offering_variable.save
+    else
+      analysis_metadata.destroy
+      break
+    end
+  end
+end
+
+def validate_params(scrape_type)
+  response = {}
+  case scrape_type
+  when "track"
+    puts "A track scrape will track and collect all Tweets (and Users), from now until when you specify, for a given word or phrase.\n Enter phrase now:"
+    answer = Sh::clean_gets
+    response = Dataset.valid_params("track", answer)
+    while !response[:reason].empty?
+      puts "Sorry, that was not valid input. Reason: #{reason}"
+      answer = Sh::clean_gets
+      response = Dataset.valid_params("track", answer)
+    end
+  when "follow"
+    puts "A follow scrape will follow and collect all Tweets from a given set of users (screen names only), from now until when you specify.\n Enter users, delimited by commas, now:"
+    answer = Sh::clean_gets
+    response = Dataset.valid_params("follow", answer)
+    while !response[:reason].empty?
+      puts "Sorry, that was not valid input. Reason: #{reason}"
+      answer = Sh::clean_gets
+      response = Dataset.valid_params("follow", answer)
+    end
+  when "locations"
+    puts "A locations scrape will track and collect all Tweets (and Users), from now until when you specify, for a\n given geographic area entered like: -74,40,-73,41 (A one-degree square\n from -74 and 40 to -73 and 41. Decimals are acceptable to any accuracy).\n Enter phrase now:"
+    answer = Sh::clean_gets
+    response = Dataset.valid_params("locations", answer)
+    while !response[:reason].empty?
+      puts "Sorry, that was not valid input. Reason: #{reason}"
+      answer = Sh::clean_gets
+      response = Dataset.valid_params("locations", answer)
+    end
+  end
+  return response[:clean_params]
+end
+
 def load_settings
   env = ENV["e"] || "development"
   db = YAML.load(File.read(ENV['PWD']+'/config/database.yml'))
@@ -97,6 +299,7 @@ def load_settings
   db = db[env]
   return db
 end
+
 def load_environment
   require 'environment'
   require 'dm-migrations'

@@ -1,3 +1,5 @@
+#note: Changing the order of some of these requires may screw things up. 
+#Don't do it if you're not sure.
 require 'rubygems'
 require 'bundler/setup'
 require 'dm-core'
@@ -10,6 +12,9 @@ require 'extensions/string'
 require 'extensions/hash'
 require 'extensions/time'
 require 'extensions/date'
+
+require 'utils/git'
+require 'utils/sh'
 
 require 'models/analysis_metadata'
 require 'models/analytical_offering'
@@ -27,7 +32,6 @@ require 'models/tweet'
 require 'models/user'
 require 'models/whitelisting'
 
-require 'utils/sh'
 require 'utils/tweet_helper'
 require 'utils/u'
 require 'lib/tweetstream'
@@ -35,3 +39,6 @@ require 'lib/tweetstream'
 require 'eventmachine'
 require 'em-http'
 require 'json'
+require 'twitter'
+
+Twit = Twitter::Client.new
