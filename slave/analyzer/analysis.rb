@@ -1,12 +1,21 @@
 class Analysis
   
-  require "#{ROOT_FOLDER}cluster-code/analyzer/analysis_flow"
+  require "#{File.dirname(__FILE__)}/analysis_flow"
   
-  `ls #{ROOT_FOLDER}cluster-code/analyzer/tools/`.split.each {|f| require "#{ROOT_FOLDER}cluster-code/analyzer/tools/#{f}"}
-  `ls #{ROOT_FOLDER}cluster-code/analyzer/library_functions/`.split.each {|f| require "#{ROOT_FOLDER}cluster-code/analyzer/library_functions/#{f}"}
+  `ls #{File.dirname(__FILE__)}/library_functions/`.split.each {|f| require "#{File.dirname(__FILE__)}/library_functions/#{f}"}
   
-  def self.tools
-    return `ls #{ROOT_FOLDER}cluster-code/analyzer/tools/`.split.collect {|t| t.gsub(".rb", "")}.reject {|t| t.include?("|")}
+  AnalyticalOffering.all.each do |ao|
+    #here is where we come up with magic for running the other languages.
+    #probably, it will just be something we omit entirely, unless there 
+    #is some way to plug in a language binding over to ruby. When it's 
+    #not ruby we just sh the function name, passing in the correct vars - 
+    #it would have to either return structured output with a partnered 
+    #ruby function to interpret and save, or make it's own mysql connection 
+    #and save (may get ugly with lots of connections outside our system....)
+    case ao.language
+    when "ruby"
+      require "#{File.dirname(__FILE__)}/tools/#{ao.function}.rb"
+    end
   end
   
   def self.mean(class_name, attribute, parameters={})
@@ -38,20 +47,8 @@ class Analysis
       query += parameters
     end
     query += " group by #{attribute} order by count(*) desc;"
-    # if block_given? 
-    # This was having errors, may need to consult real programmers to deal with failed block_given? answers?
-    # For now, frequency_hash requires block. - Devin
     objects = Database.spooled_result(query)
     yield objects
-    # else
-    #   result = Environment.db.query(query)
-    #   hash = {}
-    #   1.upto(result.num_rows) do |iii|
-    #     row = SQLParser.type_attributes(result.fetch_hash, result).to_a.flatten
-    #     hash[row[row.index(attribute)+1]] = row[row.index("frequency")+1]
-    #   end
-    #   return hash
-    # end
   end
   
   def self.mode(class_name, attribute, parameters={})
@@ -183,31 +180,7 @@ class Analysis
     sql = sql.chop.chop.chop.chop + ")"
     return sql
   end
-  
-  #deprecated
-  # def self.conditional(collection)
-  #   conditional = ""
-  #   if collection.single_dataset
-  #     m_ids = [collection.metadata.id]
-  #     metadatas = [collection.metadata]
-  #     conditional = " metadata_id = #{metadatas.first.id} and metadata_type = '#{metadatas.first.class.underscore.chop}' "
-  #   else
-  #     metadatas = [collection.metadatas]
-  #     rm_ids = collection.metadatas.collect{|rm| rm.id if rm.class == RestMetadata}.compact
-  #     sm_ids = collection.metadatas.collect{|sm| sm.id if sm.class == StreamMetadata}.compact
-  #     rm_conditional = rm_ids.empty? ? "" : " (metadata_type = 'rest_metadata' and ( metadata_id = '#{rm_ids.join("' or metadata_id = '")}')) "
-  #     sm_conditional = sm_ids.empty? ? "" : " (metadata_type = 'stream_metadata' and ( metadata_id = '#{sm_ids.join("' or metadata_id = '")}')) "
-  #     if rm_ids.empty?
-  #       conditional = sm_conditional
-  #     elsif sm_ids.empty?
-  #       conditional = rm_conditional
-  #     elsif !rm_ids.empty? && !sm_ids.empty?
-  #       conditional = rm_conditional+" or "+sm_conditional
-  #     end
-  #   end
-  #   return " where "+conditional
-  # end
-  
+
   def self.time_conditional(time_variable, datetime, granularity)
     case granularity
     when "hour"
@@ -222,24 +195,7 @@ class Analysis
       return "#{time_variable} >= cast('#{datetime}-01-01 00:00:00' as datetime) and #{time_variable} <= cast('#{datetime}-12-31 23:59:59' as datetime)"
     end
   end
-  
-  #deprecated
-  # def self.remove_broken_collections(collection)
-  #   if collection.scraped_collection
-  #     if collection.scrape.tweets.length == 0 && collection.scrape.users.length == 0
-  #       AnalysisMetadata.find_all({:collection_id => collection.id}).each {|x| x.destroy}
-  #       collection.metadatas.collect{|x| x.destroy}
-  #       collection.scrape.destroy
-  #       collection.destroy
-  #     end  
-  #   else
-  #     if collection.metadatas.collect{|m| m.tweets_count}.sum == 0 && collection.metadatas.collect{|m| m.tweets_count}.sum == 0
-  #       AnalysisMetadata.find_all({:collection_id => collection.id}).each {|x| x.destroy}
-  #       collection.destroy
-  #     end
-  #   end
-  # end
-  
+
   def self.hashes_to_csv(hash_array, file_name, path=$w.tmp_path)
     require 'fastercsv'
     raise "Temp Folder not declared" if $w.tmp_path.nil?

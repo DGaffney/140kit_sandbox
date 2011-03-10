@@ -1,12 +1,13 @@
 class AnalysisMetadata
   include DataMapper::Resource
   property :id,   Serial
-  property :function, String, :unique_index => [:unique_metadata]
   property :finished, Boolean, :default => false
   property :rest, Boolean, :default => false
-  property :save_path, String, :default => lambda {|am, sp| "analytical_results/"+am.function.strip.downcase}
   property :curation_id, Integer, :unique_index => [:unique_metadata]
+  property :analytical_offering_id, Integer, :unique_index => [:unique_metadata]
   belongs_to :curation, :child_key => :curation_id
+  belongs_to :analytical_offering, :child_key => :analytical_offering_id
+  has n, :analytical_offering_variables
   
   def analytical_offering_variable_descriptions
     #placeholder code - Analytical Offerings will be those files in tools, 
@@ -18,4 +19,40 @@ class AnalysisMetadata
     return []
   end
   
+  def variables
+    return analytical_offering_variables.sort{|x,y| x.position<=>y.position}
+  end
+  
+  def set_variables(curation)
+    remaining_variables = []
+    case analytical_offering.language
+    when "ruby"
+      remaining_variables = function_class.set_variables(self, self.curation)
+    end
+    return remaining_variables
+  end
+  
+  def self.set_variables(curation)
+    return []
+  end
+  
+  def verify_variable(variable_descriptor, answer, curation)
+    verification = function_class.verify_variable(self, variable_descriptor, answer, curation)
+  end
+  
+  def self.verify_variable(variable_descriptor, answer, curation)
+    return {:variable => answer}
+  end
+  
+  def language
+    return analytical_offering.language
+  end
+  
+  def function
+    return analytical_offering.function
+  end
+  
+  def function_class
+    return function.to_class
+  end
 end

@@ -250,14 +250,14 @@ module TweetStream
 
     def parser_from(parser)
       case parser
-        when Class
-          parser
-        when Symbol
-          require ENV['PWD']+"/parsers/#{parser.to_s}"
-          eval("TweetStream::Parsers::#{parser.to_s.split('_').map{|s| s.capitalize}.join('')}")
+      when Class
+        parser
+      when Symbol
+        require "tweetstream/parsers/#{parser.to_s}"
+        eval("TweetStream::Parsers::#{parser.to_s.split('_').map{|s| s.capitalize}.join('')}")
       end
     end
-    
+            
     def build_uri(path, query_parameters = {}) #:nodoc:
       URI.parse("/1/#{path}.json#{build_query_parameters(query_parameters)}")
     end

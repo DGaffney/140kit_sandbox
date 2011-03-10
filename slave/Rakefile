@@ -21,6 +21,40 @@ task :set_up do
   sh "rake db:migrate"
 end
 
+desc "Load up environment and start a console"
+task :load do
+  load_environment
+  require 'irb'
+  ARGV.clear
+  IRB.start
+end
+
+namespace :unlock do
+  desc "Unlock all locked objects"
+  task :all do 
+    load_environment
+    affected_objectss = 0
+    Lock.all.each do |l|
+      l.destroy
+      affected_objectss+=1
+    end
+    puts "Unlocked #{affected_objectss} objects"
+  end
+
+  desc "Unlock all locked auth_users"
+  task :auth_users do 
+    load_environment
+    affected_users = 0
+    Lock.all.each do |l|
+      if l.classname=="AuthUser"
+        l.destroy
+        affected_users+=1
+      end
+    end
+    puts "Unlocked #{affected_users} auth_users"
+  end
+  
+end
 namespace :curation do
   desc "Create a new curation."
   task :new do
@@ -199,6 +233,9 @@ def select_analysis_metadata(curation)
       analytical_offering = AnalyticalOffering.first(:function => answer.gsub("man ", ""))
       if analytical_offering
         puts analytical_offering.description
+        analytical_offering.variables.each do |aov|
+          puts "\t"+aov.name+": "+aov.description
+        end
       else
         puts "Sorry, something was screwy in finding that function. Try again."
       end
@@ -206,7 +243,7 @@ def select_analysis_metadata(curation)
       analytical_offering = AnalyticalOffering.first(:function => answer.gsub("add ", ""))
       if analytical_offering
         analysis_metadata = AnalysisMetadata.new
-        analysis_metadata.function = analytical_offering.function
+        analysis_metadata.analytical_offering_id = analytical_offering.id
         analysis_metadata.curation = curation
         analysis_metadata.save
         create_analysis_metadata(analysis_metadata, curation)
@@ -231,20 +268,20 @@ def select_analysis_metadata(curation)
 end
 
 def create_analysis_metadata(analysis_metadata, curation)
-  analysis_metadata.analytical_offering_variable_descriptions.each do |variable|
-    puts "Name: "+variable[:variable_name]
-    puts "Description: "+variable[:description]
-    puts "Example: "+variable[:example]
+  analysis_metadata.set_variables(curation).each do |variable|
+    puts "Name: "+variable.name
+    puts "Description: "+variable.description
+    puts "Data Type: "+variable.kind
     puts "Enter your variable now, or type 'cancel' to cancel adding this analytical process."
     answer = Sh::clean_gets
     if answer!="cancel"
-      response = analysis_metadata.verify_variable(variable[:variable_name], answer, curation)
+      response = analysis_metadata.verify_variable(variable, answer, curation)
       while !response[:reason].empty?
-        response = analysis_metadata.verify_variable(variable[:variable_name], answer, curation)
+        response = analysis_metadata.verify_variable(variable, answer, curation)
       end
       analytical_offering_variable = AnalyticalOfferingVariable.new
       analytical_offering_variable.value = response[:variable]
-      analytical_offering_variable.position = variable[:position]
+      analytical_offering_variable.analytical_offering_variable_descriptor = variable.id
       analytical_offering_variable.analysis_metadata = analysis_metadata
       analytical_offering_variable.save
     else
@@ -302,11 +339,6 @@ end
 
 def load_environment
   require 'environment'
-  require 'dm-migrations'
-  require 'dm-migrations/migration_runner'
-  db = load_settings
-  DataMapper.finalize
-  DataMapper.setup(:default, "#{db["adapter"]}://#{db["username"]}:#{db["password"]}@#{db["host"]}/#{db["database"]}")
 end
 
 

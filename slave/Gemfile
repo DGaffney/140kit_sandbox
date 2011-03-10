@@ -8,6 +8,7 @@ gem 'dm-sqlite-adapter'#, '1.1.0.rc2', :git => "git://github.com/datamapper/dm-s
 gem 'eventmachine'
 gem 'em-http-request', :require => 'em-http'
 gem 'jeweler'
+gem 'yajl-ruby'
 gem 'json'
 gem 'htmlentities'
 gem 'twitter'

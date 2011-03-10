@@ -5,6 +5,8 @@ require 'bundler/setup'
 require 'dm-core'
 require 'dm-aggregates'
 require 'dm-validations'
+require 'dm-migrations'
+require 'dm-migrations/migration_runner'
 
 require 'extensions/dm-extensions'
 require 'extensions/array'
@@ -19,6 +21,7 @@ require 'utils/sh'
 require 'models/analysis_metadata'
 require 'models/analytical_offering'
 require 'models/analytical_offering_variable'
+require 'models/analytical_offering_variable_descriptor'
 require 'models/auth_user'
 require 'models/curation'
 require 'models/dataset'
@@ -40,5 +43,16 @@ require 'eventmachine'
 require 'em-http'
 require 'json'
 require 'twitter'
+
+env = ENV["e"] || "development"
+db = YAML.load(File.read(ENV['PWD']+'/config/database.yml'))
+if !db.has_key?(env)
+  env = "development"
+end
+db = db[env]
+DataMapper.finalize
+DataMapper.setup(:default, "#{db["adapter"]}://#{db["username"]}:#{db["password"]}@#{db["host"]}/#{db["database"]}")
+
+require 'analyzer/analysis'
 
 Twit = Twitter::Client.new

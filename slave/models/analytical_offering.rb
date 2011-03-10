@@ -13,6 +13,7 @@ class AnalyticalOffering
   property :access_level, String, :index => [:unique_metadata]
   property :save_path, Text, :index => [:unique_metadata], :default => lambda {|ao, sp| "analytical_results/"+ao.function.strip.downcase}
   property :source_code_link, Text, :index => [:unique_metadata], :default => lambda {|ao, scl| Git::url_repo+ANALYTICAL_OFFERING_PATH+ao.function+AnalyticalOffering.language_extensions(ao.language)}
+  has n, :analytical_offering_variable_descriptors
   
   def self.language_extensions(language)
     languages = {
@@ -24,4 +25,7 @@ class AnalyticalOffering
     return languages[language]
   end
   
+  def variables
+    return analytical_offering_variable_descriptors.sort{|x,y| x.position<=>y.position}
+  end
 end

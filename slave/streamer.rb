@@ -101,6 +101,7 @@ class Streamer < Instance
     client.on_error { |message| puts "\nError: #{message}\n" }
     client.filter(params_for_stream) do |tweet|
       # puts tweet.inspect
+      debugger
       puts "[tweet] #{tweet[:user][:screen_name]}: #{tweet[:text]}"
       @queue << tweet
       save_queue if @queue.length >= BATCH_SIZE

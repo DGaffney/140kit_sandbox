@@ -56,6 +56,10 @@ class String
     return Object.const_defined?(self) ? Object.const_get(self) : Object.const_missing(self)
   end
   
+  def to_class
+    return self.classify.constantize
+  end
+  
   def super_strip
     #This regexp is used in place of \W to allow for # and @ signs.
      if self.include?("#") || self.include?("@")
