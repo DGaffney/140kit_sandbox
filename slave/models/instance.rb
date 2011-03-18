@@ -16,7 +16,7 @@ class Instance
   # validates_uniqueness_of :instance_id
   
   attr_accessor :metadata, :rest_allowed, :last_count_check, :tmp_path, :tmp_data, :check_in_thread
-
+  
   def initialize
     super
     connect_to_db

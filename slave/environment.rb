@@ -14,6 +14,8 @@ require 'extensions/string'
 require 'extensions/hash'
 require 'extensions/time'
 require 'extensions/date'
+require 'extensions/date_time'
+require 'extensions/inflectors'
 
 require 'utils/git'
 require 'utils/sh'
@@ -26,6 +28,7 @@ require 'models/auth_user'
 require 'models/curation'
 require 'models/dataset'
 require 'models/edge'
+require 'models/entity'
 require 'models/graph'
 require 'models/graph_point'
 require 'models/instance'
@@ -36,9 +39,10 @@ require 'models/user'
 require 'models/whitelisting'
 
 require 'utils/tweet_helper'
+require 'utils/entity_helper'
+
 require 'utils/u'
 require 'lib/tweetstream'
-
 require 'eventmachine'
 require 'em-http'
 require 'json'
@@ -56,3 +60,5 @@ DataMapper.setup(:default, "#{db["adapter"]}://#{db["username"]}:#{db["password"
 require 'analyzer/analysis'
 
 Twit = Twitter::Client.new
+
+ROOT = File.dirname(__FILE__)

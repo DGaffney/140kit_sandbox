@@ -11,7 +11,6 @@ class AnalyticalOffering
   property :enabled, Boolean, :index => [:unique_metadata], :default => true
   property :language, String, :index => [:unique_analytical_offering]
   property :access_level, String, :index => [:unique_metadata]
-  property :save_path, Text, :index => [:unique_metadata], :default => lambda {|ao, sp| "analytical_results/"+ao.function.strip.downcase}
   property :source_code_link, Text, :index => [:unique_metadata], :default => lambda {|ao, scl| Git::url_repo+ANALYTICAL_OFFERING_PATH+ao.function+AnalyticalOffering.language_extensions(ao.language)}
   has n, :analytical_offering_variable_descriptors
   

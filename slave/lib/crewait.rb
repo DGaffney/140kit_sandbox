@@ -45,22 +45,15 @@ module Crewait
   
   module BaseMethods
     
-    def table_name
-      self.to_s.gsub(/::/, '/').
-      gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
-      gsub(/([a-z\d])([A-Z])/,'\1_\2').
-      tr("-", "_").downcase.concat("s")
-    end
-    
     def next_insert_id
       # connection = ActiveRecord::Base.connection
       connection = DataMapper.repository.adapter
       database, adapter = connection.options["path"].delete('/'), connection.options["adapter"]
       sql = case adapter.downcase
       when 'postgresql'
-        "SELECT nextval('#{self.table_name}_id_seq')"
+        "SELECT nextval('#{self.storage_name}_id_seq')"
       when /mysql/
-        "SELECT auto_increment FROM information_schema.tables WHERE table_name='#{self.table_name}' AND table_schema ='#{database}'"
+        "SELECT auto_increment FROM information_schema.tables WHERE table_name='#{self.storage_name}' AND table_schema ='#{database}'"
       else
         raise "your database/adapter (#{adapter}) is not supported by crewait! want to write a patch?"
       end
@@ -85,8 +78,8 @@ module Crewait
   
   module HashMethods
     def import_to_sql(model_class, sql_method)
-      if model_class.respond_to? :table_name
-        model_class = model_class.table_name
+      if model_class.respond_to? :storage_name
+        model_class = model_class.storage_name
       end
       keys = self.keys
       values = []

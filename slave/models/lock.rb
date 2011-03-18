@@ -10,7 +10,7 @@ end
 module Locking
   module ClassMethods
     def locked(opts=:all, where="")
-      table = self.to_s.to_table
+      table = self.storage_name
       where = " AND #{where}" if !where.empty?
       sql = "SELECT id FROM `#{table}` WHERE (`#{table}`.`id` IN (SELECT `locks`.`with_id` FROM `locks` WHERE `locks`.`classname` = '#{self.to_s}')#{where})"
       sql += " ORDER BY id DESC LIMIT 1" if opts == :last
@@ -21,7 +21,7 @@ module Locking
     end
   
     def unlocked(opts=:all, where="")
-      table = self.to_s.to_table
+      table = self.storage_name
       where = " AND #{where}" if !where.empty?
       sql = "SELECT id FROM `#{table}` WHERE (`#{table}`.`id` NOT IN (SELECT `locks`.`with_id` FROM `locks` WHERE `locks`.`classname` = '#{self.to_s}')#{where})"
       sql += " ORDER BY id DESC LIMIT 1" if opts == :last

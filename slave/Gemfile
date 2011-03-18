@@ -1,16 +1,22 @@
-source 'http://rubygems.org'
-gem 'dm-core'#, '1.1.0.rc2', :git => "git://github.com/datamapper/dm-core.git"
-gem 'dm-aggregates'#, '1.1.0.rc2', :git => "git://github.com/datamapper/dm-aggregates.git"
-gem 'dm-migrations'#, '1.1.0.rc2', :git => "git://github.com/datamapper/dm-migrations.git"
-gem 'dm-validations'#, '1.1.0.rc2', :git => "git://github.com/datamapper/dm-validations.git"
-gem 'dm-mysql-adapter'#, '1.1.0.rc2', :git => "git://github.com/datamapper/dm-mysql-adapter.git"
-gem 'dm-sqlite-adapter'#, '1.1.0.rc2', :git => "git://github.com/datamapper/dm-sqlite-adapter.git"
-gem 'eventmachine'
-gem 'em-http-request', :require => 'em-http'
-gem 'jeweler'
-gem 'yajl-ruby'
-gem 'json'
-gem 'htmlentities'
-gem 'twitter'
-gem 'tweetstream'
-gem 'rdebug'
+group :core do
+  source 'http://rubygems.org'
+  gem 'dm-core'#, '1.1.0.rc2', :git => "git://github.com/datamapper/dm-core.git"
+  gem 'dm-aggregates'#, '1.1.0.rc2', :git => "git://github.com/datamapper/dm-aggregates.git"
+  gem 'dm-migrations'#, '1.1.0.rc2', :git => "git://github.com/datamapper/dm-migrations.git"
+  gem 'dm-validations'#, '1.1.0.rc2', :git => "git://github.com/datamapper/dm-validations.git"
+  gem 'dm-mysql-adapter'#, '1.1.0.rc2', :git => "git://github.com/datamapper/dm-mysql-adapter.git"
+  gem 'dm-sqlite-adapter'#, '1.1.0.rc2', :git => "git://github.com/datamapper/dm-sqlite-adapter.git"
+  gem 'eventmachine'
+  gem 'em-http-request', :require => 'em-http'
+  gem 'jeweler'
+  gem 'yajl-ruby'
+  gem 'json'
+  gem 'htmlentities'
+  gem 'twitter'
+  gem 'tweetstream'
+  gem 'rdebug'
+end
+
+group :raw_csv do
+  gem 'fastercsv'
+end

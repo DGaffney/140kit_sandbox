@@ -29,6 +29,7 @@ class Streamer < Instance
     check_in
     assign_user_account
     puts "Entering stream routine."
+    $instance = self
     loop do
       if !killed?
         stream_routine
@@ -62,9 +63,8 @@ class Streamer < Instance
         @password = user.password
         puts "Assigned #{@username}."
       else
-        puts "No twitter accounts available. Add one now? (y/n)" if message
-        answer = Sh::clean_gets
-        if answer=="y"
+        answer = Sh::clean_gets_yes_no("No twitter accounts available. Add one now?") if message
+        if answer
           first_attempt = true
           while answer!="y" || first_attempt
             first_attempt = false
@@ -100,8 +100,6 @@ class Streamer < Instance
     client.on_limit { |skip_count| puts "\nWe are being rate limited! We lost #{skip_count} tweets!\n" }
     client.on_error { |message| puts "\nError: #{message}\n" }
     client.filter(params_for_stream) do |tweet|
-      # puts tweet.inspect
-      debugger
       puts "[tweet] #{tweet[:user][:screen_name]}: #{tweet[:text]}"
       @queue << tweet
       save_queue if @queue.length >= BATCH_SIZE
@@ -118,24 +116,26 @@ class Streamer < Instance
   def save_queue
     if !@queue.empty?
       puts "Saving #{@queue.length} tweets."
-      tweets, users = tweets_and_users_from_queue
+      tweets, users, entities = tweets_and_users_and_entities_from_queue
       @queue = []
-      Thread.new { Tweet.save_all(tweets); User.save_all(users) }
+      Thread.new { Tweet.save_all(tweets); User.save_all(users); Entity.save_all(entities) }
     end
   end
   
-  def tweets_and_users_from_queue
+  def tweets_and_users_and_entities_from_queue
     tweets = []
     users = []
+    entities = []
     @queue.each do |json|
       tweet, user = TweetHelper.prepped_tweet_and_user(json)
       dataset_id = {:dataset_id => determine_dataset(json)}
       tweets << tweet.merge(dataset_id)
       users << user.merge(dataset_id)
+      entities = entities+EntityHelper.prepped_entities(json).collect{|entity| entity.merge(dataset_id)}
     end
     tweets.uniq! {|t| t[:twitter_id] }
     users.uniq! {|u| u[:twitter_id] }
-    return tweets, users
+    return tweets, users, entities
   end
   
   def update_params
@@ -247,7 +247,7 @@ class Streamer < Instance
     refresh_datasets
     datasets_to_be_started = @datasets.select {|d| d.start_time.nil? }
     # Dataset.update_all({:start_time => DateTime.now.in_time_zone}, {:id => datasets_to_be_started.collect {|d| d.id}})
-    Dataset.all(:id => datasets_to_be_started.collect {|d| d.id}).update(:start_time => DateTime.now)
+    Dataset.all(:id => datasets_to_be_started.collect {|d| d.id}).update(:start_time => Time.now)
     refresh_datasets
   end
 

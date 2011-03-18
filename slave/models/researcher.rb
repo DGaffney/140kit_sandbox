@@ -5,15 +5,15 @@ class Researcher
   property :email, Text, :default => "user@localhost.com"
   property :reset_code, String
   property :role, String, :default => "Admin"
-  property :join_date, DateTime
-  property :last_login, DateTime
-  property :last_access, DateTime
+  property :join_date, Time
+  property :last_login, Time
+  property :last_access, Time
   property :info, Text, :default => "I like to study the internet"
   property :website_url, Text, :default => "http://140kit.com/"
   property :location, String, :default => "The Internet"
   property :salt, String
   property :remember_token, String
-  property :remember_token_expires_at, DateTime
+  property :remember_token_expires_at, Time
   property :crypted_password, String
   property :share_email, Boolean, :default => false
   property :private_data, Boolean, :default => false

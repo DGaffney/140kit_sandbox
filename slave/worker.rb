@@ -28,6 +28,7 @@ class Worker < Instance
     puts "Working..."
     check_in
     puts "Entering work routine."
+    $instance = self
     loop do
       if !killed?
         work_routine
@@ -57,8 +58,8 @@ class Worker < Instance
   
   def final_counts
     for dataset in @curation.datasets
-      dataset.tweets_count = Tweet.count(:dataset_id => dataset.id) if dataset.tweets_count.nil?
-      dataset.users_count = User.count(:dataset_id => dataset.id) if dataset.users_count.nil?
+      dataset.tweets_count = Tweet.count(:dataset_id => dataset.id) if dataset.tweets_count.nil? || dataset.tweets_count==0
+      dataset.users_count = User.count(:dataset_id => dataset.id) if dataset.users_count.nil? || dataset.users_count==0
       dataset.save
     end
   end
@@ -105,9 +106,12 @@ class Worker < Instance
   end
   
   def route(metadata)
-    puts "#{metadata.function}(#{metadata.curation_id}, \"#{metadata.save_path}\")"
-    puts "\n\n\nI GOT METADATA #{metadata.id}!!! #{metadata.inspect}\n\n\n"
-    sleep(3)
+    case metadata.language
+    when "ruby"
+      metadata.function.classify.constantize.run(*metadata.run_vars)
+    else 
+      raise "Language #{metadata.language} is not currently supported for analytical routing!"
+    end
   end
   
   ###

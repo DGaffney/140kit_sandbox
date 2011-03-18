@@ -55,8 +55,32 @@ class TweetHelper
       else
         tweet[k] = v if @@allowed_tweet_fields.include?(k)
       end
+      tweet[:user_id] = json[:user][:id]
+      tweet[:lat], tweet[:lon] = self.derive_lat_lon(json)
+      tweet[:in_reply_to_status_id] = self.derive_in_reply_to_status_id(json)
     end
     return tweet
+  end
+  
+  def self.derive_lat_lon(json)
+    lat = nil
+    lon = nil
+    lat = json[:geo]&&json[:geo][:coordinates]&&json[:geo][:coordinates].class==Array&&json[:geo][:coordinates].length==2&&json[:geo][:coordinates].first ||
+    json[:place]&&json[:place][:bounding_box]&&json[:place][:bounding_box][:coordinates]&&json[:place][:bounding_box][:coordinates].centroid.first ||
+    json[:coordinates]&&json[:coordinates][:coordinates].first ||
+    nil
+    lon = json[:geo]&&json[:geo][:coordinates]&&json[:geo][:coordinates].class==Array&&json[:geo][:coordinates].length==2&&json[:geo][:coordinates].last ||
+    json[:place]&&json[:place][:bounding_box]&&json[:place][:bounding_box][:coordinates]&&json[:place][:bounding_box][:coordinates].centroid.last ||
+    json[:coordinates]&&json[:coordinates][:coordinates].last ||
+    nil
+    return lat, lon
+  end
+  
+  def self.derive_in_reply_to_status_id(json)
+    in_reply_to_status_id = nil
+    in_reply_to_status_id = json[:in_repy_to_status_id] ||
+    json[:retweeted_status]&&json[:retweeted_status][:id]
+    return in_reply_to_status_id
   end
   
   def self.prep_user(json)

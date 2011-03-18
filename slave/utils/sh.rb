@@ -25,4 +25,8 @@ module Sh
     end
     return answer=="y"
   end
+  
+  def self.mkdirs(folder_location)
+    folder_location.split("/").repack{|dir| Sh::sh("mkdir #{dir.join("/")}")}
+  end
 end

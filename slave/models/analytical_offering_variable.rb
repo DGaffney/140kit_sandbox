@@ -2,8 +2,8 @@ class AnalyticalOfferingVariable
   include DataMapper::Resource
   property :id, Serial, :serial => true
   property :value, Object
-  property :analytical_offering_variable_descriptor, Integer
   property :analysis_metadata_id, Integer, :unique_index => [:unique_analytical_offering_variable]
+  property :analytical_offering_variable_descriptor_id, Integer, :unique_index => [:unique_analytical_offering_variable]
   belongs_to :analysis_metadata, :child_key => :analysis_metadata_id
   belongs_to :analytical_offering_variable_descriptor, :child_key => :analytical_offering_variable_descriptor_id
 

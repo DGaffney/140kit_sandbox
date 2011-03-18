@@ -3,21 +3,22 @@ class GenderEstimation < AnalysisMetadata
     remaining_variables = []
     analysis_metadata.analytical_offering.variables.each do |variable|
       analytical_offering_variable = AnalyticalOfferingVariable.new
-      analytical_offering_variable.analytical_offering_variable_descriptor = variable.id
+      analytical_offering_variable.analytical_offering_variable_descriptor_id = variable.id
       analytical_offering_variable.analysis_metadata_id = analysis_metadata.id
       case variable.name
       when "curation_id"
         analytical_offering_variable.value = curation.id
-        analysis_metadata.analytical_offering_variables
+        analytical_offering_variable.save
       when "save_path"
         analytical_offering_variable.value = "analytical_results/#{analysis_metadata.function}"
-        analysis_metadata.analytical_offering_variables
+        analytical_offering_variable.save
       else
         remaining_variables << variable
       end
     end
     return remaining_variables
   end
+
   
   def self.run(collection_id, save_path)
     collection = Collection.find({:id => collection_id})

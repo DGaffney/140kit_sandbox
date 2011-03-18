@@ -2,10 +2,10 @@ class Dataset
   include DataMapper::Resource
   property :id, Serial
   property :scrape_type, String, :index => [:scrape_type]
-  property :start_time, DateTime
+  property :start_time, Time
   property :length, Integer
-  property :created_at, DateTime
-  property :updated_at, DateTime
+  property :created_at, Time
+  property :updated_at, Time
   property :scrape_finished, Boolean, :default => false
   property :instance_id, String, :index => [:instance_id]
   property :params, String
@@ -48,7 +48,7 @@ class Dataset
       response[:reason] = "Latitudes are out of range (max 90 degrees)" if boundings[0].abs>90 || boundings[2].abs>90
       response[:reason] = "Longitudes are out of range (max 180 degrees)" if boundings[1].abs>180 || boundings[3].abs>180
       break if !response[:reason].empty?
-      response[:clean_params] = boundings
+      response[:clean_params] = boundings.join(",")
     end
     return response
   end

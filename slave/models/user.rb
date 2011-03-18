@@ -1,7 +1,7 @@
 class User
   include DataMapper::Resource
   property :id, Serial
-  property :twitter_id, Integer, :index => [:twitter_id_dataset, :twitter_id], :unique_index => [:unique_user]
+  property :twitter_id, Integer, :index => [:twitter_id_dataset, :twitter_id], :unique_index => [:unique_user], :min => 0, :max => 2**64-1
   property :name, String, :index => [:name]
   property :screen_name, String, :index => [:screen_name]
   property :location, Text, :index => [:location_dataset, :location]
@@ -16,7 +16,7 @@ class User
   property :profile_sidebar_fill_color, String, :index => [:profile_sidebar_fill_color_dataset, :profile_sidebar_fill_color]
   property :profile_sidebar_border_color, String, :index => [:profile_sidebar_border_color_dataset, :profile_sidebar_border_color]
   property :friends_count, Integer, :index => [:friends_count_dataset, :friends_count]
-  property :created_at, DateTime, :index => [:created_at_dataset, :created_at]
+  property :created_at, Time, :index => [:created_at_dataset, :created_at]
   property :favourites_count, Integer, :index => [:favorites_count_dataset, :favorites_count]
   property :utc_offset, Integer, :index => [:utc_offset_dataset, :utc_offset]
   property :time_zone, String, :index => [:time_zone_dataset, :time_zone]

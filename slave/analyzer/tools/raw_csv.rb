@@ -3,15 +3,15 @@ class RawCsv < AnalysisMetadata
     remaining_variables = []
     analysis_metadata.analytical_offering.variables.each do |variable|
       analytical_offering_variable = AnalyticalOfferingVariable.new
-      analytical_offering_variable.analytical_offering_variable_descriptor = variable.id
+      analytical_offering_variable.analytical_offering_variable_descriptor_id = variable.id
       analytical_offering_variable.analysis_metadata_id = analysis_metadata.id
       case variable.name
       when "curation_id"
         analytical_offering_variable.value = curation.id
-        analysis_metadata.analytical_offering_variables
+        analytical_offering_variable.save
       when "save_path"
         analytical_offering_variable.value = "analytical_results/#{analysis_metadata.function}"
-        analysis_metadata.analytical_offering_variables
+        analytical_offering_variable.save
       else
         remaining_variables << variable
       end
@@ -20,10 +20,10 @@ class RawCsv < AnalysisMetadata
   end
   
   def self.run(curation_id, save_path)
-    require 'fastercsv'
-    curation = Curation.find({:id => curation_id})
+    debugger
+    curation = Curation.first({:id => curation_id})
     FilePathing.tmp_folder(curation)
-    tweet_query = "select screen_name,location,language,lat,in_reply_to_status_id,created_at,lon,in_reply_to_user_id,text,source,favorited,twitter_id,truncated,user_id,in_reply_to_screen_name from tweets "+Analysis.conditional(curation)
+    tweet_query = "select screen_name,location,language,lat,in_reply_to_status_id,created_at,lon,in_reply_to_user_id,text,source,twitter_id,truncated,user_id,in_reply_to_screen_name from tweets "+Analysis.conditional(curation)
     user_query = "select profile_background_image_url,screen_name,location,profile_image_url,utc_offset,contributors_enabled,profile_sidebar_fill_color,url,profile_background_tile,profile_sidebar_border_color,created_at,followers_count,notifications,friends_count,protected,description,geo_enabled,profile_background_color,twitter_id,favourites_count,following,profile_text_color,verified,name,lang,time_zone,statuses_count,profile_link_color from users "+Analysis.conditional(curation)
     FilePathing.file_init("tweets.csv")
     spool_dataset_to_csv(tweet_query, "tweets.csv")
@@ -35,8 +35,8 @@ class RawCsv < AnalysisMetadata
     # send_email(recipient, subject, message_content, collection)
   end
 
-  def self.spool_dataset_to_csv(query, filename, path=$w.tmp_path)
-    objects = Database.spooled_result(query)
+  def self.spool_dataset_to_csv(query, filename, path=$instance.tmp_path)
+    objects = DataMapper.repository(:default).adapter.select(query)
     first_result = objects.fetch_hash
     keys, values = first_result.keys, first_result.values
     num = 1

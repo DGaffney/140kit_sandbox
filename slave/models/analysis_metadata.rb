@@ -9,6 +9,13 @@ class AnalysisMetadata
   belongs_to :analytical_offering, :child_key => :analytical_offering_id
   has n, :analytical_offering_variables
   
+  def method_missing(method_name, *args)
+    if variables.include?(method_name)
+    else
+      super
+    end
+  end
+
   def analytical_offering_variable_descriptions
     #placeholder code - Analytical Offerings will be those files in tools, 
     #which will be subclasses of AnalyticalOffering. Each of these can define this array, which 
@@ -19,6 +26,9 @@ class AnalysisMetadata
     return []
   end
   
+  def run_vars
+    return variables.collect{|v| v.value.inspect}
+  end
   def variables
     return analytical_offering_variables.sort{|x,y| x.position<=>y.position}
   end
