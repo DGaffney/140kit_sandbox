@@ -10,8 +10,8 @@ rescue LoadError
   puts 'Jeweler (or a dependency) not available. Install it with: gem install jeweler'
 end
 
-require "spec/rake/spectask"
-Spec::Rake::SpecTask.new
+#require "spec/rake/spectask"
+#Spec::Rake::SpecTask.new
 
 Rake.application.init('server')
 
@@ -90,14 +90,13 @@ namespace :researchers do
   end
 end
 namespace :db do
-  require 'utils/sh'
+  require File.dirname(__FILE__)+'/utils/sh'
   
   desc "Migrate the database up from current location to either \n specified migration or to latest"
   task :migrate do
     load_environment
     answer = Sh::clean_gets_yes_no("Warning! A migrate will drop all current tables, and refresh the system. It is good to do this on first run, \n or if something horrible has happened. Otherwise, please, for your own sake, run `rake db:export` before doing this.\n That said, do you want to continue?")
     if answer
-      load_environment
       DataMapper.auto_migrate!
     end
   end
@@ -338,7 +337,7 @@ def load_settings
 end
 
 def load_environment
-  require 'environment'
+  require File.dirname(__FILE__)+'/environment'
 end
 
 

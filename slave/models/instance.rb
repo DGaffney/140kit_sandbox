@@ -1,5 +1,5 @@
-require 'models/whitelisting'
-require 'models/lock'
+require File.dirname(__FILE__)+'/whitelisting'
+require File.dirname(__FILE__)+'/lock'
 # require 'YAML'
 
 class Instance
