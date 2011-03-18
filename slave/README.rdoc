@@ -11,3 +11,20 @@ To user this code, cd to the slave directory, and run the following commands to 
   bundle install
   
 Then, you'll need to create a mysql table - unfortunately we can't do that automagically.
+
+After making the table, update your config/database.yml to reflect that. 
+
+run these rake commands:
+rake
+rake db:migrate
+rake db:seed
+rake curation:new
+
+
+After following the prompts therein, continue on by running a streaming instance to collect tweets for you:
+
+ruby streamer.rb
+
+And after that process is complete, start up a worker to analyze the data:
+
+ruby worker.rb
