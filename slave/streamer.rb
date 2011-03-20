@@ -1,4 +1,4 @@
-require 'environment'
+require './environment'
 class Streamer < Instance
 
   MAX_TRACK_IDS = 10000

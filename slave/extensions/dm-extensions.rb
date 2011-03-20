@@ -1,6 +1,6 @@
 require 'rubygems'
 require 'dm-core'
-require 'extensions/array'
+require './extensions/array'
 
 module DataMapperExtensions
   

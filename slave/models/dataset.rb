@@ -26,7 +26,7 @@ class Dataset < Model
       term = params
       response[:reason] = "The term must contain one letter or number" if term.scan(/\w/).flatten.empty?
       response[:reason] = "The term can't be empty" if term.scan(/\w/).flatten.empty?
-      break if !response[:reason].empty?
+      #break if !response[:reason].empty?
       response[:clean_params] = term
     when "follow"
       users = params.split(",")
@@ -47,7 +47,7 @@ class Dataset < Model
       response[:reason] = "Longitudes cover more than one degree of area" if (boundings[1]-boundings[3]).abs>1
       response[:reason] = "Latitudes are out of range (max 90 degrees)" if boundings[0].abs>90 || boundings[2].abs>90
       response[:reason] = "Longitudes are out of range (max 180 degrees)" if boundings[1].abs>180 || boundings[3].abs>180
-      break if !response[:reason].empty?
+      #break if !response[:reason].empty?
       response[:clean_params] = boundings.join(",")
     end
     return response
