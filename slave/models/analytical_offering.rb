@@ -1,4 +1,4 @@
-class AnalyticalOffering
+class AnalyticalOffering < Model
   ANALYTICAL_OFFERING_PATH = "analyzer/tools/"
   include DataMapper::Resource
   property :id, Serial

@@ -23,11 +23,12 @@ class RawCsv < AnalysisMetadata
     debugger
     curation = Curation.first({:id => curation_id})
     FilePathing.tmp_folder(curation)
-    tweet_query = "select screen_name,location,language,lat,in_reply_to_status_id,created_at,lon,in_reply_to_user_id,text,source,twitter_id,truncated,user_id,in_reply_to_screen_name from tweets "+Analysis.conditional(curation)
-    user_query = "select profile_background_image_url,screen_name,location,profile_image_url,utc_offset,contributors_enabled,profile_sidebar_fill_color,url,profile_background_tile,profile_sidebar_border_color,created_at,followers_count,notifications,friends_count,protected,description,geo_enabled,profile_background_color,twitter_id,favourites_count,following,profile_text_color,verified,name,lang,time_zone,statuses_count,profile_link_color from users "+Analysis.conditional(curation)
+    conditional = Analysis.conditional(curation)
+    tweet_select = ["screen_name", "location", "language", "lat", "in_reply_to_status_id", "created_at", "lon", "in_reply_to_user_id", "text", "source", "twitter_id", "truncated", "user_id", "in_reply_to_screen_name"]
+    user_select = ["profile_background_image_url", "screen_name", "location", "profile_image_url", "utc_offset", "contributors_enabled", "profile_sidebar_fill_color", "url", "profile_background_tile", "profile_sidebar_border_color", "created_at", "followers_count", "notifications", "friends_count", "protected", "description", "geo_enabled", "profile_background_color", "twitter_id", "favourites_count", "following", "profile_text_color", "verified", "name", "lang", "time_zone", "statuses_count", "profile_link_color"]
     FilePathing.file_init("tweets.csv")
-    spool_dataset_to_csv(tweet_query, "tweets.csv")
-    spool_dataset_to_csv(user_query, "users.csv")
+    spool_dataset_to_csv(Tweet.all(conditional), "tweets.csv")
+    spool_dataset_to_csv(User, user_query, "users.csv")
     FilePathing.push_tmp_folder(save_path)
     # recipient = collection.researcher.email
     # subject = "#{collection.researcher.user_name}, your raw CSV data for the #{collection.name} data set is complete."
@@ -35,20 +36,33 @@ class RawCsv < AnalysisMetadata
     # send_email(recipient, subject, message_content, collection)
   end
 
-  def self.spool_dataset_to_csv(query, filename, path=$instance.tmp_path)
-    objects = DataMapper.repository(:default).adapter.select(query)
-    first_result = objects.fetch_hash
-    keys, values = first_result.keys, first_result.values
-    num = 1
-    FasterCSV.open(path+filename, "w") do |csv|
-      csv << keys
-      csv << values
-      while row = objects.fetch_hash do
-        num+=1
-        csv << keys.collect{|key| row[key].to_s}
+  def self.spool_dataset_to_csv(dataset, filename, path=$instance.tmp_path)
+    first = true
+    keys = nil
+    if dataset.class==DataMapper::ChunkedQuery::Chunks #should be more like if dataset.chunked?
+      dataset.each do |chunk|
+        FasterCSV.open(path+filename, "w") do |csv|
+          if first
+            keys = chunk.first.attributes.keys.collect{|k| k.to_s}
+            csv << keys
+            first = false
+          end
+          chunk.each do |row|
+            csv << keys.collect{|key| row.attributes[key.to_sym].to_s}
+          end
+        end
       end
-      objects.free
+    else
+      dataset.each do |row|
+        FasterCSV.open(path+filename, "w") do |csv|
+          if first
+            keys = row.attributes.keys.collect{|k| k.to_s}
+            csv << keys
+            first = false
+          end
+          csv << keys.collect{|key| row.attributes[key.to_sym].to_s}
+        end
+      end
     end
-    Database.terminate_spooling
   end
 end

@@ -1,4 +1,4 @@
-class Curation
+class Curation < Model
   include DataMapper::Resource
   property :id, Serial
   property :name, String, :unique_index => [:unique_curation]

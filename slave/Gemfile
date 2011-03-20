@@ -6,6 +6,7 @@ group :core do
   gem 'dm-validations'#, '1.1.0.rc2', :git => "git://github.com/datamapper/dm-validations.git"
   gem 'dm-mysql-adapter'#, '1.1.0.rc2', :git => "git://github.com/datamapper/dm-mysql-adapter.git"
   gem 'dm-sqlite-adapter'#, '1.1.0.rc2', :git => "git://github.com/datamapper/dm-sqlite-adapter.git"
+  gem 'dm-chunked_query'
   gem 'eventmachine'
   gem 'em-http-request', :require => 'em-http'
   gem 'jeweler'

@@ -1,4 +1,4 @@
-class Whitelisting
+class Whitelisting < Model
   include DataMapper::Resource
   property :id, Serial
   property :hostname, String, :key => true, :unique_index => [:unique_whitelisting], :default => Sh::hostname

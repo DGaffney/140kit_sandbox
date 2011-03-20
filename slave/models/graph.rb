@@ -1,4 +1,4 @@
-class Graph
+class Graph < Model
   include DataMapper::Resource
   property :id, Serial
   property :title, String, :unique_index => [:unique_graph], :index => [:title_graph]

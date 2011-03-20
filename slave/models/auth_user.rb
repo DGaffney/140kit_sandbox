@@ -1,4 +1,4 @@
-class AuthUser
+class AuthUser < Model
   include DataMapper::Resource
   property :id, Serial
   property :user_name, String, :unique_index => [:unique_auth_user]

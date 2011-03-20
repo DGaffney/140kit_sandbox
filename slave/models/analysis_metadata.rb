@@ -1,4 +1,4 @@
-class AnalysisMetadata
+class AnalysisMetadata < Model
   include DataMapper::Resource
   property :id,   Serial
   property :finished, Boolean, :default => false

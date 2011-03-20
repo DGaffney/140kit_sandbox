@@ -1,4 +1,4 @@
-class GraphPoint
+class GraphPoint < Model
   include DataMapper::Resource
   property :id, Serial
   property :label, String, :unique_index => [:unique_graph_point], :index => [:label_value_graph_id, :label_value, :label_curation_id, :label_graph_id_curation_id]

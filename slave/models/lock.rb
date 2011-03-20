@@ -1,4 +1,4 @@
-class Lock
+class Lock < Model
   include DataMapper::Resource
   property :id, Serial
   property :classname, String, :index => [:unique_metadata]

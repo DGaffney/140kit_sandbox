@@ -1,4 +1,4 @@
-class Dataset
+class Dataset < Model
   include DataMapper::Resource
   property :id, Serial
   property :scrape_type, String, :index => [:scrape_type]

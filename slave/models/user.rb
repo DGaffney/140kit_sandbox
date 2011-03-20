@@ -1,4 +1,4 @@
-class User
+class User < Model
   include DataMapper::Resource
   property :id, Serial
   property :twitter_id, Integer, :index => [:twitter_id_dataset, :twitter_id], :unique_index => [:unique_user], :min => 0, :max => 2**64-1

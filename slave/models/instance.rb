@@ -2,7 +2,7 @@ require 'models/whitelisting'
 require 'models/lock'
 # require 'YAML'
 
-class Instance
+class Instance < Model
   include DataMapper::Resource
   property :id,             Serial
   property :instance_id,    String, :length => 40

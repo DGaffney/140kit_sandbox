@@ -7,6 +7,9 @@ GEM
       addressable (~> 2.1)
     dm-aggregates (1.0.2)
       dm-core (~> 1.0.2)
+    dm-chunked_query (0.1.2)
+      dm-aggregates (~> 1.0)
+      dm-core (~> 1.0)
     dm-core (1.0.2)
       addressable (~> 2.2)
       extlib (~> 0.9.15)
@@ -77,6 +80,7 @@ PLATFORMS
 
 DEPENDENCIES
   dm-aggregates
+  dm-chunked_query
   dm-core
   dm-migrations
   dm-mysql-adapter
