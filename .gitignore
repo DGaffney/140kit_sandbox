@@ -5,6 +5,7 @@
 *.sqlite
 *.sql
 
+slave/config/database.yml
 api/script/*
 front-end/public/images/0000/*
 front-end/public/files/source_data/*
