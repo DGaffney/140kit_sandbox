@@ -25,8 +25,21 @@ module Sh
     end
     return answer=="y"
   end
-  
-  def self.mkdirs(folder_location)
-    folder_location.split("/").repack{|dir| Sh::sh("mkdir #{dir.join("/")}")}
+
+  def self.mkdir(folder_location)
+    Sh::sh("mkdir -p #{folder_location}")
+    # start_position = if folder_location.split("").first == "/"
+    #   "/"
+    # elsif folder_location.split("").first == "../"
+    # folder_location.split("/").select{|d| !d.blank?}.repack do |dir| 
+    #   begin
+    #   directory_name = dir.join("/")
+    #   if FileTest::directory?(directory_name)
+    #   return
+    #   end
+    #   Dir::mkdir(directory_name)
+    #   end      
+    # end
   end
 end
+

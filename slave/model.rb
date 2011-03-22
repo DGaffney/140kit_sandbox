@@ -1,5 +1,5 @@
 class Model
-  def self.blah
-    puts "woo"
+  def self.underscore
+    return self.to_s.underscore
   end
 end

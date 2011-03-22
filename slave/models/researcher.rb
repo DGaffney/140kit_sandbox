@@ -21,8 +21,6 @@ class Researcher < Model
   property :rate_limited, Boolean, :default => false
   attr_accessor :password
   
-  require 'digest/sha1'
-  
   def self.authenticate(user_name, password)
     u = find_by_user_name(user_name) # need to get the salt
     u && u.authenticated?(password) ? u : nil

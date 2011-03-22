@@ -1,22 +1,21 @@
 class FilePathing
   def self.tmp_folder(curation, sub_folder="")
-    $instance.tmp_path = ROOT+"/tmp_files/#{$instance.instance_id}/#{curation.folder_name}/#{sub_folder}"
-    Sh::mkdirs($instance.tmp_path)
-    return $instance.tmp_path.gsub(/\/+/, "/")
+    ENV['TMP_PATH'] = DIR+"/tmp_files/#{ENV['INSTANCE_ID']}/#{curation.folder_name}/#{sub_folder}"
+    Sh::mkdir(ENV['TMP_PATH'])
+    return ENV['TMP_PATH'].gsub(/\/+/, "/")
   end
 
   def self.mysqldump(model, conditional)
-    `mysqldump -h #{Environment.host} -u #{Environment.username} --password='#{Environment.password}' --databases #{Environment.database} --tables #{model} --where='#{conditional}' > #{$instance.tmp_path}/#{model}.sql`
+    `mysqldump -h #{Environment.host} -u #{Environment.username} --password='#{Environment.password}' --databases #{Environment.database} --tables #{model} --where='#{conditional}' > #{ENV['TMP_PATH']}/#{model}.sql`
   end
 
-  def self.push_tmp_folder(sub_dir, folder=$instance.tmp_path)
+  def self.push_tmp_folder(sub_dir, folder=ENV['TMP_PATH'])
     raise "Can't navigate below Environment.storage path of #{Environment.storage_path} with sub_dir" if sub_dir.include?("..")
     folder = folder.chop if folder.split("").last == "/"
     sub_dir = sub_dir.chop if sub_dir.split("").last == "/"
     parent_dir, direct_dir = FilePathing.resolve_path_zip_name(folder)
     `cd #{parent_dir};zip -r -9 #{direct_dir} #{direct_dir}`
-    final_path = "#{Environment.storage_path}/#{sub_dir}/".gsub("//", "/")
-    Sh::mkdir.make_directories(sub_dir)
+    final_path = "#{STORAGE['path']}/#{sub_dir}/".gsub("//", "/")
     FilePathing.submit_file(folder+".zip", final_path)
     FilePathing.remove_folder(parent_dir)
   end
@@ -26,9 +25,10 @@ class FilePathing
     sent = false
     exception_message = ""
     attempt = ""
-    case Environment.storage_type
+    case STORAGE['type']
     when "local"
-      attempt = "mv #{folder} ../../#{final_path}"
+      Sh::mkdir("../"+final_path)
+      attempt = "mv #{folder} ../#{final_path}"
       exception_message = "mkdir for #{attempt} failed after #{attempts+1} tries."
     when "remote"
       #This check actually fails since return of rsync message is ALWAYS empty string?
@@ -58,11 +58,11 @@ class FilePathing
     return parent_dir, direct_dir
   end
   
-  def self.file_init(file_name, path=$instance.tmp_path)
-    `rm -r #{ROOT+path+file_name}`
+  def self.file_init(file_name, path=ENV['TMP_PATH'])
+    `rm -r #{DIR+path+"/"+file_name}`
   end
   
-  def self.line_count(file_name, path=$instance.tmp_path)
+  def self.line_count(file_name, path=ENV['TMP_PATH'])
     f = File.open(path+file_name)
     count = f.lines.count
     f.close

@@ -1,18 +1,26 @@
 #note: Changing the order of some of these requires may screw things up. 
 #Don't do it if you're not sure.
+
 require 'rubygems'
 require 'bundler/setup'
+require 'digest/sha1'
 require 'dm-core'
 require 'dm-aggregates'
 require 'dm-validations'
 require 'dm-migrations'
 require 'dm-migrations/migration_runner'
+require 'dm-chunked_query'
 require 'eventmachine'
 require 'em-http'
 require 'json'
 require 'twitter'
 
-DIR = File.dirname(__FILE__)
+DIR = Dir::pwd
+ENV['HOSTNAME'] = Sh::hostname
+ENV['PID'] = Process.pid.to_s #because ENV only allows strings.
+ENV['INSTANCE_ID'] = Digest::SHA1.hexdigest("#{ENV['HOSTNAME']}#{ENV['PID']}")
+ENV['TMP_PATH'] = DIR+"/tmp_files/#{ENV['INSTANCE_ID']}/scratch_processes"
+
 
 require DIR+'/extensions/dm-extensions'
 require DIR+'/extensions/array'
@@ -53,16 +61,20 @@ require DIR+'/utils/u'
 require DIR+'/lib/tweetstream'
 
 env = ENV["e"] || "development"
-db = YAML.load(File.read(ENV['PWD']+'/config/database.yml'))
-if !db.has_key?(env)
+database = YAML.load(File.read(ENV['PWD']+'/config/database.yml'))
+if !database.has_key?(env)
   env = "development"
 end
-db = db[env]
+database = database[env]
 DataMapper.finalize
-DataMapper.setup(:default, "#{db["adapter"]}://#{db["username"]}:#{db["password"]}@#{db["host"]}/#{db["database"]}")
+DataMapper.setup(:default, "#{database["adapter"]}://#{database["username"]}:#{database["password"]}@#{database["host"]}/#{database["database"]}")
+
+storage = YAML.load(File.read(ENV['PWD']+'/config/storage.yml'))
+if !storage.has_key?(env)
+  env = "development"
+end
+STORAGE = storage[env]
 
 require DIR+'/analyzer/analysis'
 
 Twit = Twitter::Client.new
-
-ROOT = DIR

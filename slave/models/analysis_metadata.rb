@@ -65,4 +65,9 @@ class AnalysisMetadata < Model
   def function_class
     return function.to_class
   end
+  
+  def self.push_tmp_folder(folder_name, folder=ENV['TMP_PATH'])
+    folder = (folder+"/"+self.underscore.chop).gsub("//", "/")
+    FilePathing.push_tmp_folder(folder_name, folder)
+  end
 end

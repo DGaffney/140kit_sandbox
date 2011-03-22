@@ -28,7 +28,7 @@ class Worker < Instance
     puts "Working..."
     check_in
     puts "Entering work routine."
-    $instance = self
+    ENV['INSTANCE'] = self
     loop do
       if !killed?
         work_routine
@@ -108,6 +108,7 @@ class Worker < Instance
   def route(metadata)
     case metadata.language
     when "ruby"
+      Analysis::Dependencies.send(metadata.function)
       metadata.function.classify.constantize.run(*metadata.run_vars)
     else 
       raise "Language #{metadata.language} is not currently supported for analytical routing!"

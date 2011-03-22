@@ -6,8 +6,8 @@ class Instance < Model
   include DataMapper::Resource
   property :id,             Serial
   property :instance_id,    String, :length => 40
-  property :hostname,       String, :unique_index => [:unique_instance], :default => Sh::hostname
-  property :pid,            Integer, :unique_index => [:unique_instance], :default => Process.pid
+  property :hostname,       String, :unique_index => [:unique_instance], :default => ENV['HOSTNAME']
+  property :pid,            Integer, :unique_index => [:unique_instance], :default => ENV['PID']
   property :killed,         Boolean, :default => false
   property :instance_type,  String, :unique_index => [:unique_instance]
   
@@ -22,7 +22,7 @@ class Instance < Model
     connect_to_db
     self.rest_allowed = whitelisted?
     self.tmp_data = {}
-    self.instance_id = Digest::SHA1.hexdigest("#{self.hostname}#{self.pid}")
+    self.instance_id = ENV['INSTANCE_ID']
     puts "Hello, my name is #{self.instance_id}."
   end
   

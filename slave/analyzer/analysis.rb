@@ -1,7 +1,7 @@
 class Analysis
   
-  require "#{File.dirname(__FILE__)}/analysis_flow"
-  
+  require File.dirname(__FILE__)+"/analysis_flow"
+  require File.dirname(__FILE__)+"/dependencies"
   `ls #{File.dirname(__FILE__)}/library_functions/`.split.each {|f| require "#{File.dirname(__FILE__)}/library_functions/#{f}"}
   
   AnalyticalOffering.all.each do |ao|
@@ -172,13 +172,10 @@ class Analysis
     return SQLParser.type_attributes(hash, result).to_a.flatten[1].class.to_s.downcase
   end
   
-  def self.conditional(curation)
-    sql = " where ("
-    for dataset in curation.datasets
-      sql += " dataset_id = #{dataset.id} or "
-    end
-    sql = sql.chop.chop.chop.chop + ")"
-    return sql
+  def self.curation_conditional(curation)
+    conditional = {}
+    conditional[:dataset_id] = curation.datasets.collect{|d| d.id}
+    return conditional
   end
 
   def self.time_conditional(time_variable, datetime, granularity)
@@ -197,7 +194,6 @@ class Analysis
   end
 
   def self.hashes_to_csv(hash_array, file_name, path=$w.tmp_path)
-    require 'fastercsv'
     raise "Temp Folder not declared" if $w.tmp_path.nil?
     FasterCSV.open(path+file_name, "w") do |csv|
       keys = hash_array.first.keys
