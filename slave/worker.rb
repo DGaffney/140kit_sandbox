@@ -28,7 +28,7 @@ class Worker < Instance
     puts "Working..."
     check_in
     puts "Entering work routine."
-    ENV['INSTANCE'] = self
+    $instance = self
     loop do
       if !killed?
         work_routine

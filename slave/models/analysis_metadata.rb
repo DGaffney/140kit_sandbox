@@ -66,8 +66,21 @@ class AnalysisMetadata < Model
     return function.to_class
   end
   
+  def clear
+    function_class.clear(self)
+  end
+  
+  def self.clear
+    self.destroy
+  end
+  
   def self.push_tmp_folder(folder_name, folder=ENV['TMP_PATH'])
     folder = (folder+"/"+self.underscore.chop).gsub("//", "/")
     FilePathing.push_tmp_folder(folder_name, folder)
+  end
+
+  def self.remove_permanent_folder(folder_name, folder=ENV['TMP_PATH'])
+    folder = (folder+"/"+self.underscore.chop).gsub("//", "/")
+    FilePathing.remove_permanent_folder(folder_name, folder)
   end
 end

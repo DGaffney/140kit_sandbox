@@ -29,7 +29,7 @@ class Streamer < Instance
     check_in
     assign_user_account
     puts "Entering stream routine."
-    ENV['INSTANCE'] = self
+    $instance = self
     loop do
       if !killed?
         stream_routine

@@ -5,6 +5,7 @@ require 'rubygems'
 require 'bundler/setup'
 require 'digest/sha1'
 require 'dm-core'
+require 'dm-types'
 require 'dm-aggregates'
 require 'dm-validations'
 require 'dm-migrations'
@@ -16,11 +17,6 @@ require 'json'
 require 'twitter'
 
 DIR = Dir::pwd
-ENV['HOSTNAME'] = Sh::hostname
-ENV['PID'] = Process.pid.to_s #because ENV only allows strings.
-ENV['INSTANCE_ID'] = Digest::SHA1.hexdigest("#{ENV['HOSTNAME']}#{ENV['PID']}")
-ENV['TMP_PATH'] = DIR+"/tmp_files/#{ENV['INSTANCE_ID']}/scratch_processes"
-
 
 require DIR+'/extensions/dm-extensions'
 require DIR+'/extensions/array'
@@ -33,6 +29,11 @@ require DIR+'/extensions/inflectors'
 
 require DIR+'/utils/git'
 require DIR+'/utils/sh'
+
+ENV['HOSTNAME'] = Sh::hostname
+ENV['PID'] = Process.pid.to_s #because ENV only allows strings.
+ENV['INSTANCE_ID'] = Digest::SHA1.hexdigest("#{ENV['HOSTNAME']}#{ENV['PID']}")
+ENV['TMP_PATH'] = DIR+"/tmp_files/#{ENV['INSTANCE_ID']}/scratch_processes"
 
 require DIR+'/model'
 require DIR+'/models/analysis_metadata'

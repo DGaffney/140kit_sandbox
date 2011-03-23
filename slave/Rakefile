@@ -81,6 +81,92 @@ namespace :curation do
     curation = create_curation(dataset, researcher)
     select_analysis_metadata(curation)
   end
+  desc "Manage existing Curations"
+  task :manage do
+    load_environment
+    puts "First, I'll need to get the name of the researcher whose curations you want to manage:"
+    researcher = load_researcher
+    puts "Researcher #{researcher.user_name} has #{researcher.curations.length} curations."
+    researcher.curations.each do |curation|
+      puts "ID: #{curation.id} Name: #{curation.name} Date Created: #{curation.created_at} Number of Datasets: #{curation.datasets.length}"
+    end
+    puts "Type 'man curation_id' to see more information about a curation"
+    puts "Type 'archives' to see the archived curations for this researcher"
+    puts "Type 'archive curation_id' to archive a curation"
+    puts "Type 'unarchive curation_id' to reactivate a curation"
+    answer = Sh::clean_gets
+    manage_curations(answer, researcher)
+    answer = Sh::clean_gets_yes_no("Warning! A migrate will drop all current tables, and refresh the system. It is good to do this on first run, \n or if something horrible has happened. Otherwise, please, for your own sake, run `rake db:export` before doing this.\n That said, do you want to continue?")
+    
+  end
+  
+  def manage_curations(answer, researcher)
+    while answer!="finish"
+      puts "Type 'finish' at any time to boot out of management" 
+      if answer[0..2] == "man"
+        while answer!="finish"
+          curation = Curation.find(:id => answer.gsub("man ", ""))
+          puts "Curation not found!" if curation.nil?
+          break if curation.nil?
+          puts "From here, you can do all sorts of stuff:"
+          puts "Type 'analyze' to select analysis processes for the curation"
+          puts "Type 'clear' to clear analysis processes for the curation"
+          puts "Type 'finish' to exit the curation and return to management."
+          answer = Sh::clean_gets
+          if answer == "analyze"
+            select_analysis_metadata(curation)
+          elsif answer == "clear"
+            curation.analysis_metadatas.each do |am|
+              am.clear
+            end
+          elsif answer != "finish"
+            puts "Sorry, command not recognized."
+          end
+        end
+      elsif answer=="archives"
+        curations = Curation.all_deleted(:researcher_id => researcher.id)
+        if curations.empty?
+          puts "#{researcher.user_name}'s archive is empty."
+        else
+          curations.each do |curation|
+            puts "ID: #{curation.id} Name: #{curation.name} Date Created: #{curation.created_at} Number of Datasets: #{curation.datasets.length}"
+          end
+          puts "Note: you must unarchive a curation in order to manage it."
+        end
+      elsif answer[0..6]=="archive"
+        puts "Archiving Curation.."
+        curation = Curation.first(:id => answer.gsub("archive ", ""))
+        if curation
+          if curation.researcher == researcher
+            curation.archived = true
+            curation.save
+            puts "Curation successfully archived!"
+          else
+            puts "You can't archive a curation you do not own!"
+          end
+        else
+          puts "Curation not found. Try again."
+        end
+      elsif answer[0..8]=="unarchive"
+        puts "Unarchiving Curation.."
+        curation = Curation.first(:id => answer.gsub("unarchive ", ""))
+        if curation
+          if curation.researcher == researcher
+            curation.archived = true
+            curation.save
+            puts "Curation successfully unarchived!"
+          else
+            puts "You can't unarchive a curation you do not own!"
+          end
+        else
+          puts "Curation not found. Try again."
+        end
+      else
+        puts "Sorry, I didn't understand your entry. Try again?"
+        answer = Sh::clean_gets
+      end
+    end
+  end
 end
 
 namespace :researchers do 
@@ -181,7 +267,7 @@ def load_researcher
     puts "There are no researchers currently set up. You will need to do this first."
     researcher = create_researcher
   else
-    puts "Under which researcher will this curation be created? Enter username for researcher."
+    puts "Which researcher do you want to use for the session? Enter username for researcher."
     answer = Sh::clean_gets
     researcher = Researcher.first(:user_name => answer)
     while researcher.nil?
