@@ -19,6 +19,8 @@ class Researcher < Model
   property :private_data, Boolean, :default => false
   property :hidden_account, Boolean, :default => false
   property :rate_limited, Boolean, :default => false
+  has n, :curations
+  has n, :datasets, :through => :curations
   attr_accessor :password
   
   def self.authenticate(user_name, password)

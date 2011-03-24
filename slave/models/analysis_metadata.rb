@@ -9,6 +9,23 @@ class AnalysisMetadata < Model
   belongs_to :analytical_offering, :child_key => :analytical_offering_id
   has n, :analytical_offering_variables
   
+  def display_terminal
+    display = ""
+    info = get_info
+    display+="Function: #{info[:function]} Language: #{info[:language]}\nVariables:\n----------"
+    info[:variables].each do |var|
+      display+="\n  Name: #{var[:name]} Kind: #{var[:kind]} Value: #{var[:value]}"
+    end
+    return display
+  end
+
+  def get_info
+    info = {:function => function, :language => language, :variables => []}
+    analytical_offering_variables.each do |var|
+      info[:variables] << {:name => var.name, :kind => var.kind, :value => var.value}
+    end
+    return info
+  end
   def method_missing(method_name, *args)
     if variables.include?(method_name)
     else

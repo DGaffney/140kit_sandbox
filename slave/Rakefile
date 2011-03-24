@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 require 'rubygems'
 require 'rake'
-
 begin
   gem 'jeweler', '~> 1.5.2'
   require 'jeweler'
@@ -55,6 +54,7 @@ namespace :unlock do
   end
   
 end
+
 namespace :curation do
   desc "Create a new curation."
   task :new do
@@ -86,46 +86,64 @@ namespace :curation do
     load_environment
     puts "First, I'll need to get the name of the researcher whose curations you want to manage:"
     researcher = load_researcher
-    puts "Researcher #{researcher.user_name} has #{researcher.curations.length} curations."
+    puts "Researcher #{researcher.user_name} has #{researcher.curations.length} active curations."
     researcher.curations.each do |curation|
       puts "ID: #{curation.id} Name: #{curation.name} Date Created: #{curation.created_at} Number of Datasets: #{curation.datasets.length}"
     end
+    manage_curations(researcher)
+    exit 0    
+  end
+  
+  def manage_curations(researcher)
     puts "Type 'man curation_id' to see more information about a curation"
     puts "Type 'archives' to see the archived curations for this researcher"
     puts "Type 'archive curation_id' to archive a curation"
     puts "Type 'unarchive curation_id' to reactivate a curation"
+    puts "Type 'finish' at any time to go up one level in management" 
+    puts "Type 'exit' at any time to boot out" 
     answer = Sh::clean_gets
-    manage_curations(answer, researcher)
-    answer = Sh::clean_gets_yes_no("Warning! A migrate will drop all current tables, and refresh the system. It is good to do this on first run, \n or if something horrible has happened. Otherwise, please, for your own sake, run `rake db:export` before doing this.\n That said, do you want to continue?")
-    
-  end
-  
-  def manage_curations(answer, researcher)
     while answer!="finish"
-      puts "Type 'finish' at any time to boot out of management" 
       if answer[0..2] == "man"
-        while answer!="finish"
-          curation = Curation.find(:id => answer.gsub("man ", ""))
-          puts "Curation not found!" if curation.nil?
-          break if curation.nil?
+        curation = Curation.first(:id => answer.gsub("man ", ""))
+        puts "Curation not found!" if curation.nil?
+        if !curation.nil?
           puts "From here, you can do all sorts of stuff:"
+          puts "Type 'list' to see current stats about this curation"
           puts "Type 'analyze' to select analysis processes for the curation"
-          puts "Type 'clear' to clear analysis processes for the curation"
+          puts "Type 'clear function_name' to clear an analysis process for the curation"
+          puts "Type 'clear' to clear all analysis processes for the curation"
           puts "Type 'finish' to exit the curation and return to management."
           answer = Sh::clean_gets
-          if answer == "analyze"
-            select_analysis_metadata(curation)
-          elsif answer == "clear"
-            curation.analysis_metadatas.each do |am|
-              am.clear
+          while answer!="finish"
+            if answer == "list"
+              puts "Curation Stats:"
+              puts "Tweets: #{curation.tweets_count}"
+              puts "Users: #{curation.users_count}"
+              puts "Total Analytical Processes: #{curation.analysis_metadatas.count}"
+              curation.analysis_metadatas.each do |am|
+                puts am.display_terminal
+              end
+            elsif answer == "analyze"
+              select_analysis_metadata(curation)
+            elsif answer[0..5] == "clear "
+              analysis_metadata = curation.analysis_metadatas.select{|am| am.function == answer.gsub("clear ", "")}.first
+              if analysis_metadata
+                analysis_metadata.clear
+                puts "Analysis Metadata #{answer.gsub("clear ", "")} cleared from curation #{curation.id}."
+              else
+                puts "Analysis Metadata of function name #{answer.gsub("clear ", "")} not found on curation #{curation.id}"
+              end
+            elsif answer == "clear"
+              curation.analysis_metadatas.each do |am|
+                am.clear
+              end
             end
-          elsif answer != "finish"
-            puts "Sorry, command not recognized."
+            answer = Sh::clean_gets
           end
         end
       elsif answer=="archives"
         curations = Curation.all_deleted(:researcher_id => researcher.id)
-        if curations.empty?
+        if curations.blank?
           puts "#{researcher.user_name}'s archive is empty."
         else
           curations.each do |curation|
@@ -149,10 +167,10 @@ namespace :curation do
         end
       elsif answer[0..8]=="unarchive"
         puts "Unarchiving Curation.."
-        curation = Curation.first(:id => answer.gsub("unarchive ", ""))
+        curation = Curation.first_deleted(:id => answer.gsub("unarchive ", ""))
         if curation
           if curation.researcher == researcher
-            curation.archived = true
+            curation.archived = false
             curation.save
             puts "Curation successfully unarchived!"
           else
@@ -165,6 +183,12 @@ namespace :curation do
         puts "Sorry, I didn't understand your entry. Try again?"
         answer = Sh::clean_gets
       end
+      puts "Type 'man curation_id' to see more information about a curation"
+      puts "Type 'archives' to see the archived curations for this researcher"
+      puts "Type 'archive curation_id' to archive a curation"
+      puts "Type 'unarchive curation_id' to reactivate a curation"
+      puts "Type 'finish' at any time to boot out of management"
+      answer = Sh::clean_gets
     end
   end
 end
