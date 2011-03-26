@@ -143,10 +143,10 @@ end
 
 class Class
   def underscore
-    return self.to_s.underscore
+    return self.to_s.pluralize
   end
   
   def sym
-    return self.to_s.underscore.to_sym
+    return self.to_s.pluralize.to_sym
   end
 end

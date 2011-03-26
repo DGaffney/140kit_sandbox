@@ -1,15 +1,8 @@
 module U
 
   def self.append_and_save(objects, dataset)
-    # U.append_dataset_id(objects, dataset)
-    # 10.times do |i| 
-    #   books << Book.new(:name => "book #{i}")
-    # end
     Tweet.import objects[:tweets].collect {|t| Tweet.new(t.merge({:dataset => dataset.id})) }
     User.import objects[:users].collect {|u| User.new(u.merge({:dataset => dataset.id})) }
-    # Database.save_all(objects)
-    # puts objects.inspect
-    puts
   end
   
   def self.append_dataset_id(objects, dataset)
@@ -17,22 +10,6 @@ module U
       object["dataset_id"] = dataset.id
     end
   end
-  
-  #deprecated
-  # def self.append_scrape_id(objects, metadata)
-  #   objects.values.flatten.compact.each do |object|
-  #     object["metadata_id"] = metadata.id
-  #     object["metadata_type"] = metadata.class.to_s.underscore.chop
-  #     object["scrape_id"] = metadata.scrape_id
-  #   end
-  # end
-    
-  # def self.times_up(start_time, counter)
-  #   if Time.now.to_f >= start_time.to_f+counter
-  #     return true
-  #   else return false
-  #   end
-  # end
   
   def self.times_up?(time)
     return DateTime.now.gmt >= time ? true : false

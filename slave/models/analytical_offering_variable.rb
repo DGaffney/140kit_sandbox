@@ -1,4 +1,4 @@
-class AnalyticalOfferingVariable < Model
+class AnalyticalOfferingVariable
   include DataMapper::Resource
   property :id, Serial, :serial => true
   property :value, Object

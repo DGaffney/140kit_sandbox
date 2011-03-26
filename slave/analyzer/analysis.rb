@@ -21,7 +21,7 @@ class Analysis
   def self.mean(class_name, attribute, parameters={})
     return nil if !self.valid_type?([Fixnum, Integer, Float, Date, Time, DateTime], class_name, attribute)
     if "datetime".include?(self.data_type(class_name, attribute))
-      query = "select #{attribute} from #{class_name.to_s.underscore}"
+      query = "select #{attribute} from #{class_name.pluralize}"
       query += self.where(parameters)
       query += ";"
       result = Environment.db.query(query)
@@ -31,7 +31,7 @@ class Analysis
       mean = results.sum / results.length
       return Time.at(mean)
     else
-      query = "select avg(#{attribute}) from #{class_name.to_s.underscore}"
+      query = "select avg(#{attribute}) from #{class_name.pluralize}"
       query += self.where(parameters)
       query += ";"
       result = Environment.db.query(query)
@@ -40,7 +40,7 @@ class Analysis
   end
   
   def self.frequency_hash(class_name, attribute, parameters={})
-    query = "select count(*) as frequency, #{attribute} from #{class_name.to_s.underscore}"
+    query = "select count(*) as frequency, #{attribute} from #{class_name.pluralize}"
     if parameters.class == Hash && !parameters.empty?
       query += self.where(parameters)
     elsif parameters.class == String
@@ -62,7 +62,7 @@ class Analysis
   
   def self.median(class_name, attribute, parameters={})
     return nil if !self.valid_type?([Fixnum, Integer, Float, Date, Time, DateTime], class_name, attribute)
-    query = "select #{attribute} from #{class_name.to_s.underscore}"
+    query = "select #{attribute} from #{class_name.pluralize}"
     query += self.where(parameters)
     query += ";"
     result = Environment.db.query(query)
@@ -80,7 +80,7 @@ class Analysis
   
   def self.std_dev(class_name, attribute, parameters={})
     return nil if !self.valid_type?([Fixnum, Integer, Float], class_name, attribute)
-    query = "select std(#{attribute}) from #{class_name.to_s.underscore}"
+    query = "select std(#{attribute}) from #{class_name.pluralize}"
     query += self.where(parameters)
     query += ";"
     result = Environment.db.query(query)
@@ -90,7 +90,7 @@ class Analysis
   
   def self.variance(class_name, attribute, parameters={})
     return nil if !self.valid_type?([Fixnum, Integer, Float], class_name, attribute)
-    query = "select variance(#{attribute}) from #{class_name.to_s.underscore}"
+    query = "select variance(#{attribute}) from #{class_name.pluralize}"
     query += self.where(parameters)
     query += ";"
     result = Environment.db.query(query)
@@ -100,7 +100,7 @@ class Analysis
   
   def self.max(class_name, attribute, parameters={})
     return nil if !self.valid_type?([Fixnum, Integer, Float, Date, Time, DateTime], class_name, attribute)
-    query = "select max(#{attribute}) from #{class_name.to_s.underscore}"
+    query = "select max(#{attribute}) from #{class_name.pluralize}"
     query += self.where(parameters)
     query += ";"
     result = Environment.db.query(query)
@@ -110,7 +110,7 @@ class Analysis
   
   def self.min(class_name, attribute, parameters={})
     return nil if !self.valid_type?([Fixnum, Integer, Float, Date, Time, DateTime], class_name, attribute)
-    query = "select min(#{attribute}) from #{class_name.to_s.underscore}"
+    query = "select min(#{attribute}) from #{class_name.pluralize}"
     query += self.where(parameters)
     query += ";"
     result = Environment.db.query(query)
@@ -166,7 +166,7 @@ class Analysis
   end
   
   def self.data_type(class_name, attribute)
-    result = Environment.db.query("select #{attribute} from #{class_name.to_s.underscore} limit 1")
+    result = Environment.db.query("select #{attribute} from #{class_name.pluralize} limit 1")
     hash = result.fetch_hash
     return nil if hash.nil?
     return SQLParser.type_attributes(hash, result).to_a.flatten[1].class.to_s.downcase

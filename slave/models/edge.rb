@@ -1,4 +1,4 @@
-class Edge < Model
+class Edge
   include DataMapper::Resource
   property :id, Serial
   property :start_node, String, :unique_index => [:unique_edge], :index => [:start_node_edge, :start_node]

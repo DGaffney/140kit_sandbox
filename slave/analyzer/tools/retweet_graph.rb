@@ -71,14 +71,6 @@ class RetweetGraph < AnalysisMetadata
     FilePathing.push_tmp_folder(save_path)
   end
 
-  def self.generate_graph(attribute_hash)
-    graph = Graph.find(attribute_hash)
-    if graph.nil?
-      graph = Graph.new(attribute_hash).update
-    end
-    return graph
-  end
-
   def self.generate_graphml_files(curation, save_path, graph)
     granularity = "hour"
     time_queries = resolve_time_query(granularity)

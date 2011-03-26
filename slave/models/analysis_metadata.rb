@@ -1,4 +1,4 @@
-class AnalysisMetadata < Model
+class AnalysisMetadata
   include DataMapper::Resource
   property :id,   Serial
   property :finished, Boolean, :default => false
@@ -91,13 +91,33 @@ class AnalysisMetadata < Model
     self.destroy
   end
   
+  def self.function
+    return self.underscore
+  end
   def self.push_tmp_folder(folder_name, folder=ENV['TMP_PATH'])
-    folder = (folder+"/"+self.underscore.chop).gsub("//", "/")
+    folder = (folder+"/"+self.underscore).gsub("//", "/")
     FilePathing.push_tmp_folder(folder_name, folder)
   end
 
   def self.remove_permanent_folder(folder_name, folder=ENV['TMP_PATH'])
-    folder = (folder+"/"+self.underscore.chop).gsub("//", "/")
+    folder = (folder+"/"+self.underscore).gsub("//", "/")
     FilePathing.remove_permanent_folder(folder_name, folder)
+  end
+  
+  def self.finalize(curation)
+    response = self.finalize_analysis(curation)
+    response[:researcher_id] = curation.researcher.id
+    Mail.queue(response)
+    debugger
+    analysis_metadata = curation.analysis_metadatas.select{|x| x.function == self.function}.first
+    analysis_metadata.update(:finished => true)
+  end
+  
+  def self.finalize_analysis(curation)
+    response = {}
+    response[:recipient] = curation.researcher.email
+    response[:subject] = "#{curation.researcher.user_name}, an analytical process on your '#{curation.name}' data has finished."
+    response[:message_content] = "An analytical process, #{self}, has finished running on your dataset. You can view results by visiting the collection's page: <a href=\"http://140kit.com/#{curation.researcher.user_name}/collections/#{curation.id}\">http://140kit.com/#{curation.researcher.user_name}/collections/#{curation.id}</a>."
+    return response
   end
 end

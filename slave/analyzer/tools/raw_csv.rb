@@ -33,13 +33,10 @@ class RawCsv < AnalysisMetadata
     self.query_to_csv(Tweet, {:fields => tweet_fields}.merge(conditional))
     self.query_to_csv(User, {:fields => user_fields}.merge(conditional))
     self.push_tmp_folder(curation.stored_folder_name)
-    # recipient = collection.researcher.email
-    # subject = "#{collection.researcher.user_name}, your raw CSV data for the #{collection.name} data set is complete."
-    # message_content = "Your CSV files are ready for download. You can grab them by visiting the collection's page: <a href=\"http://140kit.com/#{collection.researcher.user_name}/collections/#{collection.id}\">http://140kit.com/#{collection.researcher.user_name}/collections/#{collection.id}</a>."
-    # send_email(recipient, subject, message_content, collection)
+    self.finalize(curation)
   end
 
-  def self.query_to_csv(model, conditional, filename="/"+model.underscore+".csv", path=ENV['TMP_PATH'])
+  def self.query_to_csv(model, conditional, filename="/"+model.pluralize+".csv", path=ENV['TMP_PATH'])
     first = true
     keys = nil
     Sh::mkdir(path+"/raw_csv")
@@ -61,5 +58,13 @@ class RawCsv < AnalysisMetadata
   def self.clear(am)
     self.remove_permanent_folder(am.curation.stored_folder_name)
     am.destroy
+  end
+  
+  def self.finalize_analysis(curation)
+    response = {}
+    response[:recipient] = curation.researcher.email
+    response[:subject] = "#{curation.researcher.user_name}, your raw CSV data for the #{curation.name} data set is complete."
+    response[:message_content] = "Your CSV files are ready for download. You can grab them by visiting the collection's page: <a href=\"http://140kit.com/#{curation.researcher.user_name}/collections/#{curation.id}\">http://140kit.com/#{curation.researcher.user_name}/collections/#{curation.id}</a>."
+    return response
   end
 end

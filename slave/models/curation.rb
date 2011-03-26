@@ -1,4 +1,4 @@
-class Curation < Model
+class Curation
   
   include DataMapper::Resource
   property :id, Serial

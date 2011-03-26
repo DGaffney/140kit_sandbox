@@ -82,8 +82,8 @@ module AnalysisFlow
       for scrape in scrapes
         metadatas = scrape.metadatas.select{|m| (m.class == StreamMetadata && m.term != "retweet") || (m.class == RestMetadata)}
         metadatas.each do |metadata|
-          metadata.tweets_count = Tweet.count({:metadata_id => metadata.id, :metadata_type => metadata.class.underscore.chop})
-          metadata.users_count = User.count({:metadata_id => metadata.id, :metadata_type => metadata.class.underscore.chop})
+          metadata.tweets_count = Tweet.count({:metadata_id => metadata.id, :metadata_type => metadata.class.underscore})
+          metadata.users_count = User.count({:metadata_id => metadata.id, :metadata_type => metadata.class.underscore})
           metadata.save #done singularly because we don't have a general save_object method.... (diff metadata_typs necessitate this)
         end
         tweets_count = metadatas.collect {|m| m.tweets_count}.sum

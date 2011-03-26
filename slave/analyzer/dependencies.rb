@@ -8,6 +8,7 @@ module Analysis::Dependencies
           require dependency
         end
         puts "Required #{dependencies.length} dependencies:"
+        puts dependencies.join(", ")
         return dependencies
       else
         return "No dependencies defined."
@@ -18,6 +19,10 @@ module Analysis::Dependencies
   end
   
   def self.raw_csv_dependencies
+    ['fastercsv']
+  end
+  
+  def self.basic_histogram_dependencies
     ['fastercsv']
   end
 end

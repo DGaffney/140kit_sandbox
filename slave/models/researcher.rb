@@ -1,4 +1,4 @@
-class Researcher < Model
+class Researcher
   include DataMapper::Resource
   property :id, Serial
   property :user_name, String

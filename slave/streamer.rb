@@ -56,7 +56,7 @@ class Streamer < Instance
     puts "Assigning user account."
     message = true
     while @username.nil?
-      user = AuthUser.unlocked(:first)
+      user = AuthUser.unlocked.first
       if !user.nil? && lock(user)
         @user_account = user
         @username = user.user_name
@@ -78,7 +78,7 @@ class Streamer < Instance
           puts "Creating new AuthUser..."
           user = AuthUser.new(:user_name => user_name, :password => password)
           user.save
-          user = AuthUser.unlocked(:first)
+          user = AuthUser.unlocked.first
           @user_account = user
           @username = user.user_name
           @password = user.password
@@ -207,7 +207,7 @@ class Streamer < Instance
   # end
   
   def add_datasets
-    datasets = Dataset.unlocked(:all, "scrape_finished = 0 AND (scrape_type='track' OR scrape_type='follow' OR scrape_type='locations')")
+    datasets = Dataset.unlocked.all(:scrape_finished => false, :scrape_type => ['track', 'follow', 'locations'])
     return claim_new_datasets(datasets)
   end
 

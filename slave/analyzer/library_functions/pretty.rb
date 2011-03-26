@@ -4,37 +4,37 @@ class Pretty
       when "tweet_location"
         new_graphs = []
         graphs.each{|g|
-        case g["label"]
+        case g[:label]
         when "ÜT:"
-          if new_graphs.select{|g| g["label"] == "iPhone Geo Location"}.compact.length == 0
-            g["label"] = "iPhone Geo Location" 
+          if new_graphs.select{|g| g[:label] == "iPhone Geo Location"}.compact.length == 0
+            g[:label] = "iPhone Geo Location" 
           else 
-            new_graphs.select{|g| g["label"] == "iPhone Geo Location"}.first["value"] += g["value"]
+            new_graphs.select{|g| g[:label] == "iPhone Geo Location"}.first[:value] += g[:value]
             graphs = graphs-[g]
           end
         when "iPhone:"
-          if new_graphs.select{|g| g["label"] == "iPhone Geo Location"}.compact.length == 0
-            g["label"] = "iPhone Geo Location" 
+          if new_graphs.select{|g| g[:label] == "iPhone Geo Location"}.compact.length == 0
+            g[:label] = "iPhone Geo Location" 
           else 
-            new_graphs.select{|g| g["label"] == "iPhone Geo Location"}.first["value"] += g["value"]
+            new_graphs.select{|g| g[:label] == "iPhone Geo Location"}.first[:value] += g[:value]
             graphs = graphs-[g]
           end
         when "Pre:"
-          g["label"] = "Palm Pre Geo Location"
+          g[:label] = "Palm Pre Geo Location"
         end
         new_graphs << g
       }
       return new_graphs.uniq
       when "tweet_language"
-        graphs.collect{|graph| graph["label"] = Pretty.language(graph["label"])}
+        graphs.collect{|graph| graph[:label] = Pretty.language(graph[:label])}
       when "tweet_created_at"
         graphs = Pretty.time_generalize(graphs)
       when "tweet_source"
-        graphs.collect{|graph| graph["label"] = Pretty.source(graph["label"])}
+        graphs.collect{|graph| graph[:label] = Pretty.source(graph[:label])}
       when "user_lang"
-        graphs.collect{|graph| graph["label"] = Pretty.language(graph["label"])}
+        graphs.collect{|graph| graph[:label] = Pretty.language(graph[:label])}
       when "user_geo_enabled"
-        graphs.collect{|graph| graph["label"] = Pretty.boolean_fix(graph["label"])}
+        graphs.collect{|graph| graph[:label] = Pretty.boolean_fix(graph[:label])}
       when "user_created_at"
         # if graph_style != "time_based_histogram"
           graphs = Pretty.time_generalize(graphs)
@@ -65,7 +65,7 @@ class Pretty
   end
   
   def self.time_generalize(graphs)
-    sorted_times = graphs.collect{|g| Time.parse(g["label"].to_s).to_i}.sort
+    sorted_times = graphs.collect{|g| Time.parse(g[:label].to_s).to_i}.sort
     length = sorted_times.last-sorted_times.first
     if length < 60
       new_graphs = Pretty.time_rounder("second", graphs)
@@ -87,38 +87,38 @@ class Pretty
       return graphs
     when "minute"
       graphs.each do |graph|
-        time = Time.parse(graph["label"])
+        time = Time.parse(graph[:label])
         if new_graphs[time.strftime("%b %d, %Y, %H:%m")].nil?
-          new_graphs[time.strftime("%b %d, %Y, %H:%m")] = {"label" => time.strftime("%b %d, %Y, %H:%m"), "value" => graph["value"].to_i, "dataset_id" => graph["dataset_id"], "graph_id" => graph["graph_id"]}
+          new_graphs[time.strftime("%b %d, %Y, %H:%m")] = {:label => time.strftime("%b %d, %Y, %H:%m"), :value => graph[:value].to_i, :curation_id => graph[:curation_id], :graph_id => graph[:graph_id]}
         else
-          new_graphs[time.strftime("%b %d, %Y, %H:%m")]["value"] += graph["value"].to_i
+          new_graphs[time.strftime("%b %d, %Y, %H:%m")][:value] += graph[:value].to_i
         end
       end
     when "hour"
       graphs.each do |graph|
-        time = Time.parse(graph["label"])
+        time = Time.parse(graph[:label])
         if new_graphs[time.strftime("%b %d, %Y, %H")].nil?
-          new_graphs[time.strftime("%b %d, %Y, %H")] = {"label" => time.strftime("%b %d, %Y, %H"), "value" => graph["value"].to_i, "dataset_id" => graph["dataset_id"], "graph_id" => graph["graph_id"]}
+          new_graphs[time.strftime("%b %d, %Y, %H")] = {:label => time.strftime("%b %d, %Y, %H"), :value => graph[:value].to_i, :curation_id => graph[:curation_id], :graph_id => graph[:graph_id]}
         else
-          new_graphs[time.strftime("%b %d, %Y, %H")]["value"] += graph["value"].to_i
+          new_graphs[time.strftime("%b %d, %Y, %H")][:value] += graph[:value].to_i
         end
       end
     when "day"
       graphs.each do |graph|
-        time = Time.parse(graph["label"])
+        time = Time.parse(graph[:label])
         if new_graphs[time.strftime("%b %d, %Y")].nil?
-          new_graphs[time.strftime("%b %d, %Y")] = {"label" => time.strftime("%b %d, %Y"), "value" => graph["value"].to_i, "dataset_id" => graph["dataset_id"], "graph_id" => graph["graph_id"]}
+          new_graphs[time.strftime("%b %d, %Y")] = {:label => time.strftime("%b %d, %Y"), :value => graph[:value].to_i, :curation_id => graph[:curation_id], :graph_id => graph[:graph_id]}
         else
-          new_graphs[time.strftime("%b %d, %Y")]["value"] += graph["value"].to_i
+          new_graphs[time.strftime("%b %d, %Y")][:value] += graph[:value].to_i
         end
       end
     when "month"
       graphs.each do |graph|
-        time = Time.parse(graph["label"])
+        time = Time.parse(graph[:label])
         if new_graphs[time.strftime("%b %Y")].nil?
-          new_graphs[time.strftime("%b %Y")] = {"label" => time.strftime("%b %Y"), "value" => graph["value"].to_i, "dataset_id" => graph["dataset_id"], "graph_id" => graph["graph_id"]}
+          new_graphs[time.strftime("%b %Y")] = {:label => time.strftime("%b %Y"), :value => graph[:value].to_i, :curation_id => graph[:curation_id], :graph_id => graph[:graph_id]}
         else
-          new_graphs[time.strftime("%b %Y")]["value"] += graph["value"].to_i
+          new_graphs[time.strftime("%b %Y")][:value] += graph[:value].to_i
         end
       end
     end

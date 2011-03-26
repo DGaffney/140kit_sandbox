@@ -2,7 +2,7 @@ require File.dirname(__FILE__)+'/whitelisting'
 require File.dirname(__FILE__)+'/lock'
 # require 'YAML'
 
-class Instance < Model
+class Instance
   include DataMapper::Resource
   property :id,             Serial
   property :instance_id,    String, :length => 40

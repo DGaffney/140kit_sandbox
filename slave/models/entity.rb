@@ -1,4 +1,4 @@
-class Entity < Model
+class Entity
   include DataMapper::Resource
   property :id, Serial
   property :dataset_id, Integer, :index => [:dataset_id, :dataset_id_twitter_id, :dataset_id_kind, :dataset_id_name, :dataset_id_value, :dataset_id_twitter_id_kind, :dataset_id_kind_name, :dataset_id_kind_value, :dataset_id_kind_name_value, :dataset_id_twitter_id_kind_name, :dataset_id_twitter_id_kind_value, :dataset_id_twitter_id_kind_name_value]

@@ -1,4 +1,4 @@
-class Graph < Model
+class Graph
   include DataMapper::Resource
   property :id, Serial
   property :title, String, :unique_index => [:unique_graph], :index => [:title_graph]
@@ -10,4 +10,15 @@ class Graph < Model
   property :written, Boolean, :default => false
   property :time_slice, Time, :unique_index => [:unique_graph], :index => [:time_slice_graph]
   belongs_to :curation, :unique_index => [:unique_graph], :index => [:curation_id_graph, :year_month_date_hour_graph, :year_month_date_graph, :year_month_graph, :month_date_hour_graph, :month_date_graph, :date_hour_graph, :year_graph, :month_graph, :date_graph, :hour_graph]
+  
+  def folder_name
+    if time_slice
+      time_slice.strftime("%Y/%m/%d/%H/%M/%S")
+    elsif year || month || date || hour
+      [year,month,date,hour].compact.join("/")
+    else
+      ""
+    end
+    
+  end
 end
