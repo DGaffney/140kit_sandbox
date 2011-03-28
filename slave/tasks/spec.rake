@@ -6,10 +6,10 @@ end
 
 begin
   require 'spec/rake/spectask'
-
+  Rake::Task["environment"].execute
   Spec::Rake::SpecTask.new(:spec, &spec_defaults)
 rescue LoadError
-  task :spec do
+  task :spec => :environment do
     abort 'rspec is not available. In order to run spec, you must: gem install rspec'
   end
 end

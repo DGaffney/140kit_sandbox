@@ -22,6 +22,7 @@ require DIR+'/extensions/dm-extensions'
 require DIR+'/extensions/array'
 require DIR+'/extensions/string'
 require DIR+'/extensions/hash'
+require DIR+'/extensions/fixnum'
 require DIR+'/extensions/time'
 require DIR+'/extensions/date'
 require DIR+'/extensions/date_time'
@@ -36,24 +37,11 @@ ENV['INSTANCE_ID'] = Digest::SHA1.hexdigest("#{ENV['HOSTNAME']}#{ENV['PID']}")
 ENV['TMP_PATH'] = DIR+"/tmp_files/#{ENV['INSTANCE_ID']}/scratch_processes"
 
 require DIR+'/model'
-require DIR+'/models/analysis_metadata'
-require DIR+'/models/analytical_offering'
-require DIR+'/models/analytical_offering_variable'
-require DIR+'/models/analytical_offering_variable_descriptor'
-require DIR+'/models/auth_user'
-require DIR+'/models/curation'
-require DIR+'/models/dataset'
-require DIR+'/models/edge'
-require DIR+'/models/entity'
-require DIR+'/models/graph'
-require DIR+'/models/graph_point'
-require DIR+'/models/instance'
-require DIR+'/models/lock'
-require DIR+'/models/mail'
-require DIR+'/models/researcher'
-require DIR+'/models/tweet'
-require DIR+'/models/user'
-require DIR+'/models/whitelisting'
+models = [
+  "analysis_metadata", "analytical_offering", "analytical_offering_variable", "analytical_offering_variable_descriptor", "auth_user", "curation",
+  "dataset", "edge", "entity", "graph", "graph_point", "instance", "lock", "mail", "researcher", "tweet", "user", "whitelisting"
+]
+models.collect{|model| require DIR+'/models/'+model}
 
 
 require DIR+'/utils/tweet_helper'

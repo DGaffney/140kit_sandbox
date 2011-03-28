@@ -1,3 +1,7 @@
+test:
+  type: local
+  path: results_test #This will always be relative to project root.
+
 development:
   type: local
   path: results #This will always be relative to project root.

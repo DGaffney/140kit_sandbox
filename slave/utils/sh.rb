@@ -12,7 +12,7 @@ module Sh
   def self.clean_gets
     STDOUT.flush
     response = STDIN.gets.chomp
-    exit if response=="exit"
+    exit 0 if response=="exit"
     return response
   end
   
