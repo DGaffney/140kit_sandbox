@@ -1,0 +1,31 @@
+titles = ["breakdown",
+"hashtags",
+"mapping",
+"mentions",
+"Network Map",
+"significant_words",
+"tweet_created_at",
+"tweet_language",
+"tweet_location",
+"tweet_source",
+"urls",
+"User Gender Breakdown",
+"User Gender Mapping",
+"user_created_at",
+"user_favourites_count",
+"user_followers_count",
+"user_friends_count",
+"user_gender_breakdown",
+"user_gender_mapping",
+"user_geo_enabled",
+"user_lang",
+"user_statuses_count",
+"user_time_zone"]
+Graph.fix{{
+  :title => /\w+/.gen[5..20],
+  :style => titles.shuffle.first,
+  :year => rand(Time.now.year),
+  :month => rand(12),
+  :date => rand(28), #in case we end up in february.
+  :hour => rand(24)
+}}
