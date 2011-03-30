@@ -1,7 +1,10 @@
 require 'spec_helper'
 
 describe Curation do
-  it "should work" do
-    puts Curation.all
+  it "should not be created without a researcher" do
+        debugger
+    c = Curation.gen
+    c.researcher_id = nil
+    c.save!
   end
 end

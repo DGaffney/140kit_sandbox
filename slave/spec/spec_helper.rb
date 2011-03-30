@@ -1,4 +1,5 @@
 require File.dirname(__FILE__)+'/../environment'
+require 'ruby-debug'
 require 'dm-sweatshop'
 include DataMapper::Sweatshop::Unique 
 require 'rake'
@@ -15,4 +16,4 @@ end
 
 DataMapper.auto_migrate!
 load 'config/seed.rb'
-FileList[DIR+'/spec/fixtures/*.rb'].each { |task| load task }
+FileList[DIR+'/spec/fixtures/*.rb'].each { |task| require task.gsub(".rb", "")}

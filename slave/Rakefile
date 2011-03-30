@@ -23,6 +23,7 @@ begin
 rescue LoadError
   puts 'Jeweler (or a dependency) not available. Install it with: gem install jeweler -v 1.5.2'
 end
+
 desc "Setup your environment"
 task :set_up do
   Sh::sh("bundle install")
