@@ -9,7 +9,7 @@ Tweet.fix {{
   :created_at => this_user.created_at+rand(((Time.now-this_user.created_at)/60/60/24)).days+rand(86400),
   :retweet_count => rand(100),
   :lat => rand*rand(100),
-  :long => rand*rand(100),
+  :lon => rand*rand(100),
   :source => /[:sentence:]/.gen[0..50],
   :retweeted => [true,false][rand(2)]
 }}
@@ -27,7 +27,7 @@ Tweet.fix(:mention) {{
   :created_at => this_user.created_at+rand(((Time.now-this_user.created_at)/60/60/24)).days+rand(86400),
   :retweet_count => rand(100),
   :lat => rand*rand(100),
-  :long => rand*rand(100),
+  :lon => rand*rand(100),
   :source => /[:sentence:]/.gen[0..50],
   :retweeted => [true,false][rand(2)]
 }}
@@ -45,7 +45,7 @@ Tweet.fix(:retweet) {{
   :created_at => this_user.created_at+rand(((Time.now-this_user.created_at)/60/60/24)).days+rand(86400),
   :retweet_count => rand(100),
   :lat => rand*rand(100),
-  :long => rand*rand(100),
+  :lon => rand*rand(100),
   :source => /[:sentence:]/.gen[0..50],
   :retweeted => [true,false][rand(2)]
 }}
@@ -60,7 +60,7 @@ Tweet.fix(:hashtagged) {{
   :created_at => this_user.created_at+rand(((Time.now-this_user.created_at)/60/60/24)).days+rand(86400),
   :retweet_count => rand(100),
   :lat => rand*rand(100),
-  :long => rand*rand(100),
+  :lon => rand*rand(100),
   :source => /[:sentence:]/.gen[0..50],
   :retweeted => [true,false][rand(2)]
 }}
@@ -75,7 +75,7 @@ Tweet.fix(:linked) {{
   :created_at => this_user.created_at+rand(((Time.now-this_user.created_at)/60/60/24)).days+rand(86400),
   :retweet_count => rand(100),
   :lat => rand*rand(100),
-  :long => rand*rand(100),
+  :lon => rand*rand(100),
   :source => /[:sentence:]/.gen[0..50],
   :retweeted => [true,false][rand(2)]
 }}

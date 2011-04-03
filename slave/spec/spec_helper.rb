@@ -16,4 +16,9 @@ end
 
 DataMapper.auto_migrate!
 load 'config/seed.rb'
+
+Spec::Runner.configure do |config|
+  config.mock_with :mocha
+end
+
 FileList[DIR+'/spec/fixtures/*.rb'].each { |task| require task.gsub(".rb", "")}

@@ -15,6 +15,8 @@ class Curation
   has n, :tweets, :through => :datasets
   has n, :users, :through => :datasets
   
+  validates_presence_of :researcher_id, :name
+  
   def stored_folder_name
     return name.downcase.gsub(/[\ |\=|\-|\(|\)|\*|\&|\^|\%|\$|\#|\@|\!]/, "_")+"_"+id.to_s+"_"+researcher_id.to_s
   end

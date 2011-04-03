@@ -14,6 +14,7 @@ require 'dm-chunked_query'
 require 'eventmachine'
 require 'em-http'
 require 'json'
+require 'ntp'
 require 'twitter'
 
 DIR = Dir::pwd
@@ -24,8 +25,7 @@ require DIR+'/extensions/string'
 require DIR+'/extensions/hash'
 require DIR+'/extensions/fixnum'
 require DIR+'/extensions/time'
-require DIR+'/extensions/date'
-require DIR+'/extensions/date_time'
+require DIR+'/extensions/nil_class'
 require DIR+'/extensions/inflectors'
 
 require DIR+'/utils/git'
@@ -64,6 +64,7 @@ if !storage.has_key?(env)
   env = "development"
 end
 STORAGE = storage[env]
+TIME_OFFSET = NET::NTP.get_ntp_response()["Receive Timestamp"] - Time.now.to_f
 
 require DIR+'/analyzer/analysis'
 

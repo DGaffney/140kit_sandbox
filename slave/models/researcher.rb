@@ -5,7 +5,7 @@ class Researcher
   property :email, Text, :default => "user@localhost.com"
   property :reset_code, String
   property :role, String, :default => "Admin"
-  property :join_date, Time
+  property :join_date, Time, :default => Time.now
   property :last_login, Time
   property :last_access, Time
   property :info, Text, :default => "I like to study the internet"
@@ -22,6 +22,8 @@ class Researcher
   has n, :curations
   has n, :datasets, :through => :curations
   attr_accessor :password
+  
+  alias :created_at :join_date
   
   def self.authenticate(user_name, password)
     u = find_by_user_name(user_name) # need to get the salt

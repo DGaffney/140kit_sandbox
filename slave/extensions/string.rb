@@ -13,31 +13,10 @@ class String
   def pluralize
     self.underscore.concat("s")
   end
-  
-  def to_table
-    self.gsub(/::/, '/').
-    gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
-    gsub(/([a-z\d])([A-Z])/,'\1_\2').
-    tr("-", "_").downcase.concat("s")
-  end
-  
-  def to_bool
-    if self == "1"
-      return true
-    elsif self == "0"
-      return false
-    else return nil
-    end
-  end
-  
-  def sanitize
-    coder = HTMLEntities.new
-    return coder.encode(self).gsub("#", "%23").gsub(" ", "%20").gsub("&quot\;", "%22").gsub("\"", "%22").gsub("\342\231\245", "&#9829\;")
-  end
-  
+      
   def sanitize_for_streaming
     # return self.split("").reject {|c| c.match(/[\w\'\-]/).nil?}.to_s
-    return self.gsub(/[\'\"#]/, '').gsub(' ', '%20')
+    return self.gsub(/[\'\"]/, '').gsub("#", "%23").gsub(' ', '%20')
   end
   
   def classify
@@ -51,8 +30,6 @@ class String
   def camelize(lower_case_and_underscored_word, first_letter_in_uppercase = true)
     if first_letter_in_uppercase
       lower_case_and_underscored_word.to_s.gsub(/\/(.?)/) { "::#{$1.upcase}" }.gsub(/(?:^|_)(.)/) { $1.upcase }
-    else
-      lower_case_and_underscored_word.first.downcase + camelize(lower_case_and_underscored_word)[1..-1]
     end
   end
   

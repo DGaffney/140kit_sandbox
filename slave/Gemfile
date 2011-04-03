@@ -1,5 +1,6 @@
 group :core do
   source 'http://rubygems.org'
+  source 'http://gems.github.com'
   gem 'dm-aggregates'
   gem 'dm-chunked_query'
   gem 'dm-core'
@@ -14,6 +15,9 @@ group :core do
   gem 'htmlentities'
   gem 'jeweler'
   gem 'json'
+  gem 'mocha'
+  gem 'ntp'
+  gem 'spicycode-rcov'
   gem 'rdebug'
   gem 'rspec'
   gem 'tweetstream'

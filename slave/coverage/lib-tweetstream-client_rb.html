@@ -1,0 +1,884 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang='en' xml:lang='en' xmlns='http://www.w3.org/1999/xhtml'><head><title>lib/tweetstream/client.rb - Bogo-profile information</title>
+    <style type='text/css'>body { background-color: rgb(179,205,255); }</style>
+    <style type='text/css'>span.cross-ref-title {
+ font-size: 140%;
+}
+span.cross-ref a {
+ text-decoration: none;
+}
+span.cross-ref {
+ background-color:#f3f7fa;
+ border: 1px dashed #333;
+ margin: 1em;
+ padding: 0.5em;
+ overflow: hidden;
+}
+a.crossref-toggle {
+ text-decoration: none;
+}
+span.marked0 {
+ background-color: rgb(185, 210, 200);
+ display: block;
+}
+span.marked1 {
+ background-color: rgb(190, 215, 205);
+ display: block;
+}
+span.inferred0 {
+ background-color: rgb(255, 255, 240);
+ display: block;
+}
+span.inferred1 {
+ background-color: rgb(255, 255, 240);
+ display: block;
+}
+span.uncovered0 {
+ background-color: rgb(225, 110, 110);
+ display: block;
+}
+span.uncovered1 {
+ background-color: rgb(235, 120, 120);
+ display: block;
+}
+span.overview {
+ border-bottom: 8px solid black;
+}
+div.overview {
+ border-bottom: 8px solid black;
+}
+body {
+ font-family: verdana, arial, helvetica;
+}
+div.footer {
+ font-size: 68%;
+ margin-top: 1.5em;
+}
+h1, h2, h3, h4, h5, h6 {
+ margin-bottom: 0.5em;
+}
+h5 {
+ margin-top: 0.5em;
+}
+.hidden {
+ display: none;
+}
+div.separator {
+ height: 10px;
+}
+/* Commented out for better readability, esp. on IE */
+/*
+table tr td, table tr th {
+ font-size: 68%;
+}
+td.value table tr td {
+ font-size: 11px;
+}
+*/
+table.percent_graph {
+ height: 12px;
+ border: #808080 1px solid;
+ empty-cells: show;
+}
+table.percent_graph td.covered {
+ height: 10px;
+ background: #00f000;
+}
+table.percent_graph td.uncovered {
+ height: 10px;
+ background: #e00000;
+}
+table.percent_graph td.NA {
+ height: 10px;
+ background: #eaeaea;
+}
+table.report {
+ border-collapse: collapse;
+ width: 100%;
+}
+table.report td.heading {
+ background: #dcecff;
+ border: #d0d0d0 1px solid;
+ font-weight: bold;
+ text-align: center;
+}
+table.report td.heading:hover {
+ background: #c0ffc0;
+}
+table.report td.text {
+ border: #d0d0d0 1px solid;
+}
+table.report td.value,
+table.report td.lines_total,
+table.report td.lines_code {
+ text-align: right;
+ border: #d0d0d0 1px solid;
+}
+table.report tr.light {
+ background-color: rgb(240, 240, 245);
+}
+table.report tr.dark {
+ background-color: rgb(230, 230, 235);
+}
+</style>
+    <script type='text/javascript'>
+// <![CDATA[
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+
+  // Make cross-references hidden by default
+  document.writeln( "<style type=\"text/css\">span.cross-ref { display: none }</style>" )
+  // ]]>
+</script>
+    <style type='text/css'>span.run0 {
+  background-color: rgb(178, 204, 255);
+  display: block;
+}
+span.run1 {
+  background-color: rgb(178, 206, 255);
+  display: block;
+}
+span.run2 {
+  background-color: rgb(178, 209, 255);
+  display: block;
+}
+span.run3 {
+  background-color: rgb(178, 211, 255);
+  display: block;
+}
+span.run4 {
+  background-color: rgb(178, 214, 255);
+  display: block;
+}
+span.run5 {
+  background-color: rgb(178, 218, 255);
+  display: block;
+}
+span.run6 {
+  background-color: rgb(178, 220, 255);
+  display: block;
+}
+span.run7 {
+  background-color: rgb(178, 223, 255);
+  display: block;
+}
+span.run8 {
+  background-color: rgb(178, 225, 255);
+  display: block;
+}
+span.run9 {
+  background-color: rgb(178, 228, 255);
+  display: block;
+}
+span.run10 {
+  background-color: rgb(178, 232, 255);
+  display: block;
+}
+span.run11 {
+  background-color: rgb(178, 234, 255);
+  display: block;
+}
+span.run12 {
+  background-color: rgb(178, 237, 255);
+  display: block;
+}
+span.run13 {
+  background-color: rgb(178, 239, 255);
+  display: block;
+}
+span.run14 {
+  background-color: rgb(178, 242, 255);
+  display: block;
+}
+span.run15 {
+  background-color: rgb(178, 246, 255);
+  display: block;
+}
+span.run16 {
+  background-color: rgb(178, 248, 255);
+  display: block;
+}
+span.run17 {
+  background-color: rgb(178, 251, 255);
+  display: block;
+}
+span.run18 {
+  background-color: rgb(178, 253, 255);
+  display: block;
+}
+span.run19 {
+  background-color: rgb(178, 255, 253);
+  display: block;
+}
+span.run20 {
+  background-color: rgb(178, 255, 249);
+  display: block;
+}
+span.run21 {
+  background-color: rgb(178, 255, 247);
+  display: block;
+}
+span.run22 {
+  background-color: rgb(178, 255, 244);
+  display: block;
+}
+span.run23 {
+  background-color: rgb(178, 255, 242);
+  display: block;
+}
+span.run24 {
+  background-color: rgb(178, 255, 239);
+  display: block;
+}
+span.run25 {
+  background-color: rgb(178, 255, 235);
+  display: block;
+}
+span.run26 {
+  background-color: rgb(178, 255, 233);
+  display: block;
+}
+span.run27 {
+  background-color: rgb(178, 255, 230);
+  display: block;
+}
+span.run28 {
+  background-color: rgb(178, 255, 228);
+  display: block;
+}
+span.run29 {
+  background-color: rgb(178, 255, 225);
+  display: block;
+}
+span.run30 {
+  background-color: rgb(178, 255, 221);
+  display: block;
+}
+span.run31 {
+  background-color: rgb(178, 255, 219);
+  display: block;
+}
+span.run32 {
+  background-color: rgb(178, 255, 216);
+  display: block;
+}
+span.run33 {
+  background-color: rgb(178, 255, 214);
+  display: block;
+}
+span.run34 {
+  background-color: rgb(178, 255, 211);
+  display: block;
+}
+span.run35 {
+  background-color: rgb(178, 255, 207);
+  display: block;
+}
+span.run36 {
+  background-color: rgb(178, 255, 205);
+  display: block;
+}
+span.run37 {
+  background-color: rgb(178, 255, 202);
+  display: block;
+}
+span.run38 {
+  background-color: rgb(178, 255, 200);
+  display: block;
+}
+span.run39 {
+  background-color: rgb(178, 255, 197);
+  display: block;
+}
+span.run40 {
+  background-color: rgb(178, 255, 193);
+  display: block;
+}
+span.run41 {
+  background-color: rgb(178, 255, 191);
+  display: block;
+}
+span.run42 {
+  background-color: rgb(178, 255, 188);
+  display: block;
+}
+span.run43 {
+  background-color: rgb(178, 255, 186);
+  display: block;
+}
+span.run44 {
+  background-color: rgb(178, 255, 183);
+  display: block;
+}
+span.run45 {
+  background-color: rgb(178, 255, 179);
+  display: block;
+}
+span.run46 {
+  background-color: rgb(179, 255, 178);
+  display: block;
+}
+span.run47 {
+  background-color: rgb(182, 255, 178);
+  display: block;
+}
+span.run48 {
+  background-color: rgb(184, 255, 178);
+  display: block;
+}
+span.run49 {
+  background-color: rgb(187, 255, 178);
+  display: block;
+}
+span.run50 {
+  background-color: rgb(191, 255, 178);
+  display: block;
+}
+span.run51 {
+  background-color: rgb(193, 255, 178);
+  display: block;
+}
+span.run52 {
+  background-color: rgb(196, 255, 178);
+  display: block;
+}
+span.run53 {
+  background-color: rgb(198, 255, 178);
+  display: block;
+}
+span.run54 {
+  background-color: rgb(201, 255, 178);
+  display: block;
+}
+span.run55 {
+  background-color: rgb(205, 255, 178);
+  display: block;
+}
+span.run56 {
+  background-color: rgb(207, 255, 178);
+  display: block;
+}
+span.run57 {
+  background-color: rgb(210, 255, 178);
+  display: block;
+}
+span.run58 {
+  background-color: rgb(212, 255, 178);
+  display: block;
+}
+span.run59 {
+  background-color: rgb(215, 255, 178);
+  display: block;
+}
+span.run60 {
+  background-color: rgb(219, 255, 178);
+  display: block;
+}
+span.run61 {
+  background-color: rgb(221, 255, 178);
+  display: block;
+}
+span.run62 {
+  background-color: rgb(224, 255, 178);
+  display: block;
+}
+span.run63 {
+  background-color: rgb(226, 255, 178);
+  display: block;
+}
+span.run64 {
+  background-color: rgb(229, 255, 178);
+  display: block;
+}
+span.run65 {
+  background-color: rgb(233, 255, 178);
+  display: block;
+}
+span.run66 {
+  background-color: rgb(235, 255, 178);
+  display: block;
+}
+span.run67 {
+  background-color: rgb(238, 255, 178);
+  display: block;
+}
+span.run68 {
+  background-color: rgb(240, 255, 178);
+  display: block;
+}
+span.run69 {
+  background-color: rgb(243, 255, 178);
+  display: block;
+}
+span.run70 {
+  background-color: rgb(247, 255, 178);
+  display: block;
+}
+span.run71 {
+  background-color: rgb(249, 255, 178);
+  display: block;
+}
+span.run72 {
+  background-color: rgb(252, 255, 178);
+  display: block;
+}
+span.run73 {
+  background-color: rgb(255, 255, 178);
+  display: block;
+}
+span.run74 {
+  background-color: rgb(255, 252, 178);
+  display: block;
+}
+span.run75 {
+  background-color: rgb(255, 248, 178);
+  display: block;
+}
+span.run76 {
+  background-color: rgb(255, 246, 178);
+  display: block;
+}
+span.run77 {
+  background-color: rgb(255, 243, 178);
+  display: block;
+}
+span.run78 {
+  background-color: rgb(255, 240, 178);
+  display: block;
+}
+span.run79 {
+  background-color: rgb(255, 238, 178);
+  display: block;
+}
+span.run80 {
+  background-color: rgb(255, 234, 178);
+  display: block;
+}
+span.run81 {
+  background-color: rgb(255, 232, 178);
+  display: block;
+}
+span.run82 {
+  background-color: rgb(255, 229, 178);
+  display: block;
+}
+span.run83 {
+  background-color: rgb(255, 226, 178);
+  display: block;
+}
+span.run84 {
+  background-color: rgb(255, 224, 178);
+  display: block;
+}
+span.run85 {
+  background-color: rgb(255, 220, 178);
+  display: block;
+}
+span.run86 {
+  background-color: rgb(255, 218, 178);
+  display: block;
+}
+span.run87 {
+  background-color: rgb(255, 215, 178);
+  display: block;
+}
+span.run88 {
+  background-color: rgb(255, 212, 178);
+  display: block;
+}
+span.run89 {
+  background-color: rgb(255, 210, 178);
+  display: block;
+}
+span.run90 {
+  background-color: rgb(255, 206, 178);
+  display: block;
+}
+span.run91 {
+  background-color: rgb(255, 204, 178);
+  display: block;
+}
+span.run92 {
+  background-color: rgb(255, 201, 178);
+  display: block;
+}
+span.run93 {
+  background-color: rgb(255, 198, 178);
+  display: block;
+}
+span.run94 {
+  background-color: rgb(255, 196, 178);
+  display: block;
+}
+span.run95 {
+  background-color: rgb(255, 192, 178);
+  display: block;
+}
+span.run96 {
+  background-color: rgb(255, 189, 178);
+  display: block;
+}
+span.run97 {
+  background-color: rgb(255, 187, 178);
+  display: block;
+}
+span.run98 {
+  background-color: rgb(255, 184, 178);
+  display: block;
+}
+span.run99 {
+  background-color: rgb(255, 182, 178);
+  display: block;
+}
+span.run100 {
+  background-color: rgb(255, 178, 178);
+  display: block;
+}
+</style>
+    </head>
+  <body><h3>Bogo-profile information</h3>
+    <p>Generated on Sat Apr 02 20:24:10 -0700 2011 with <a href='http://github.com/spicycode/rcov'>rcov 0.8.2.1</a>
+      </p>
+    <hr/>
+    <table class='report'><thead><tr><td class='heading'>Name</td>
+      <td class='heading'>Total lines</td>
+      <td class='heading'>Lines of code</td>
+      <td class='heading'>Total coverage</td>
+      <td class='heading'>Code coverage</td>
+      </tr>
+    </thead>
+  <tbody><tr class='light'><td><a href='lib-tweetstream-client_rb.html'>lib/tweetstream/client.rb</a>
+        </td>
+      <td class='lines_total'><tt>280</tt>
+        </td>
+      <td class='lines_code'><tt>151</tt>
+        </td>
+      <td><table cellspacing='0' align='right' cellpadding='0'><tr><td><tt class='coverage_total'>51.4%</tt>
+              &nbsp;</td>
+            <td><table class='percent_graph' cellspacing='0' cellpadding='0' width='100'><tr><td class='covered' width='51'/>
+                  <td class='uncovered' width='49'/>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      <td><table cellspacing='0' align='right' cellpadding='0'><tr><td><tt class='coverage_code'>18.5%</tt>
+              &nbsp;</td>
+            <td><table class='percent_graph' cellspacing='0' cellpadding='0' width='100'><tr><td class='covered' width='19'/>
+                  <td class='uncovered' width='81'/>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+<pre><span class="run50"><a name="line1"></a>  1 require 'uri'
+<a name="line2"></a>  2 require 'cgi'
+<a name="line3"></a>  3 require 'eventmachine'
+<a name="line4"></a>  4 require 'twitter/json_stream'
+<a name="line5"></a>  5 require 'json'
+</span><a name="line6"></a>  6 
+<span class="run55"><a name="line7"></a>  7 module TweetStream
+</span><a name="line8"></a>  8   # Provides simple access to the Twitter Streaming API (http://apiwiki.twitter.com/Streaming-API-Documentation)
+<a name="line9"></a>  9   # for Ruby scripts that need to create a long connection to
+<a name="line10"></a> 10   # Twitter for tracking and other purposes.
+<a name="line11"></a> 11   #
+<a name="line12"></a> 12   # Basic usage of the library is to call one of the provided
+<a name="line13"></a> 13   # methods and provide a block that will perform actions on
+<a name="line14"></a> 14   # a yielded TweetStream::Status. For example:
+<a name="line15"></a> 15   #
+<a name="line16"></a> 16   #     TweetStream::Client.new('user','pass').track('fail') do |status|
+<a name="line17"></a> 17   #       puts &quot;[#{status.user.screen_name}] #{status.text}&quot;
+<a name="line18"></a> 18   #     end
+<a name="line19"></a> 19   #
+<a name="line20"></a> 20   # For information about a daemonized TweetStream client,
+<a name="line21"></a> 21   # view the TweetStream::Daemon class.
+<span class="run55"><a name="line22"></a> 22   class Client
+</span><span class="run50"><a name="line23"></a> 23     attr_accessor :username, :password
+<a name="line24"></a> 24     attr_reader :parser
+</span><a name="line25"></a> 25 
+<a name="line26"></a> 26     # Set the JSON Parser for this client. Acceptable options are:
+<a name="line27"></a> 27     #
+<a name="line28"></a> 28     # &lt;tt&gt;:json_gem&lt;/tt&gt;:: Parse using the JSON gem.
+<a name="line29"></a> 29     # &lt;tt&gt;:json_pure&lt;/tt&gt;:: Parse using the pure-ruby implementation of the JSON gem.
+<a name="line30"></a> 30     # &lt;tt&gt;:active_support&lt;/tt&gt;:: Parse using ActiveSupport::JSON.decode
+<a name="line31"></a> 31     # &lt;tt&gt;:yajl&lt;/tt&gt;:: Parse using &lt;tt&gt;yajl-ruby&lt;/tt&gt;.
+<a name="line32"></a> 32     #
+<a name="line33"></a> 33     # You may also pass a class that will return a hash with symbolized
+<a name="line34"></a> 34     # keys when &lt;tt&gt;YourClass.parse&lt;/tt&gt; is called with a JSON string.
+<span class="run50"><a name="line35"></a> 35     def parser=(parser)
+</span><a name="line36"></a> 36       @parser = parser_from(parser)
+<a name="line37"></a> 37     end
+<a name="line38"></a> 38     
+<a name="line39"></a> 39     # Create a new client with the Twitter credentials
+<a name="line40"></a> 40     # of the account you want to be using its API quota.
+<a name="line41"></a> 41     # You may also set the JSON parsing library as specified
+<a name="line42"></a> 42     # in the #parser= setter.
+<span class="run50"><a name="line43"></a> 43     def initialize(user, pass, parser = :json_gem)
+</span><a name="line44"></a> 44       self.username = user
+<a name="line45"></a> 45       self.password = pass
+<a name="line46"></a> 46       self.parser = parser
+<a name="line47"></a> 47       @periodic_timers = []
+<a name="line48"></a> 48     end
+<a name="line49"></a> 49    
+<a name="line50"></a> 50     # Returns all public statuses. The Firehose is not a generally
+<a name="line51"></a> 51     # available resource. Few applications require this level of access. 
+<a name="line52"></a> 52     # Creative use of a combination of other resources and various access 
+<a name="line53"></a> 53     # levels can satisfy nearly every application use case. 
+<span class="run50"><a name="line54"></a> 54     def firehose(query_parameters = {}, &amp;block)
+</span><a name="line55"></a> 55       start('statuses/firehose', query_parameters, &amp;block)
+<a name="line56"></a> 56     end
+<a name="line57"></a> 57     
+<a name="line58"></a> 58     # Returns all retweets. The retweet stream is not a generally available 
+<a name="line59"></a> 59     # resource. Few applications require this level of access. Creative
+<a name="line60"></a> 60     # use of a combination of other resources and various access levels
+<a name="line61"></a> 61     # can satisfy nearly every application use case. As of 9/11/2009,
+<a name="line62"></a> 62     # the site-wide retweet feature has not yet launched,
+<a name="line63"></a> 63     # so there are currently few, if any, retweets on this stream.
+<span class="run50"><a name="line64"></a> 64     def retweet(query_parameters = {}, &amp;block)
+</span><a name="line65"></a> 65       start('statuses/retweet', query_parameters, &amp;block)
+<a name="line66"></a> 66     end
+<a name="line67"></a> 67     
+<a name="line68"></a> 68     # Returns a random sample of all public statuses. The default access level 
+<a name="line69"></a> 69     # provides a small proportion of the Firehose. The &quot;Gardenhose&quot; access
+<a name="line70"></a> 70     # level provides a proportion more suitable for data mining and
+<a name="line71"></a> 71     # research applications that desire a larger proportion to be statistically
+<a name="line72"></a> 72     # significant sample.
+<span class="run50"><a name="line73"></a> 73     def sample(query_parameters = {}, &amp;block)
+</span><a name="line74"></a> 74       start('statuses/sample', query_parameters, &amp;block)
+<a name="line75"></a> 75     end
+<a name="line76"></a> 76 
+<a name="line77"></a> 77     # Specify keywords to track. Queries are subject to Track Limitations, 
+<a name="line78"></a> 78     # described in Track Limiting and subject to access roles, described in 
+<a name="line79"></a> 79     # the statuses/filter method. Track keywords are case-insensitive logical 
+<a name="line80"></a> 80     # ORs. Terms are exact-matched, and also exact-matched ignoring
+<a name="line81"></a> 81     # punctuation. Phrases, keywords with spaces, are not supported. 
+<a name="line82"></a> 82     # Keywords containing punctuation will only exact match tokens.
+<a name="line83"></a> 83     # Query parameters may be passed as the last argument.
+<span class="run50"><a name="line84"></a> 84     def track(*keywords, &amp;block)
+</span><a name="line85"></a> 85       query_params = keywords.pop if keywords.last.is_a?(::Hash)
+<a name="line86"></a> 86       query_params ||= {}
+<a name="line87"></a> 87       filter(query_params.merge(:track =&gt; keywords), &amp;block)
+<a name="line88"></a> 88     end
+<a name="line89"></a> 89 
+<a name="line90"></a> 90     # Returns public statuses from or in reply to a set of users. Mentions 
+<a name="line91"></a> 91     # (&quot;Hello @user!&quot;) and implicit replies (&quot;@user Hello!&quot; created without 
+<a name="line92"></a> 92     # pressing the reply &quot;swoosh&quot;) are not matched. Requires integer user
+<a name="line93"></a> 93     # IDs, not screen names. Query parameters may be passed as the last argument.
+<span class="run50"><a name="line94"></a> 94     def follow(*user_ids, &amp;block)
+</span><a name="line95"></a> 95       query_params = user_ids.pop if user_ids.last.is_a?(::Hash)
+<a name="line96"></a> 96       query_params ||= {}
+<a name="line97"></a> 97       filter(query_params.merge(:follow =&gt; user_ids), &amp;block)
+<a name="line98"></a> 98     end
+<a name="line99"></a> 99     
+<a name="line100"></a>100     # Make a call to the statuses/filter method of the Streaming API,
+<a name="line101"></a>101     # you may provide &lt;tt&gt;:follow&lt;/tt&gt;, &lt;tt&gt;:track&lt;/tt&gt; or both as options
+<a name="line102"></a>102     # to follow the tweets of specified users or track keywords. This
+<a name="line103"></a>103     # method is provided separately for cases when it would conserve the
+<a name="line104"></a>104     # number of HTTP connections to combine track and follow.
+<span class="run50"><a name="line105"></a>105     def filter(query_params = {}, &amp;block)
+</span><a name="line106"></a>106       [:follow, :track, :locations].each do |param|
+<a name="line107"></a>107         if query_params[param].is_a?(Array)
+<a name="line108"></a>108           query_params[param] = query_params[param].collect{|q| q.to_s}.join(',')
+<a name="line109"></a>109         elsif query_params[param]
+<a name="line110"></a>110           query_params[param] = query_params[param].to_s
+<a name="line111"></a>111         end
+<a name="line112"></a>112       end
+<a name="line113"></a>113       start('statuses/filter', query_params.merge(:method =&gt; :post), &amp;block)
+<a name="line114"></a>114     end
+<a name="line115"></a>115 
+<a name="line116"></a>116     # Set a Proc to be run when a deletion notice is received
+<a name="line117"></a>117     # from the Twitter stream. For example:
+<a name="line118"></a>118     #
+<a name="line119"></a>119     #     @client = TweetStream::Client.new('user','pass')
+<a name="line120"></a>120     #     @client.on_delete do |status_id, user_id|
+<a name="line121"></a>121     #       Tweet.delete(status_id)
+<a name="line122"></a>122     #     end
+<a name="line123"></a>123     #
+<a name="line124"></a>124     # Block must take two arguments: the status id and the user id.
+<a name="line125"></a>125     # If no block is given, it will return the currently set 
+<a name="line126"></a>126     # deletion proc. When a block is given, the TweetStream::Client
+<a name="line127"></a>127     # object is returned to allow for chaining.
+<span class="run50"><a name="line128"></a>128     def on_delete(&amp;block)
+</span><a name="line129"></a>129       if block_given?
+<a name="line130"></a>130         @on_delete = block
+<a name="line131"></a>131         self
+<a name="line132"></a>132       else
+<a name="line133"></a>133         @on_delete
+<a name="line134"></a>134       end
+<a name="line135"></a>135     end
+<a name="line136"></a>136     
+<a name="line137"></a>137     # Set a Proc to be run when a rate limit notice is received
+<a name="line138"></a>138     # from the Twitter stream. For example:
+<a name="line139"></a>139     #
+<a name="line140"></a>140     #     @client = TweetStream::Client.new('user','pass')
+<a name="line141"></a>141     #     @client.on_limit do |discarded_count|
+<a name="line142"></a>142     #       # Make note of discarded count
+<a name="line143"></a>143     #     end
+<a name="line144"></a>144     #
+<a name="line145"></a>145     # Block must take one argument: the number of discarded tweets.
+<a name="line146"></a>146     # If no block is given, it will return the currently set 
+<a name="line147"></a>147     # limit proc. When a block is given, the TweetStream::Client
+<a name="line148"></a>148     # object is returned to allow for chaining.
+<span class="run50"><a name="line149"></a>149     def on_limit(&amp;block)
+</span><a name="line150"></a>150       if block_given?
+<a name="line151"></a>151         @on_limit = block
+<a name="line152"></a>152         self
+<a name="line153"></a>153       else
+<a name="line154"></a>154         @on_limit
+<a name="line155"></a>155       end
+<a name="line156"></a>156     end
+<a name="line157"></a>157     
+<a name="line158"></a>158     # Set a Proc to be run when an HTTP error is encountered in the
+<a name="line159"></a>159     # processing of the stream. Note that TweetStream will automatically
+<a name="line160"></a>160     # try to reconnect, this is for reference only. Don't panic!
+<a name="line161"></a>161     #
+<a name="line162"></a>162     #     @client = TweetStream::Client.new('user','pass')
+<a name="line163"></a>163     #     @client.on_error do |message|
+<a name="line164"></a>164     #       # Make note of error message
+<a name="line165"></a>165     #     end
+<a name="line166"></a>166     #
+<a name="line167"></a>167     # Block must take one argument: the error message.
+<a name="line168"></a>168     # If no block is given, it will return the currently set 
+<a name="line169"></a>169     # error proc. When a block is given, the TweetStream::Client
+<a name="line170"></a>170     # object is returned to allow for chaining.
+<span class="run50"><a name="line171"></a>171     def on_error(&amp;block)
+</span><a name="line172"></a>172       if block_given?
+<a name="line173"></a>173         @on_error = block
+<a name="line174"></a>174         self
+<a name="line175"></a>175       else
+<a name="line176"></a>176         @on_error
+<a name="line177"></a>177       end
+<a name="line178"></a>178     end
+<a name="line179"></a>179     
+<span class="run50"><a name="line180"></a>180     def add_periodic_timer(seconds, &amp;block)
+</span><a name="line181"></a>181       if block_given?
+<a name="line182"></a>182         @periodic_timer = {:seconds =&gt; seconds, :proc =&gt; block}
+<a name="line183"></a>183         self
+<a name="line184"></a>184       end
+<a name="line185"></a>185     end
+<a name="line186"></a>186     
+<span class="run50"><a name="line187"></a>187     def start(path, query_parameters = {}, &amp;block) #:nodoc:
+</span><a name="line188"></a>188       method = query_parameters.delete(:method) || :get
+<a name="line189"></a>189       delete_proc = query_parameters.delete(:delete) || self.on_delete
+<a name="line190"></a>190       limit_proc = query_parameters.delete(:limit) || self.on_limit
+<a name="line191"></a>191       error_proc = query_parameters.delete(:error) || self.on_error
+<a name="line192"></a>192       
+<a name="line193"></a>193       uri = method == :get ? build_uri(path, query_parameters) : build_uri(path)
+<a name="line194"></a>194       
+<a name="line195"></a>195       EventMachine::run {
+<a name="line196"></a>196         EventMachine::add_periodic_timer(@periodic_timer[:seconds]) { @periodic_timer[:proc].call } if @periodic_timer
+<a name="line197"></a>197         @stream = Twitter::JSONStream.connect(
+<a name="line198"></a>198           :path =&gt; uri,
+<a name="line199"></a>199           :auth =&gt; &quot;#{URI.encode self.username}:#{URI.encode self.password}&quot;,
+<a name="line200"></a>200           :method =&gt; method.to_s.upcase,
+<a name="line201"></a>201           :content =&gt; (method == :post ? build_post_body(query_parameters) : ''),
+<a name="line202"></a>202           :user_agent =&gt; 'TweetStream'
+<a name="line203"></a>203         )
+<a name="line204"></a>204         
+<a name="line205"></a>205         @stream.each_item do |item|
+<a name="line206"></a>206           raw_hash = @parser.decode(item)
+<a name="line207"></a>207           
+<a name="line208"></a>208           unless raw_hash.is_a?(::Hash)
+<a name="line209"></a>209             error_proc.call(&quot;Unexpected JSON object in stream: #{item}&quot;)
+<a name="line210"></a>210             next
+<a name="line211"></a>211           end
+<a name="line212"></a>212           
+<a name="line213"></a>213           hash = TweetStream::Hash.new(raw_hash) # @parser.parse(item)
+<a name="line214"></a>214           
+<a name="line215"></a>215           if hash[:delete] &amp;&amp; hash[:delete][:status]
+<a name="line216"></a>216             delete_proc.call(hash[:delete][:status][:id], hash[:delete][:status][:user_id]) if delete_proc.is_a?(Proc)
+<a name="line217"></a>217           elsif hash[:limit] &amp;&amp; hash[:limit][:track]
+<a name="line218"></a>218             limit_proc.call(hash[:limit][:track]) if limit_proc.is_a?(Proc)
+<a name="line219"></a>219           elsif hash[:text] &amp;&amp; hash[:user]
+<a name="line220"></a>220             @last_status = TweetStream::Status.new(hash)
+<a name="line221"></a>221             
+<a name="line222"></a>222             # Give the block the option to receive either one
+<a name="line223"></a>223             # or two arguments, depending on its arity.
+<a name="line224"></a>224             case block.arity
+<a name="line225"></a>225               when 1
+<a name="line226"></a>226                 yield @last_status
+<a name="line227"></a>227               when 2
+<a name="line228"></a>228                 yield @last_status, self
+<a name="line229"></a>229             end
+<a name="line230"></a>230           end
+<a name="line231"></a>231         end
+<a name="line232"></a>232         
+<a name="line233"></a>233         @stream.on_error do |message|
+<a name="line234"></a>234           error_proc.call(message) if error_proc.is_a?(Proc)
+<a name="line235"></a>235         end
+<a name="line236"></a>236         
+<a name="line237"></a>237         @stream.on_max_reconnects do |timeout, retries|
+<a name="line238"></a>238           raise TweetStream::ReconnectError.new(timeout, retries)
+<a name="line239"></a>239         end
+<a name="line240"></a>240       }
+<a name="line241"></a>241     end
+<a name="line242"></a>242     
+<a name="line243"></a>243     # Terminate the currently running TweetStream.
+<span class="run50"><a name="line244"></a>244     def stop
+</span><a name="line245"></a>245       EventMachine.stop_event_loop
+<a name="line246"></a>246       @last_status
+<a name="line247"></a>247     end
+<a name="line248"></a>248  
+<span class="run50"><a name="line249"></a>249     protected
+</span><a name="line250"></a>250 
+<span class="run50"><a name="line251"></a>251     def parser_from(parser)
+</span><a name="line252"></a>252       case parser
+<a name="line253"></a>253       when Class
+<a name="line254"></a>254         parser
+<a name="line255"></a>255       when Symbol
+<a name="line256"></a>256         require &quot;tweetstream/parsers/#{parser.to_s}&quot;
+<a name="line257"></a>257         eval(&quot;TweetStream::Parsers::#{parser.to_s.split('_').map{|s| s.capitalize}.join('')}&quot;)
+<a name="line258"></a>258       end
+<a name="line259"></a>259     end
+<a name="line260"></a>260             
+<span class="run50"><a name="line261"></a>261     def build_uri(path, query_parameters = {}) #:nodoc:
+</span><a name="line262"></a>262       URI.parse(&quot;/1/#{path}.json#{build_query_parameters(query_parameters)}&quot;)
+<a name="line263"></a>263     end
+<a name="line264"></a>264 
+<span class="run50"><a name="line265"></a>265     def build_query_parameters(query)
+</span><a name="line266"></a>266       query.size &gt; 0 ? &quot;?#{build_post_body(query)}&quot; : ''
+<a name="line267"></a>267     end
+<a name="line268"></a>268     
+<span class="run50"><a name="line269"></a>269     def build_post_body(query) #:nodoc:
+</span><a name="line270"></a>270       return '' unless query &amp;&amp; query.is_a?(::Hash) &amp;&amp; query.size &gt; 0
+<a name="line271"></a>271       pairs = []
+<a name="line272"></a>272       
+<a name="line273"></a>273       query.each_pair do |k,v|
+<a name="line274"></a>274         pairs &lt;&lt; &quot;#{k.to_s}=#{CGI.escape(v.to_s)}&quot;
+<a name="line275"></a>275       end
+<a name="line276"></a>276 
+<a name="line277"></a>277       pairs.join('&amp;')
+<a name="line278"></a>278     end
+<a name="line279"></a>279   end
+<a name="line280"></a>280 end
+</pre><hr/>
+    <p>Generated using the <a href='http://eigenclass.org/hiki.rb?rcov'>rcov code coverage analysis tool for Ruby</a>
+   version 0.8.2.1.</p>
+<p><a href='http://validator.w3.org/check/referer'><img src='http://www.w3.org/Icons/valid-xhtml10' height='31' alt='Valid XHTML 1.0!' width='88'/>
+        </a>
+      <a href='http://jigsaw.w3.org/css-validator/check/referer'><img src='http://jigsaw.w3.org/css-validator/images/vcss' alt='Valid CSS!' style='border:0;width:88px;height:31px'/>
+        </a>
+      </p>
+    </body>
+  </html>
