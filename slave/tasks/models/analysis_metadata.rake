@@ -61,7 +61,6 @@ namespace :analysis_metadata do
           answer = Sh::clean_gets
           response = analysis_metadata.verify_variable(variable, answer, curation)
         end
-        debugger
         analytical_offering_variable = AnalyticalOfferingVariable.new
         analytical_offering_variable.value = response[:variable]
         analytical_offering_variable.analytical_offering_variable_descriptor = variable

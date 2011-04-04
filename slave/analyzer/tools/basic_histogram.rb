@@ -66,7 +66,6 @@ class BasicHistogram < AnalysisMetadata
   end
 
   def self.frequency_graphs(fs, graph, conditional, path=ENV['TMP_PATH'])
-    debugger
     limit = DEFAULT_CHUNK_SIZE||1000
     offset = 0
     sub_directory = "/"+[fs[:year],fs[:month],fs[:date],fs[:hour]].compact.join("/")

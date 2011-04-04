@@ -10,7 +10,8 @@ class Graph
   property :written, Boolean, :default => false
   property :time_slice, Time, :unique_index => [:unique_graph], :index => [:time_slice_graph]
   has n, :graph_points
-  belongs_to :curation, :unique_index => [:unique_graph], :index => [:curation_id_graph, :year_month_date_hour_graph, :year_month_date_graph, :year_month_graph, :month_date_hour_graph, :month_date_graph, :date_hour_graph, :year_graph, :month_graph, :date_graph, :hour_graph]
+  belongs_to :analysis_metadata, :unique_index => [:unique_edge], :index => [:curation_id_analysis_metadata_id, :analysis_metadata_id]
+  belongs_to :curation, :unique_index => [:unique_graph], :index => [:curation_id_graph, :year_month_date_hour_graph, :year_month_date_graph, :year_month_graph, :month_date_hour_graph, :month_date_graph, :date_hour_graph, :year_graph, :month_graph, :date_graph, :hour_graph, :curation_id_analysis_metadata_id]
   
   def folder_name
     if time_slice

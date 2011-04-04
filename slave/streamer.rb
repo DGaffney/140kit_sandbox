@@ -68,15 +68,15 @@ class Streamer < Instance
           first_attempt = true
           while answer!="y" || first_attempt
             first_attempt = false
-            puts "Enter your username:"
-            user_name = Sh::clean_gets
+            puts "Enter your screen name:"
+            screen_name = Sh::clean_gets
             puts "Enter your password:"
             password = Sh::clean_gets
-            puts "We got the username '#{user_name}' and a password that was #{password.length} characters long. Sound right-ish? (y/n)"
+            puts "We got the username '#{screen_name}' and a password that was #{password.length} characters long. Sound right-ish? (y/n)"
             answer = Sh::clean_gets
           end
           puts "Creating new AuthUser..."
-          user = AuthUser.new(:user_name => user_name, :password => password)
+          user = AuthUser.new(:screen_name => screen_name, :password => password)
           user.save
           user = AuthUser.unlocked.first
           @user_account = user

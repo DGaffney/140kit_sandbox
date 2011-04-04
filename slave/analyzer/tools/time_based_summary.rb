@@ -91,7 +91,6 @@ class TimeBasedSummary < AnalysisMetadata
       }
       case model
       when "tweets"
-        # frequency_listing = get_frequency_listing("select text from tweets "+Analysis.conditional(curation)+" and "+Analysis.time_conditional("created_at", object_group["created_at"], granularity))
         basic_histogram_frequency_sets = [
           {:attribute => :language},
           {:attribute => :created_at},
@@ -99,13 +98,13 @@ class TimeBasedSummary < AnalysisMetadata
           {:attribute => :location}
         ].collect{|fs| fs.merge(general_frequency_set_conditions)}
         BasicHistogram.generate_graph_points(basic_histogram_frequency_sets, curation)
-        # generate_graph_points([
-        #   {:model => Tweet, "title" => "hashtags",          "style" => "word_frequency", "collection" => collection, "time_slice" => object_group["created_at"], "granularity" => granularity},
-        #   {:model => Tweet, "title" => "mentions",          "style" => "word_frequency", "collection" => collection, "time_slice" => object_group["created_at"], "granularity" => granularity},
-        #   {:model => Tweet, "title" => "significant_words", "style" => "word_frequency", "collection" => collection, "time_slice" => object_group["created_at"], "granularity" => granularity},
-        #   {:model => Tweet, "title" => "urls",              "style" => "word_frequency", "collection" => collection, "time_slice" => object_group["created_at"], "granularity" => granularity}]) do |fs, graph, tmp_folder|
-        #     generate_word_frequency(fs, tmp_folder, frequency_listing, collection, graph)
-        # end
+        BasicHistogram.generate_graph_points([
+          {:title => "urls", :frequency_type => "urls", :style => "word_frequencies", :time_slice => time_slice, :granularity => granularity, :year => year, :month => month, :date => date, :hour => hour}, 
+          {:title => "hashtags", :frequency_type => "hashtags", :style => "word_frequencies", :time_slice => time_slice, :granularity => granularity, :year => year, :month => month, :date => date, :hour => hour}, 
+          {:title => "user_mentions", :frequency_type => "user_mentions", :style => "word_frequencies", :time_slice => time_slice, :granularity => granularity, :year => year, :month => month, :date => date, :hour => hour}
+        ]) do |fs, graph, curation|
+          WordFrequency.generate_word_frequencies_from_entities(fs, graph, conditional)
+        end
       when "users"
         basic_histogram_frequency_sets = [
           {:attribute => :followers_count},
@@ -150,4 +149,13 @@ class TimeBasedSummary < AnalysisMetadata
     end
     return time, year, month, date, hour
   end
+  
+  def self.finalize_analysis(curation)
+    response = {}
+    response[:recipient] = curation.researcher.email
+    response[:subject] = "#{curation.researcher.user_name}, the Time-based Summary for the basic histograms in the \"#{curation.name}\" data set is complete."
+    response[:message_content] = "Your CSV files and online charts are ready for download and viewing. You can grab them by visiting the collection's page: <a href=\"http://140kit.com/#{curation.researcher.user_name}/collections/#{curation.id}\">http://140kit.com/#{curation.researcher.user_name}/collections/#{curation.id}</a>."
+    return response
+  end
+  
 end

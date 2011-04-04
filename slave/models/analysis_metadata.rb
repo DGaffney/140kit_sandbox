@@ -8,6 +8,9 @@ class AnalysisMetadata
   belongs_to :curation, :child_key => :curation_id
   belongs_to :analytical_offering, :child_key => :analytical_offering_id
   has n, :analytical_offering_variables
+  has n, :graphs
+  has n, :graph_points
+  has n, :edges
   
   def display_terminal
     display = ""
@@ -90,6 +93,9 @@ class AnalysisMetadata
   end
   
   def self.clear
+    self.graph_points.destroy
+    self.graphs.destroy
+    self.edges.destroy
     self.destroy
   end
   
@@ -109,7 +115,6 @@ class AnalysisMetadata
     response = self.finalize_analysis(curation)
     response[:researcher_id] = curation.researcher.id
     Mail.queue(response)
-    debugger
     analysis_metadata = curation.analysis_metadatas.select{|x| x.function == self.function}.first
     analysis_metadata.update(:finished => true)
   end
