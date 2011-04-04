@@ -25,4 +25,8 @@ module Analysis::Dependencies
   def self.basic_histogram_dependencies
     ['fastercsv']
   end
+
+  def self.time_based_summary_dependencies
+    ['fastercsv']
+  end
 end

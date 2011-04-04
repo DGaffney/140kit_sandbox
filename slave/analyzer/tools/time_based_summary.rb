@@ -18,19 +18,44 @@ class TimeBasedSummary < AnalysisMetadata
     end
     return remaining_variables
   end
-
   
-    def self.time_based_summary(collection_id, save_path)
-    granularity = "hour"
-    time_queries = resolve_time_query(granularity)
-    time_queries.each_pair do |time_granularity,time_query|
-      collection = Collection.find({:id => collection_id})
-      user_timeline = Database.result("select date_format(created_at, '#{time_query}') as created_at from users"+Analysis.conditional(collection)+"group by date_format(created_at, '#{time_query}') order by created_at desc")
-      tweet_timeline = Database.result("select date_format(created_at, '#{time_query}') as created_at from tweets"+Analysis.conditional(collection)+"group by date_format(created_at, '#{time_query}') order by created_at desc")
-      time_based_analytics("tweets", time_query, tweet_timeline, collection, time_granularity, save_path)
-      time_based_analytics("users", time_query, user_timeline, collection, time_granularity, save_path)
+  def self.verify_variable(metadata, variable_descriptor, answer, curation)
+    case variable_descriptor.name
+    when "granularity"
+      valid_responses = ["year", "month", "date", "hour"]
+      response = {}
+      response[:reason] = "You may only choose one of these options, and only these options (can't be left blank). You entered: #{answer}. You can choose from ['year','month','date','hour']."
+      response[:variable] = answer
+      return response if !valid_responses.include?(answer)
     end
-    FilePathing.push_tmp_folder(save_path)
+    return {:variable => answer}
+  end
+  
+  def self.run(curation_id, save_path, granularity)
+    curation = Curation.first({:id => curation_id})
+    FilePathing.tmp_folder(curation, self.underscore)
+    conditional = Analysis.curation_conditional(curation)
+    time_queries = self.resolve_time_query(granularity)
+    time_queries.each_pair do |time_granularity,time_query|
+      user_timeline = nil
+      tweet_timeline = nil
+      #this ugliness is necessary as datamapper does not currently support native integration of big weird group by's that use sql functions
+      case DataMapper.repository.adapter.options["adapter"]
+      when "mysql"
+        user_timeline = DataMapper.repository.adapter.select("select date_format(created_at, '#{time_query}') as created_at from users where"+Analysis.conditions_to_mysql_query(conditional)+"group by date_format(created_at, '#{time_query}') order by created_at desc")
+        tweet_timeline = DataMapper.repository.adapter.select("select date_format(created_at, '#{time_query}') as created_at from tweets where"+Analysis.conditions_to_mysql_query(conditional)+"group by date_format(created_at, '#{time_query}') order by created_at desc")
+      when "sqlite"
+        user_timeline = DataMapper.repository.adapter.select("select date_format(created_at, '#{time_query}') as created_at from users where"+Analysis.conditions_to_mysql_query(conditional)+"group by date_format(created_at, '#{time_query}') order by created_at desc")
+        tweet_timeline = DataMapper.repository.adapter.select("select date_format(created_at, '#{time_query}') as created_at from tweets where"+Analysis.conditions_to_mysql_query(conditional)+"group by date_format(created_at, '#{time_query}') order by created_at desc")
+      when "memory"
+        user_timeline = User.all(conditional).select{|u| u.created_at.year}.uniq
+        tweet_timeline = Tweet.all(conditional).select{|u| u.created_at.year}.uniq
+      end
+      self.time_based_analytics("tweets", time_query, tweet_timeline, curation, time_granularity, save_path)
+      self.time_based_analytics("users", time_query, user_timeline, curation, time_granularity, save_path)
+    end
+    self.push_tmp_folder(curation.stored_folder_name)
+    self.finalize(curation)
   end
 
   def self.resolve_time_query(time_granularity)
@@ -46,76 +71,83 @@ class TimeBasedSummary < AnalysisMetadata
     end
   end
 
-  def self.time_based_analytics(model, time_query, object_timeline, collection, granularity, save_path)
-    object_timeline.each do |object_group|
-      temp_save_path = resolve_time(granularity, object_group["created_at"])
-      temp_save_path.shift
+  def self.time_based_analytics(model, time_query, timeline, curation, granularity, save_path)
+    timeline.each do |time|
+      time_slice, year, month, date, hour = self.resolve_time(granularity, time)
       graphs = []
       graph_points = []
-      conditional = Analysis.conditional(collection)+" and "+Analysis.time_conditional("created_at", object_group["created_at"], granularity)#" and date_format(created_at, '#{time_query}') = '#{object_group["created_at"]}'"
+      conditional = Analysis.curation_conditional(curation).merge(Analysis.time_conditional("created_at", time, granularity))
       totals_hash = {}
+      general_frequency_set_conditions = {
+        :model => model.to_class, 
+        :conditional => conditional, 
+        :style => "histogram", 
+        :time_slice => time_slice, 
+        :granularity => granularity, 
+        :year => year, 
+        :month => month, 
+        :date => date, 
+        :hour => hour
+      }
       case model
       when "tweets"
-        frequency_listing = get_frequency_listing("select text from tweets "+Analysis.conditional(collection)+" and "+Analysis.time_conditional("created_at", object_group["created_at"], granularity))
-        generate_graph_points([
-          {"model" => Tweet, "attribute" => "language", "conditional" => conditional, "style" => "histogram", "title" => "tweet_language", "collection" => collection, "time_slice" => object_group["created_at"], "granularity" => granularity},
-          {"model" => Tweet, "attribute" => "created_at", "conditional" => conditional, "style" => "histogram", "title" => "tweet_created_at", "collection" => collection, "time_slice" => object_group["created_at"], "granularity" => granularity},
-          {"model" => Tweet, "attribute" => "source", "conditional" => conditional, "style" => "histogram", "title" => "tweet_source", "collection" => collection, "time_slice" => object_group["created_at"], "granularity" => granularity},
-          {"model" => Tweet, "attribute" => "location", "conditional" => conditional, "style" => "histogram", "title" => "tweet_location", "collection" => collection, "time_slice" => object_group["created_at"], "granularity" => granularity}
-        ])
-        generate_graph_points([{"title" => "hashtags", "style" => "word_frequency", "collection" => collection, "time_slice" => object_group["created_at"], "granularity" => granularity},
-          {"title" => "mentions", "style" => "word_frequency", "collection" => collection, "time_slice" => object_group["created_at"], "granularity" => granularity},
-          {"title" => "significant_words", "style" => "word_frequency", "collection" => collection, "time_slice" => object_group["created_at"], "granularity" => granularity},
-          {"title" => "urls", "style" => "word_frequency", "collection" => collection, "time_slice" => object_group["created_at"], "granularity" => granularity}]) do |fs, graph, tmp_folder|
-            generate_word_frequency(fs, tmp_folder, frequency_listing, collection, graph)
-        end
+        # frequency_listing = get_frequency_listing("select text from tweets "+Analysis.conditional(curation)+" and "+Analysis.time_conditional("created_at", object_group["created_at"], granularity))
+        basic_histogram_frequency_sets = [
+          {:attribute => :language},
+          {:attribute => :created_at},
+          {:attribute => :source},
+          {:attribute => :location}
+        ].collect{|fs| fs.merge(general_frequency_set_conditions)}
+        BasicHistogram.generate_graph_points(basic_histogram_frequency_sets, curation)
+        # generate_graph_points([
+        #   {:model => Tweet, "title" => "hashtags",          "style" => "word_frequency", "collection" => collection, "time_slice" => object_group["created_at"], "granularity" => granularity},
+        #   {:model => Tweet, "title" => "mentions",          "style" => "word_frequency", "collection" => collection, "time_slice" => object_group["created_at"], "granularity" => granularity},
+        #   {:model => Tweet, "title" => "significant_words", "style" => "word_frequency", "collection" => collection, "time_slice" => object_group["created_at"], "granularity" => granularity},
+        #   {:model => Tweet, "title" => "urls",              "style" => "word_frequency", "collection" => collection, "time_slice" => object_group["created_at"], "granularity" => granularity}]) do |fs, graph, tmp_folder|
+        #     generate_word_frequency(fs, tmp_folder, frequency_listing, collection, graph)
+        # end
       when "users"
-        generate_graph_points([
-          {"model" => User, "attribute" => "followers_count", "conditional" => conditional, "style" => "histogram", "title" => "user_followers_count", "collection" => collection, "time_slice" => object_group["created_at"], "granularity" => granularity},
-          {"model" => User, "attribute" => "friends_count", "conditional" => conditional, "style" => "histogram", "title" => "user_friends_count", "collection" => collection, "time_slice" => object_group["created_at"], "granularity" => granularity},
-          {"model" => User, "attribute" => "favourites_count", "conditional" => conditional, "style" => "histogram", "title" => "user_favourites_count", "collection" => collection, "time_slice" => object_group["created_at"], "granularity" => granularity},
-          {"model" => User, "attribute" => "geo_enabled", "conditional" => conditional, "style" => "histogram", "title" => "user_geo_enabled", "collection" => collection, "time_slice" => object_group["created_at"], "granularity" => granularity},
-          {"model" => User, "attribute" => "statuses_count", "conditional" => conditional, "style" => "histogram", "title" => "user_statuses_count", "collection" => collection, "time_slice" => object_group["created_at"], "granularity" => granularity},
-          {"model" => User, "attribute" => "lang", "conditional" => conditional, "style" => "histogram", "title" => "user_lang", "collection" => collection, "time_slice" => object_group["created_at"], "granularity" => granularity},
-          {"model" => User, "attribute" => "time_zone", "conditional" => conditional, "style" => "histogram", "title" => "user_time_zone", "collection" => collection, "time_slice" => object_group["created_at"], "granularity" => granularity},
-          {"model" => User, "attribute" => "created_at", "conditional" => conditional, "style" => "histogram", "title" => "user_created_at", "collection" => collection, "time_slice" => object_group["created_at"], "granularity" => granularity}
-        ])
+        basic_histogram_frequency_sets = [
+          {:attribute => :followers_count},
+          {:attribute => :friends_count},
+          {:attribute => :favourites_count},
+          {:attribute => :geo_enabled},
+          {:attribute => :statuses_count},
+          {:attribute => :lang},
+          {:attribute => :time_zone},
+          {:attribute => :created_at}
+        ].collect{|fs| fs.merge(general_frequency_set_conditions)}
+        BasicHistogram.generate_graph_points(basic_histogram_frequency_sets, curation)
       end
     end
   end
 
-  def self.resolve_time(granularity, time_slice)
-    hour = ""
-    date = ""
-    month = ""
-    year = ""
-    time = time_slice.nil? ? "" : time_slice
+  def self.resolve_time(granularity, time)
+    year = nil
+    month = nil
+    date = nil
+    hour = nil
+    time = time.nil? ? "" : time
     case granularity
     when "hour"
       time = Time.parse(time)
-      hour = time.hour
-      date = time.day
-      month = time.month
       year = time.year
+      month = time.month
+      date = time.day
+      hour = time.hour
     when "date"
       time = Time.parse(time)
-      hour = ""
-      date = time.day
-      month = time.month
       year = time.year
+      month = time.month
+      date = time.day
     when "month"
       time = Time.parse("#{time}-01")
-      hour = ""
-      date = ""
-      month = time.month
       year = time.year
+      month = time.month
     when "year"
       time = Time.parse("#{time}-01-01")
-      hour = ""
-      date = ""
-      month = ""
       year = time.year
     end
-    return time, hour, date, month, year
+    return time, year, month, date, hour
   end
 end

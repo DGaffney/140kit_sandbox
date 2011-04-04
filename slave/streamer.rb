@@ -55,13 +55,13 @@ class Streamer < Instance
   def assign_user_account
     puts "Assigning user account."
     message = true
-    while @username.nil?
+    while @screen_name.nil?
       user = AuthUser.unlocked.first
       if !user.nil? && lock(user)
         @user_account = user
-        @username = user.user_name
+        @screen_name = user.screen_name
         @password = user.password
-        puts "Assigned #{@username}."
+        puts "Assigned #{@screen_name}."
       else
         answer = Sh::clean_gets_yes_no("No twitter accounts available. Add one now?") if message
         if answer
@@ -80,9 +80,9 @@ class Streamer < Instance
           user.save
           user = AuthUser.unlocked.first
           @user_account = user
-          @username = user.user_name
+          @screen_name = user.screen_name
           @password = user.password
-          puts "Assigned #{@username}."
+          puts "Assigned #{@screen_name}."
         else
           puts "Then I can't do anything for you. May god have mercy on your data"
           exit!
@@ -95,7 +95,7 @@ class Streamer < Instance
   
   def collect
     puts "Collecting: #{params_for_stream.inspect}"
-    client = TweetStream::Client.new(@username, @password, :yajl)
+    client = TweetStream::Client.new(@screen_name, @password, :yajl)
     client.add_periodic_timer(CHECK_FOR_NEW_DATASETS_INTERVAL) { puts "Checking for new datasets."; client.stop if add_datasets }
     client.on_limit { |skip_count| puts "\nWe are being rate limited! We lost #{skip_count} tweets!\n" }
     client.on_error { |message| puts "\nError: #{message}\n" }

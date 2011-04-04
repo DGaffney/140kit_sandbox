@@ -57,11 +57,14 @@ namespace :analysis_metadata do
       if answer!="cancel"
         response = analysis_metadata.verify_variable(variable, answer, curation)
         while !response[:reason].empty?
+          puts response[:reason]
+          answer = Sh::clean_gets
           response = analysis_metadata.verify_variable(variable, answer, curation)
         end
+        debugger
         analytical_offering_variable = AnalyticalOfferingVariable.new
         analytical_offering_variable.value = response[:variable]
-        analytical_offering_variable.analytical_offering_variable_descriptor = variable.id
+        analytical_offering_variable.analytical_offering_variable_descriptor = variable
         analytical_offering_variable.analysis_metadata = analysis_metadata
         analytical_offering_variable.save
       else

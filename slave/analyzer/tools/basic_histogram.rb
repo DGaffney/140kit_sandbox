@@ -26,6 +26,7 @@ class BasicHistogram < AnalysisMetadata
   #Results: Frequency Charts of basic data on Tweets and Users per data set
   def self.run(curation_id, save_path)
     curation = Curation.first(:id => curation_id)
+    FilePathing.tmp_folder(curation, self.underscore)
     self.generate_graph_points([
       {:model => Tweet, :attribute => :language},
       {:model => Tweet, :attribute => :created_at},
@@ -49,37 +50,38 @@ class BasicHistogram < AnalysisMetadata
     curation_id = curation && curation.id || nil
     graphs = []
     frequency_set.each do |fs|
-      # time, hour, date, month, year = resolve_time(fs["granularity"], fs["time_slice"])
       fs[:style] = fs[:style] || "histogram"
       fs[:title] = fs[:title] || fs[:model].pluralize+"_"+fs[:attribute].to_s
       graph_attrs = Hash[fs.select{|k,v| Graph.attributes.include?(k)}]
       graph = Graph.first_or_create({:curation_id => curation_id}.merge(graph_attrs))
       graphs << graph
-      sub_folder = graph.folder_name
-      tmp_folder = FilePathing.tmp_folder(curation, sub_folder)
       if block_given?
-        yield fs, graph, tmp_folder
+        yield fs, graph, curation
       else
-        conditional = curation.nil? ? {} : Analysis.curation_conditional(curation)
-        self.frequency_graphs(fs, graph, tmp_folder, conditional)
+        conditional = curation.nil? ? {} : Analysis.curation_conditional(curation).merge(fs[:conditional])
+        self.frequency_graphs(fs, graph, conditional)
       end
     end
     return graphs
   end
 
-  def self.frequency_graphs(fs, graph, tmp_folder, conditional)
+  def self.frequency_graphs(fs, graph, conditional, path=ENV['TMP_PATH'])
+    debugger
     limit = DEFAULT_CHUNK_SIZE||1000
     offset = 0
-    FasterCSV.open(tmp_folder+graph.title+".csv", "w") do |csv|
+    sub_directory = "/"+[fs[:year],fs[:month],fs[:date],fs[:hour]].compact.join("/")
+    full_path_with_file = sub_directory == "/" ? path+"/"+graph.title+".csv" : path+sub_directory+"/"+graph.title+".csv"
+    Sh::mkdir(path+sub_directory) if sub_directory != "/"
+    FasterCSV.open(full_path_with_file, "w") do |csv|
       records = fs[:model].aggregate(fs[:attribute], :all.count, {:limit => limit, :offset => offset}.merge(conditional))
+      graph_points = records.collect{|record| {:label => record.first, :value => record.last, :graph_id => graph.id, :curation_id => graph.curation_id}}
+      graph_points = graph.sanitize_points(graph_points)
       while !records.empty?
-        graph_points = []
-        records.each do |record|
-          csv << ["label", "value"]
-          csv << record
-          graph_points << {:label => record.first, :value => record.last, :graph_id => graph.id}
+        csv << ["label", "value"]
+        graph_points.each do |graph_point|
+          csv << [graph_point[:label],graph_point[:value]]
         end
-        GraphPoint.save_all(GraphPoint.sanitize_points(graph, graph_points))
+        GraphPoint.save_all(graph_points)
         offset+=limit
         records = fs[:model].aggregate(fs[:attribute], :all.count, {:limit => limit, :offset => offset}.merge(conditional))
       end

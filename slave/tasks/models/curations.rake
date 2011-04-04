@@ -1,6 +1,6 @@
 namespace :curation do
   desc "Create a new curation."
-  task :new => :load_environment do
+  task :new => :environment do
     researcher = load_researcher
     puts "What type of curation will this be? (Can choose from: #{Dataset.scrape_types.inspect})"
     answer = Sh::clean_gets

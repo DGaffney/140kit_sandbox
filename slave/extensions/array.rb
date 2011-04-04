@@ -21,7 +21,8 @@ class Array
   end
   
   def chunk(pieces=2)
-    len = self.length;
+    len = self.length
+    return [] if len == 0
     mid = (len/pieces)
     chunks = []
     start = 0

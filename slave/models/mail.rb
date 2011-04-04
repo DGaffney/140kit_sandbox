@@ -11,5 +11,6 @@ class Mail
   def self.queue(response)
     mail = Mail.new(response)
     mail.save if self.storage_exists? #since i'm too lazy to rake db:migrate right now...
+    return mail
   end
 end

@@ -9,6 +9,7 @@ class Graph
   property :hour, Integer, :unique_index => [:unique_graph], :index => [:hour_graph, :year_month_date_hour_graph, :month_date_hour_graph, :date_hour_graph, :year_month_date_hour, :month_date_hour, :date_hour, :hour]
   property :written, Boolean, :default => false
   property :time_slice, Time, :unique_index => [:unique_graph], :index => [:time_slice_graph]
+  has n, :graph_points
   belongs_to :curation, :unique_index => [:unique_graph], :index => [:curation_id_graph, :year_month_date_hour_graph, :year_month_date_graph, :year_month_graph, :month_date_hour_graph, :month_date_graph, :date_hour_graph, :year_graph, :month_graph, :date_graph, :hour_graph]
   
   def folder_name
@@ -19,6 +20,9 @@ class Graph
     else
       ""
     end
-    
+  end
+
+  def sanitize_points(graph_points)
+    Pretty.pretty_up_labels(self, graph_points)
   end
 end

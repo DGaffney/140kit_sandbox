@@ -44,7 +44,7 @@ class AnalysisMetadata
   end
   
   def run_vars
-    return variables.collect{|v| v.value.inspect}
+    return variables.collect{|v| v.value}
   end
   def variables
     return analytical_offering_variables.sort{|x,y| x.position<=>y.position}
@@ -67,7 +67,9 @@ class AnalysisMetadata
     verification = function_class.verify_variable(self, variable_descriptor, answer, curation)
   end
   
-  def self.verify_variable(variable_descriptor, answer, curation)
+  def self.verify_variable(metadata, variable_descriptor, answer, curation)
+    #if it got sent here, then it means that the analytical offering has not determined its own independent
+    #verification process for the given variable.
     return {:variable => answer}
   end
   
@@ -94,13 +96,12 @@ class AnalysisMetadata
   def self.function
     return self.underscore
   end
+  
   def self.push_tmp_folder(folder_name, folder=ENV['TMP_PATH'])
-    folder = (folder+"/"+self.underscore).gsub("//", "/")
     FilePathing.push_tmp_folder(folder_name, folder)
   end
 
   def self.remove_permanent_folder(folder_name, folder=ENV['TMP_PATH'])
-    folder = (folder+"/"+self.underscore).gsub("//", "/")
     FilePathing.remove_permanent_folder(folder_name, folder)
   end
   

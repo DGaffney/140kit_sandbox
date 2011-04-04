@@ -118,44 +118,43 @@ class Analysis
     return hash.empty? ? nil : SQLParser.type_attributes(hash, result).to_a.flatten[1]
   end
   
-  def self.where(parameters)
-    query = " where"
+  def self.conditions_to_mysql_query(parameters)
+    query = " "
     if !parameters.empty?
       parameters.each_pair {|k,v|
         if k.class == Array && k.length > 1
           if v.class == Array && v.length > 1
             k.each do |key|
-              query += " and ("
+              query += " ("
               v.each do |val|
-                query += " #{key} = #{SQLParser.prep_attribute(val)} or "
+                query += " #{key.to_s} = #{val} or "
               end
               query.chop!.chop!.chop!.chop!
-              query += ")"
+              query += ") and "
             end
           else
-            query = " and ("
+            query = " ("
             k.each do |key|
-              query += " #{key} = #{SQLParser.prep_attribute(v)} or "
+                query += " #{key.to_s} = #{val} or "
             end
             query.chop!.chop!.chop!.chop!
-            query += ")"
+            query += ") and "
           end
         else
           if v.class == Array && v.length > 1
-            query += " and ("
+            query += " ("
             v.each do |val|
-              query += " #{k} = #{SQLParser.prep_attribute(val)} or "
+              query += " #{key.to_s} = #{val} or "
             end
             query.chop!.chop!.chop!.chop!
-            query += ")"
+            query += ") and "
           else
-            query += " and #{k} = #{SQLParser.prep_attribute(v)} "
+            query += " #{k.to_s} = #{v} and "
           end
         end
       }
     end
-    query_clean = query.scan(/^\ *(where) \w* (.*)/)
-    query = " "+query_clean[0][0]+" "+query_clean[0][1]
+    query = query.chop!.chop!.chop!.chop!
     return query
   end
   
@@ -181,15 +180,15 @@ class Analysis
   def self.time_conditional(time_variable, datetime, granularity)
     case granularity
     when "hour"
-      return "#{time_variable} >= cast('#{datetime}:00:00' as datetime) and #{time_variable} <= cast('#{datetime}:59:59' as datetime)"
+      return {time_variable.to_sym.gt => Time.parse("#{datetime}:00:00"), time_variable.to_sym.lt => Time.parse("#{datetime}:59:59")} 
     when "date"
-      return "#{time_variable} >= cast('#{datetime} 00:00:00' as datetime) and #{time_variable} <= cast('#{datetime} 23:59:59' as datetime)"
+      return {time_variable.to_sym.gt => Time.parse("#{datetime} 00:00:00"), time_variable.to_sym.lt => Time.parse("#{datetime} 23:59:59")} 
     when "month"
       month = datetime.split("-").last.to_i
       year = datetime.split("-").first.to_i
-      return "#{time_variable} >= cast('#{datetime}-01 00:00:00' as datetime) and #{time_variable} <= cast('#{datetime}-#{U.month_days(month, year)} 23:59:59' as datetime)"
+      return {time_variable.to_sym.gt => Time.parse("#{datetime}-01 00:00:00"), time_variable.to_sym.lt => Time.parse("#{datetime}-#{U.month_days(month, year)} 23:59:59")} 
     when "year"
-      return "#{time_variable} >= cast('#{datetime}-01-01 00:00:00' as datetime) and #{time_variable} <= cast('#{datetime}-12-31 23:59:59' as datetime)"
+      return {time_variable.to_sym.gt => Time.parse("#{datetime}-01-01 00:00:00"), time_variable.to_sym.lt => Time.parse("#{datetime}-12-31 23:59:59")} 
     end
   end
 

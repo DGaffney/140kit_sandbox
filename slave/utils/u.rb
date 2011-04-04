@@ -12,7 +12,7 @@ module U
   end
   
   def self.times_up?(time)
-    return DateTime.now.gmt >= time ? true : false
+    return Time.now.gmt >= time ? true : false
   end
   
   def self.uniform_columns(objects)

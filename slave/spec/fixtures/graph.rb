@@ -24,7 +24,7 @@ titles = ["breakdown",
 Graph.fix{{
   :title => /\w+/.gen[5..20],
   :style => titles.shuffle.first,
-  :year => rand(Time.now.year),
+  :year => rand(Time.now.year-2005)+2005,
   :month => rand(12),
   :date => rand(28), #in case we end up in february.
   :hour => rand(24)

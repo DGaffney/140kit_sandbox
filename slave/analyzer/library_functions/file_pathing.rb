@@ -6,8 +6,9 @@ class FilePathing
     return ENV['TMP_PATH'].gsub(/\/+/, "/")
   end
 
-  def self.mysqldump(model, conditional)
-    `mysqldump -h #{Environment.host} -u #{Environment.username} --password='#{Environment.password}' --databases #{Environment.database} --tables #{model} --where='#{conditional}' > #{ENV['TMP_PATH']}/#{model}.sql`
+  def self.mysqldump(model, conditional, database=:default)
+    environment = DataMapper.repository(database).adapter.options
+    `mysqldump -h #{environment["host"]} -u #{environment["user"]} --password='#{environment["password"]}' --databases #{environment["path"].gsub("/","")} --tables #{model.storage_name} --where='#{conditional}' > #{ENV['TMP_PATH']}/#{model.storage_name}.sql`
   end
 
   def self.push_tmp_folder(sub_dir, folder=ENV['TMP_PATH'])

@@ -12,6 +12,7 @@ class Curation
   belongs_to :researcher, :child_key => :researcher_id
   has n, :datasets, :through => Resource
   has n, :analysis_metadatas
+  has n, :graphs
   has n, :tweets, :through => :datasets
   has n, :users, :through => :datasets
   
