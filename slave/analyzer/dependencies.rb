@@ -29,4 +29,9 @@ module Analysis::Dependencies
   def self.time_based_summary_dependencies
     ['fastercsv']
   end
+  
+  def self.word_frequency_dependencies
+    ['fastercsv']
+  end
+  
 end

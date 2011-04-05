@@ -27,7 +27,7 @@ class BasicHistogram < AnalysisMetadata
   def self.run(curation_id, save_path)
     curation = Curation.first(:id => curation_id)
     FilePathing.tmp_folder(curation, self.underscore)
-    self.generate_graph_points([
+    self.generate_graphs([
       {:model => Tweet, :attribute => :language},
       {:model => Tweet, :attribute => :created_at},
       {:model => Tweet, :attribute => :source},
@@ -45,20 +45,24 @@ class BasicHistogram < AnalysisMetadata
     self.finalize(curation)
   end
 
-  def self.generate_graph_points(frequency_set, curation)
+  def self.generate_graphs(frequency_set, curation)
     frequency_set = [frequency_set].flatten
     curation_id = curation && curation.id || nil
     graphs = []
     frequency_set.each do |fs|
       fs[:style] = fs[:style] || "histogram"
       fs[:title] = fs[:title] || fs[:model].pluralize+"_"+fs[:attribute].to_s
+      fs[:conditional] = fs[:conditional] || {}
       graph_attrs = Hash[fs.select{|k,v| Graph.attributes.include?(k)}]
-      graph = Graph.first_or_create({:curation_id => curation_id}.merge(graph_attrs))
+      debugger
+      graph = Graph.first_or_create({:curation_id => curation_id, :analysis_metadata_id => self.analysis_metadata&&self.analysis_metadata.id}.merge(graph_attrs))
+      graph.graph_points.destroy #can't call .new? as a condition for this, as it's created now.
+      graph.edges.destroy #can't call .new? as a condition for this, as it's created now.
+      conditional = Analysis.curation_conditional(curation).merge(fs[:conditional])
       graphs << graph
       if block_given?
-        yield fs, graph, curation
+        yield fs, graph, conditional
       else
-        conditional = curation.nil? ? {} : Analysis.curation_conditional(curation).merge(fs[:conditional])
         self.frequency_graphs(fs, graph, conditional)
       end
     end

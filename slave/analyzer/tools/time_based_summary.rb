@@ -82,6 +82,7 @@ class TimeBasedSummary < AnalysisMetadata
         :model => model.to_class, 
         :conditional => conditional, 
         :style => "histogram", 
+        :analysis_metadata_id => self.analysis_metadata.id,
         :time_slice => time_slice, 
         :granularity => granularity, 
         :year => year, 
@@ -97,12 +98,12 @@ class TimeBasedSummary < AnalysisMetadata
           {:attribute => :source},
           {:attribute => :location}
         ].collect{|fs| fs.merge(general_frequency_set_conditions)}
-        BasicHistogram.generate_graph_points(basic_histogram_frequency_sets, curation)
-        BasicHistogram.generate_graph_points([
-          {:title => "urls", :frequency_type => "urls", :style => "word_frequencies", :time_slice => time_slice, :granularity => granularity, :year => year, :month => month, :date => date, :hour => hour}, 
-          {:title => "hashtags", :frequency_type => "hashtags", :style => "word_frequencies", :time_slice => time_slice, :granularity => granularity, :year => year, :month => month, :date => date, :hour => hour}, 
-          {:title => "user_mentions", :frequency_type => "user_mentions", :style => "word_frequencies", :time_slice => time_slice, :granularity => granularity, :year => year, :month => month, :date => date, :hour => hour}
-        ]) do |fs, graph, curation|
+        BasicHistogram.generate_graphs(basic_histogram_frequency_sets, curation)
+        BasicHistogram.generate_graphs([
+          {:title => "urls", :frequency_type => "urls", :style => "word_frequencies", :time_slice => time_slice, :granularity => granularity, :year => year, :month => month, :date => date, :hour => hour, :analysis_metadata_id => self.analysis_metadata.id}, 
+          {:title => "hashtags", :frequency_type => "hashtags", :style => "word_frequencies", :time_slice => time_slice, :granularity => granularity, :year => year, :month => month, :date => date, :hour => hour, :analysis_metadata_id => self.analysis_metadata.id}, 
+          {:title => "user_mentions", :frequency_type => "user_mentions", :style => "word_frequencies", :time_slice => time_slice, :granularity => granularity, :year => year, :month => month, :date => date, :hour => hour, :analysis_metadata_id => self.analysis_metadata.id}
+        ], curation) do |fs, graph, conditional|
           WordFrequency.generate_word_frequencies_from_entities(fs, graph, conditional)
         end
       when "users"
@@ -116,7 +117,7 @@ class TimeBasedSummary < AnalysisMetadata
           {:attribute => :time_zone},
           {:attribute => :created_at}
         ].collect{|fs| fs.merge(general_frequency_set_conditions)}
-        BasicHistogram.generate_graph_points(basic_histogram_frequency_sets, curation)
+        BasicHistogram.generate_graphs(basic_histogram_frequency_sets, curation)
       end
     end
   end

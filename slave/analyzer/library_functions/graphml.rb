@@ -1,4 +1,19 @@
-class Graphml
+module Graphml
+  def self.header(key)
+  end
+  
+  def self.node
+  end
+  
+  def self.edge
+  end
+  
+  def self.footer
+  end
+end
+
+
+module Graphml
   def self.generate_file(query, filename, path="files")#$w.tmp_path)
     @user_names = []
     internal_keys = ["graph_id", "lock", "flagged", "dataset_id", "id"]

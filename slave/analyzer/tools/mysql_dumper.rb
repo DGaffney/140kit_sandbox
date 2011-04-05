@@ -21,7 +21,6 @@ class MysqlDumper < AnalysisMetadata
 
   
   def self.run(curation_id, save_path)
-    debugger
     curation = Curation.first({:id => curation_id})
     FilePathing.tmp_folder(curation, self.underscore)
     conditional = Analysis.conditions_to_mysql_query(Analysis.curation_conditional(curation)).strip

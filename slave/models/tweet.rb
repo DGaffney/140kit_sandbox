@@ -19,11 +19,5 @@ class Tweet
   property :retweeted,  Boolean, :index => [:retweeted_dataset, :retweeted], :default => false
   belongs_to :user, :index => [:user_id_dataset, :user_id], :child_key => :user_id
   belongs_to :dataset, :unique_index => [:unique_tweet], :index => [:dataset_id, :twitter_id_dataset, :text_dataset, :language_dataset, :user_id_dataset, :screen_name_dataset, :location_dataset, :in_reply_to_status_id_dataset, :in_reply_to_user_id_dataset, :truncated_dataset, :retweet_id_dataset, :created_at_dataset, :retweet_count_dataset, :lat_dataset, :lon_dataset, :retweeted_dataset, :source_dataset, :user_id_dataset]
-  
-  #hack; this should actually be something like:
-  #has n :entities, :through => :entity, :parent_key => :twitter_id, :child_key => :twitter_id
-  #but it wasn't working, so i said fuck it for now. FIFN
-  def entities
-    return Entity.all(:twitter_id => twitter_id)
-  end
+  has n, :entities, :parent_key => :twitter_id, :child_key => :twitter_id
 end

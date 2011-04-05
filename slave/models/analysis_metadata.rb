@@ -92,6 +92,10 @@ class AnalysisMetadata
     function_class.clear(self)
   end
   
+  def self.analysis_metadata
+    return AnalysisMetadata.all.analytical_offering.first(:function => self.underscore)
+  end
+  
   def self.clear
     self.graph_points.destroy
     self.graphs.destroy
