@@ -3,6 +3,10 @@ class String
   require 'rubygems'
   require 'htmlentities'
 
+  def write(str)
+    self << str
+  end
+  
   def underscore
     self.gsub(/::/, '/').
     gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
