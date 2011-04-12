@@ -19,8 +19,16 @@ module DataMapperExtensions
       vals += keys.collect {|k| h[k] }
     end
     vals.flatten!
-    DataMapper.repository(:default).adapter.execute(sql, *vals)
-    return true
+    case DataMapper.repository.adapter.options["adapter"]
+    when "mysql"
+      DataMapper.repository(:default).adapter.execute(sql, *vals)
+      return true
+    when "sqlite3"
+      objs.each do |obj|
+        inst_obj = self.new(obj)
+        inst_obj.save
+      end
+    end
   end
 
   def update_all(objs, storage_prefix="replace into ") # takes array of objs, hashes, or a mix of both
@@ -35,10 +43,19 @@ module DataMapperExtensions
       vals += keys.collect {|k| h[k] }
     end
     vals.flatten!
-    DataMapper.repository(:default).adapter.execute(sql, *vals)
-    return true
+    case DataMapper.repository.adapter.options["adapter"]
+    when "mysql"
+      DataMapper.repository(:default).adapter.execute(sql, *vals)
+      return true
+    when "sqlite3"
+      objs.each do |obj|
+        inst_obj = self.first(:id => obj[:id])
+        inst_obj.update(obj)
+      end
+    end
   end
   
 end
 
 DataMapper::Model.append_extensions(DataMapperExtensions)
+

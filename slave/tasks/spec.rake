@@ -37,5 +37,4 @@ end
 
 task :default => :spec
 
-
 #RSPEC2: Gix sez: dgaff: if nothing else forces you to use rspec 1 i'd go for 2 (it's "require 'rspec/core/rake_task'; Rspec::Core::RakeTask.new(:spec) ..." there). but for normal development i never use that rake task. just use rspec path/to/spec, or run guard

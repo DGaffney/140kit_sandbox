@@ -26,7 +26,7 @@ class Researcher
   alias :created_at :join_date
   
   def self.authenticate(user_name, password)
-    u = find_by_user_name(user_name) # need to get the salt
+    u = first(:user_name => user_name) # need to get the salt
     u && u.authenticated?(password) ? u : nil
   end
 
@@ -50,25 +50,15 @@ class Researcher
 
   # These create and unset the fields required for remembering users between browser closes
   def remember_me
-    self.remember_token_expires_at = 2.weeks.from_now.utc
+    self.remember_token_expires_at = Time.now.utc+2.weeks
     self.remember_token            = encrypt("#{email}--#{remember_token_expires_at}")
-    save(false)
+    self.save!
   end
 
   def forget_me
     self.remember_token_expires_at = nil
     self.remember_token            = nil
-    save(false)
-  end
-
-  def set_times
-    self.last_login = Time.now
-    self.last_access = Time.now
-    self.remember_token_expires_at = 2.weeks.from_now.utc
-  end
-  
-  def set_join_date
-    self.join_date = Time.now
+    self.save!
   end
   
   def validate_on_create
@@ -77,17 +67,7 @@ class Researcher
     end
     return true, "Name looks good."
   end
-  
-  def create_reset_code
-    self.reset_code = Digest::SHA1.hexdigest( Time.now.to_s.split(//).sort_by {rand}.join )
-    save(false)
-  end
-
-  def delete_reset_code
-    self.reset_code = nil
-    save(false)
-  end
-  
+    
   def admin?
     return self.role == "Admin"
   end
@@ -102,12 +82,6 @@ class Researcher
 
   def password_required?
     crypted_password.blank? || !password.blank?
-  end
-  
-  def after_destroy 
-    if Researcher.count.zero? 
-      raise "Can't delete last researcher" 
-    end 
   end
 
 end

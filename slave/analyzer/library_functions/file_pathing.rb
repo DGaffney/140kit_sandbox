@@ -8,7 +8,7 @@ class FilePathing
 
   def self.mysqldump(model, conditional, database=:default)
     environment = DataMapper.repository(database).adapter.options
-    `mysqldump -h #{environment["host"]} -u #{environment["user"]} --password='#{environment["password"]}' --databases #{environment["path"].gsub("/","")} --tables #{model.storage_name} --where='#{conditional}' > #{ENV['TMP_PATH']}/#{model.storage_name}.sql`
+    Sh::sh("mysqldump -h #{environment["host"]} -u #{environment["user"]} --password='#{environment["password"]}' --databases #{environment["path"].gsub("/","")} --tables #{model.storage_name} --where='#{conditional}' > #{ENV['TMP_PATH']}/#{model.storage_name}.sql")
   end
 
   def self.push_tmp_folder(sub_dir, folder=ENV['TMP_PATH'])
@@ -16,7 +16,7 @@ class FilePathing
     folder = folder.chop if folder.split("").last == "/"
     sub_dir = sub_dir.chop if sub_dir.split("").last == "/"
     parent_dir, direct_dir = FilePathing.resolve_path_zip_name(folder)
-    `cd #{parent_dir};zip -r -9 #{direct_dir} #{direct_dir}`
+    Sh::sh("cd #{parent_dir};zip -r -9 #{direct_dir} #{direct_dir}")
     final_path = "#{STORAGE['path']}/#{sub_dir}/".gsub("//", "/")
     FilePathing.submit_file(folder+".zip", final_path)
     FilePathing.remove_folder(parent_dir)
@@ -38,7 +38,7 @@ class FilePathing
       exception_message = "rsync for #{attempt} failed after #{attempts+1} tries."
     end
     while !sent
-      result = `#{attempt}`
+      result = Sh::sh(attempt)
       sent = (result.empty? || !result.scan(/mkdir: cannot create directory `.*': File exists/).first.empty?)
       attempts+=1
       raise Exception, exception_message if attempts == ERROR_THRESHOLD
@@ -50,7 +50,7 @@ class FilePathing
     folder = folder.chop if folder.split("").last == "/"
     sub_dir = sub_dir.chop if sub_dir.split("").last == "/"
     parent_dir, direct_dir = FilePathing.resolve_path_zip_name(folder)
-    `cd #{parent_dir};zip -r -9 #{direct_dir} #{direct_dir}`
+    Sh::sh("cd #{parent_dir};zip -r -9 #{direct_dir} #{direct_dir}")
     final_path = "#{STORAGE['path']}/#{sub_dir}/".gsub("//", "/")
     FilePathing.remove_file(folder+".zip", final_path)
   end
@@ -66,7 +66,7 @@ class FilePathing
       exception_message = "mkdir for #{attempt} failed after #{attempts+1} tries."
     end
     while !sent
-      result = `#{attempt}`
+      result = Sh::sh(attempt)
       sent = (result.empty? || !result.scan(/mkdir: cannot create directory `.*': File exists/).first.empty?)
       attempts+=1
       raise Exception, exception_message if attempts == ERROR_THRESHOLD
@@ -74,8 +74,8 @@ class FilePathing
   end
 
   def self.remove_folder(folder)
-    `rm -r #{folder}`
-    `mkdir ../tmp_files`
+    Sh::sh("rm -r #{folder}")
+    Sh::sh("mkdir ../tmp_files")
   end
   
   def self.resolve_path_zip_name(folder)
@@ -89,13 +89,7 @@ class FilePathing
   end
   
   def self.file_init(file_name, path=ENV['TMP_PATH'])
-    `rm -r #{DIR+path+"/"+file_name}`
+    Sh::sh("rm -r #{DIR+path+"/"+file_name}")
   end
   
-  def self.line_count(file_name, path=ENV['TMP_PATH'])
-    f = File.open(path+file_name)
-    count = f.lines.count
-    f.close
-    return count
-  end
 end

@@ -1,11 +1,11 @@
 module Gexf
-  def self.header(mode="dynamic", default_edge_type="directed")
+  def self.header(mode="dynamic", time_format="double", default_edge_type="directed")
     %{<gexf xmlns="http://www.gexf.net/1.1draft"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.gexf.net/1.1draft
                              http://www.gexf.net/1.1draft/gexf.xsd"
       version="1.1">
-  <graph mode="#{mode}" defaultedgetype="#{default_edge_type}">
+  <graph mode="#{mode}" timeformat="#{time_format}" defaultedgetype="#{default_edge_type}">
     }
   end
   
@@ -17,8 +17,9 @@ module Gexf
       attribute_declarations.each do |attribute_declaration|
         attribute_declaration_data << self.attribute_declaration(attribute_declaration)
       end
+      attribute_declaration_data << self.attribute_declaration_footer
     end
-    attribute_declaration_data << self.attribute_declaration_footer
+    attribute_declaration_data
   end
 
   #attribute_declaration_headers look like => {:class => ['node'||'edge'], :mode => ['static'||'dynamic']}
@@ -40,10 +41,6 @@ module Gexf
     attribute_declaration_data << "/>"
   end
   
-  def self.attribute_declaration(attribute)
-    %{<attribute#{attribute.collect{|k,v| " #{k}=\"#{v}\""}.to_s}/>}
-  end
-    
   def self.attribute_declaration_footer
     "</attributes>"
   end
@@ -170,7 +167,7 @@ module Gexf
   end
   
   def self.gexf_class(ruby_class)
-    classes = {"Fixnum" => "int", "Float" => "float", "Bignum" => "double", "Integer" => "int", "String" => "string", "TrueClass" => "bool", "FalseClass" => "bool", "NilClass" => "int"}
+    classes = {"Fixnum" => "double", "Float" => "float", "Bignum" => "double", "Integer" => "int", "String" => "string", "TrueClass" => "bool", "FalseClass" => "bool", "NilClass" => "int"}
     return classes[ruby_class.to_s] || "int"
   end
   
@@ -186,13 +183,16 @@ module Gexf
       header_data = File.open(path+"/temp_header.gexf", "a+")
       self.generate_header(fs, header_data)
       self.generate_attribute_declarations(fs, header_data)
+      header_data.close
     end
 
     def self.generate_temp_data(fs, edges, path=ENV['TMP_PATH'])
       node_data = File.open(path+"/temp_node.gexf", "a+")
       self.generate_nodes(fs, edges, node_data)
+      node_data.close
       edge_data = File.open(path+"/temp_edge.gexf", "a+")
       self.generate_edges(fs, edges, edge_data)
+      edge_data.close
     end
 
     def self.finalize_temp_data(fs, path=ENV['TMP_PATH'])
@@ -209,21 +209,26 @@ module Gexf
     
     def self.generate_header(fs, file)
       mode = fs[:mode]||"dynamic"
+      time_format = fs[:time_format]||"double"
       default_edge_type = fs[:default_edge_type]||"directed"
-      file.write(Gexf::header(mode, default_edge_type))
+      file.write(Gexf::header(mode, time_format, default_edge_type))
     end
 
     def self.generate_attribute_declarations(fs, file)
       attribute_declarations = {}
-      classes_for_attributes = {:statuses_count => Fixnum, :followers_count => Fixnum, :friends_count => Fixnum}
-      modes_for_attributes = {:statuses_count => :static, :followers_count => :static, :friends_count => :static}
+      classes_for_attributes = {:statuses_count => Fixnum, :followers_count => Fixnum, :friends_count => Fixnum, :style => String}
+      modes_for_attributes = {:statuses_count => :static, :followers_count => :static, :friends_count => :static, :style => :static}
       fs[:node_attributes].each do |node_attribute|
         attribute_declarations[{:class => :node, :mode => modes_for_attributes[node_attribute]}] = [] if attribute_declarations[{:class => :node, :mode => modes_for_attributes[node_attribute]}].nil?
         attribute_declarations[{:class => :node, :mode => modes_for_attributes[node_attribute]}] << {:id => node_attribute, :title => node_attribute.to_s.split("_").collect{|w| w.capitalize}.join(" "), :type => classes_for_attributes[node_attribute]}
       end
       fs[:edge_attributes].each do |edge_attribute|
-        attribute_declarations[{:class => :node, :mode => modes_for_attributes[edge_attribute]}] = [] if attribute_declarations[{:class => :node, :mode => modes_for_attributes[edge_attribute]}].nil?
-        attribute_declarations[{:class => :node, :mode => modes_for_attributes[edge_attribute]}] << {:id => edge_attribute, :title => edge_attribute.to_s.split("_").collect{|w| w.capitalize}.join(" "), :type => classes_for_attributes[edge_attribute]}
+        attribute_declarations[{:class => :edge, :mode => modes_for_attributes[edge_attribute]}] = [] if attribute_declarations[{:class => :edge, :mode => modes_for_attributes[edge_attribute]}].nil?
+        attribute_declarations[{:class => :edge, :mode => modes_for_attributes[edge_attribute]}] << {:id => edge_attribute, :title => edge_attribute.to_s.split("_").collect{|w| w.capitalize}.join(" "), :type => classes_for_attributes[edge_attribute]}
+      end
+      if (!fs[:dynamic].nil? && fs[:dynamic]) || fs[:dynamic].nil?
+        attribute_declarations[{:class => :edge, :mode => :dynamic}] = [] if attribute_declarations[{:class => :edge, :mode => :dynamic}].nil?
+        attribute_declarations[{:class => :edge, :mode => :dynamic}] << {:id => "weight", :title => "Weight", :type => Float}
       end
       file.write(Gexf::attribute_declarations(attribute_declarations))
     end
@@ -239,8 +244,9 @@ module Gexf
     def self.generate_edges(fs, edges, file)
       start_node_names = edges.collect{|edge| edge.start_node}.flatten.uniq
       start_node_names.each do |start_node_name|
-        edge_sets = self.group_edges_by_end_node(start_node_name, edges)
+        edge_sets = self.group_edges_by_end_node(fs, start_node_name, edges)
         edge_sets.each do |edge_set|
+          edge = edge_set.shuffle.first
           edge_data = {:source => edge.start_node, :target => edge.end_node}.merge(self.generate_edge_metadata(fs, edge_set))
           file.write(Gexf::edge(edge_data))
         end
@@ -253,11 +259,11 @@ module Gexf
       fs[:node_attributes].each do |node_attribute|
         case node_attribute
         when :statuses_count
-          attributes[:attributes] << {:for => :statuses_count, :value => User.first(:screen_name => node_name)&&User.first(:screen_name => node_name).statuses_count||-1}
+          attributes[:attributes] << {:for => :statuses_count, :value => User.first(:screen_name => node_name)&&User.first(:screen_name => node_name).statuses_count||nil}
         when :followers_count
-          attributes[:attributes] << {:for => :followers_count, :value => User.first(:screen_name => node_name)&&User.first(:screen_name => node_name).followers_count||-1}
+          attributes[:attributes] << {:for => :followers_count, :value => User.first(:screen_name => node_name)&&User.first(:screen_name => node_name).followers_count||nil}
         when :friends_count
-          attributes[:attributes] << {:for => :friends_count, :value => User.first(:screen_name => node_name)&&User.first(:screen_name => node_name).friends_count||-1}
+          attributes[:attributes] << {:for => :friends_count, :value => User.first(:screen_name => node_name)&&User.first(:screen_name => node_name).friends_count||nil}
         end
       end
       attributes
@@ -266,8 +272,10 @@ module Gexf
     def self.generate_edge_metadata(fs, edge_set)
       attributes = self.calculate_weights(fs, edge_set)
       fs[:edge_attributes].each do |edge_attribute|
-        # case edge_attribute
-        # end
+        case edge_attribute
+        when :style
+          attributes[:attributes] << {:for => :style, :value => edge_set.shuffle.first.style}
+        end
       end
       attributes
     end
@@ -278,20 +286,34 @@ module Gexf
       edge_data = {:attributes => [], :slices => []}
       #divide/multiply the range factor to normalize against rounding errors.
       edge_data[:start] = (edge_set.sort{|edge_a,edge_b| edge_a.time.to_i<=>edge_b.time.to_i}.first.time.to_i/range_factor)*range_factor
-      edge_data[:end] = (edge_set.sort{|edge_a,edge_b| edge_a.time.to_i<=>edge_b.time.to_i}.last.time.to_i/range_factor)*range_factor
+      edge_data[:end] = (edge_set.sort{|edge_a,edge_b| edge_a.time.to_i<=>edge_b.time.to_i}.last.time.to_i/range_factor)*range_factor+range_factor
       weights.each_pair do |time, weight|
+        time = time.to_i 
         edge_data[:attributes] << {:for => "weight", :value => weight, :start => time*range_factor, :end => time*range_factor+range_factor}
         edge_data[:slices] << {:start => time*range_factor, :end => time*range_factor+range_factor}
       end
       edge_data
     end
     
-    def self.group_edges_by_end_node(start_node_name, edges)
+    #GOTCHA: SOME DAY STYLE SHOULD IMPLEMENT BOOLEAN VARS FOR EACH OF THE DIFFERENT TYPES OF STYLES:
+    #retweet,mention,friendship,followership
+    def self.group_edges_by_end_node(fs, start_node_name, edges)
       edge_sets = {}
-      edges = edges.select{|edge| edge.start_node==start_node_name}
-      edges.each do |edge|
-        edge_sets[edge.end_node] = [] if edge_sets[edge.end_node].nil?
-        edge_sets[edge.end_node] << edge
+      if fs[:edge_attributes]&&fs[:edge_attributes].include?(:style)
+        styles = ["mention", "retweet"]
+        styles.each do |style|
+          edges = edges.select{|edge| edge.start_node==start_node_name && edge.style==style}
+          edges.each do |edge|
+            edge_sets[edge.end_node] = [] if edge_sets[edge.end_node].nil?
+            edge_sets[edge.end_node] << edge
+          end
+        end
+      else
+        edges = edges.select{|edge| edge.start_node==start_node_name}
+        edges.each do |edge|
+          edge_sets[edge.end_node] = [] if edge_sets[edge.end_node].nil?
+          edge_sets[edge.end_node] << edge
+        end
       end
       return edge_sets.values
     end

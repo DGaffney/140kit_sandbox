@@ -13,6 +13,7 @@ class AnalyticalOffering
   property :access_level, String, :index => [:unique_metadata]
   property :source_code_link, Text, :index => [:unique_metadata], :default => lambda {|ao, scl| Git::url_repo+ANALYTICAL_OFFERING_PATH+ao.function+AnalyticalOffering.language_extensions(ao.language)}
   has n, :analytical_offering_variable_descriptors
+  has n, :analysis_metadatas
   
   def self.language_extensions(language)
     languages = {

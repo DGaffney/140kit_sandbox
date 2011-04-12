@@ -32,7 +32,7 @@ class WordFrequency < AnalysisMetadata
       {:title => "urls", :frequency_type => "urls", :style => "word_frequencies", :analysis_metadata_id => self.analysis_metadata.id}, 
       {:title => "hashtags", :frequency_type => "hashtags", :style => "word_frequencies", :analysis_metadata_id => self.analysis_metadata.id}, 
       {:title => "user_mentions", :frequency_type => "user_mentions", :style => "word_frequencies", :analysis_metadata_id => self.analysis_metadata.id}
-    ], curation) do |fs, graph, conditional|
+    ], curation, self) do |fs, graph, conditional|
       self.generate_word_frequencies_from_entities(fs, graph, conditional)
     end
     self.push_tmp_folder(curation.stored_folder_name)

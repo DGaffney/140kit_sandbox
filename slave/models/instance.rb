@@ -50,35 +50,11 @@ class Instance
     return Whitelisting.first(:hostname => self.hostname).whitelisted
   end
   
-  def lock_all(objects)
-    # returns array of successfully locked objects
-    return objects.collect {|o| o if lock(o) }.compact
-  end
-  
-  def lock(obj)
-    lock = Lock.new(:classname => obj.class.to_s, :with_id => obj.id, :instance_id => self.instance_id)
-    return lock.save
-  end
-  
-  def unlock_all(objects)
-    objects.each {|o| unlock(o) }
-  end
-  
-  def unlock(obj)
-    lock = Lock.first(:classname => obj.class.to_s, :with_id => obj.id, :instance_id => self.instance_id)
-    lock.destroy if !lock.nil?
-  end
-  
   def killed?
     self.killed
   end
   
-  def locks
-    Lock.all(:instance_id => self.instance_id)
-  end
-  
-  def destroy_locks
+  def unlock_all
     Lock.all(:instance_id => self.instance_id).destroy
   end
-  
 end

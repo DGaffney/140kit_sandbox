@@ -7,8 +7,8 @@ class Tweet
   property :language,     String, :index => [:language_dataset, :language]
   property :screen_name,  String, :index => [:screen_name_dataset, :screen_name]
   property :location,     Text, :index => [:location_dataset, :location], :lazy => false
-  property :in_reply_to_status_id, Integer, :index => [:in_reply_to_status_id_dataset, :in_reply_to_status_id]
-  property :in_reply_to_user_id,   Integer, :index => [:in_reply_to_user_id_dataset, :in_reply_to_user_id]
+  property :in_reply_to_status_id, Integer, :index => [:in_reply_to_status_id_dataset, :in_reply_to_status_id], :max => 2**64-1
+  property :in_reply_to_user_id,   Integer, :index => [:in_reply_to_user_id_dataset, :in_reply_to_user_id], :max => 2**64-1
   property :truncated,    Boolean, :index => [:truncated_dataset, :truncated], :default => false
   property :in_reply_to_screen_name, String, :index => [:retweet_id_dataset, :retweet_id]
   property :created_at,   Time, :index => [:created_at_dataset, :created_at]

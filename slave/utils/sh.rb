@@ -1,10 +1,13 @@
 module Sh
+  require 'open3'
   def self.hostname
     return sh "hostname"
   end
   
-  def self.sh(command, chomped=true)
-    result = `#{command}`
+  def self.sh(command, chomped=true, silence_errors=true)
+    if silence_errors
+      result = Open3.popen3(command)[1].readlines.to_s
+    end
     result = result.chomp if chomped
     return result
   end

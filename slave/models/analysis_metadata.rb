@@ -92,15 +92,15 @@ class AnalysisMetadata
     function_class.clear(self)
   end
   
-  def self.analysis_metadata
-    return AnalysisMetadata.all.analytical_offering.first(:function => self.underscore)
+  def self.analysis_metadata(curation)
+    return AnalyticalOffering.first(:function => self.underscore).analysis_metadatas.first(:curation_id => curation.id)
   end
   
-  def self.clear
-    self.graph_points.destroy
-    self.graphs.destroy
-    self.edges.destroy
-    self.destroy
+  def self.clear(analysis_metadata)
+    analysis_metadata.graph_points.destroy
+    analysis_metadata.graphs.destroy
+    analysis_metadata.edges.destroy
+    analysis_metadata.destroy
   end
   
   def self.function

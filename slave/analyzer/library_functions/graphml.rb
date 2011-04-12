@@ -93,6 +93,7 @@ module Graphml
       header_data = File.open(path+"/temp_header.graphml", "a+")
       self.generate_header(fs, header_data)
       self.generate_attribute_declarations(fs, header_data)
+      header_data.close
     end
 
     def self.generate_temp_data(fs, edges, path=ENV['TMP_PATH'])
@@ -124,7 +125,7 @@ module Graphml
     #{:id => name, :for => ["node"||"edge"], :attr_name => name, :attr_type => type}
     def self.generate_attribute_declarations(fs, file)
       attribute_declarations = []
-      classes_for_attributes = {:statuses_count => Fixnum, :followers_count => Fixnum, :friends_count => Fixnum}
+      classes_for_attributes = {:statuses_count => Fixnum, :followers_count => Fixnum, :friends_count => Fixnum, :style => String}
       fs[:node_attributes].each do |node_attribute|
         attribute_declarations << {:id => node_attribute, :for => :node, :attr_name => node_attribute.to_s.split("_").collect{|w| w.capitalize}.join(" "), :attr_type => classes_for_attributes[node_attribute]}
       end
@@ -156,11 +157,11 @@ module Graphml
       fs[:node_attributes].each do |node_attribute|
         case node_attribute
         when :statuses_count
-          attributes[:attributes] << {:statuses_count => User.first(:screen_name => node_name)&&User.first(:screen_name => node_name).statuses_count||-1}
+          attributes[:attributes] << {:statuses_count => User.first(:screen_name => node_name)&&User.first(:screen_name => node_name).statuses_count||nil}
         when :followers_count
-          attributes[:attributes] << {:followers_count => User.first(:screen_name => node_name)&&User.first(:screen_name => node_name).followers_count||-1}
+          attributes[:attributes] << {:followers_count => User.first(:screen_name => node_name)&&User.first(:screen_name => node_name).followers_count||nil}
         when :friends_count
-          attributes[:attributes] << {:friends_count => User.first(:screen_name => node_name)&&User.first(:screen_name => node_name).friends_count||-1}
+          attributes[:attributes] << {:friends_count => User.first(:screen_name => node_name)&&User.first(:screen_name => node_name).friends_count||nil}
         end
       end
       attributes
@@ -169,8 +170,10 @@ module Graphml
     def self.generate_edge_metadata(fs, edge)
       attributes = {:attributes => []}
       fs[:edge_attributes].each do |edge_attribute|
-        # case edge_attribute
-        # end
+        case edge_attribute
+        when :style
+          attributes[:attributes] << {:style => edge.style}
+        end
       end
       attributes
     end

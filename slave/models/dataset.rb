@@ -22,7 +22,7 @@ class Dataset
   def self.valid_params(scrape_type, params)
     response = {}
     response[:reason] = ""
-    response[:clean_params] = nil
+    response[:clean_params] = ""
     case scrape_type
     when "track"
       term = params
@@ -41,14 +41,16 @@ class Dataset
           break
         end
       end
+      response[:reason] = "The follow list contained no users" if ids.empty?
       response[:clean_params] = ids.join(",")
     when "locations"
       boundings = params.split(",").collect{|b| b.to_f}
-      response[:reason] = "Must input two pairs of numbers, separated by commas." if boundings.length!=4
-      response[:reason] = "Latitudes cover more than one degree of area" if (boundings[0]-boundings[2]).abs>1
-      response[:reason] = "Longitudes cover more than one degree of area" if (boundings[1]-boundings[3]).abs>1
-      response[:reason] = "Latitudes are out of range (max 90 degrees)" if boundings[0].abs>90 || boundings[2].abs>90
-      response[:reason] = "Longitudes are out of range (max 180 degrees)" if boundings[1].abs>180 || boundings[3].abs>180
+      (response[:reason] = "Must input two pairs of numbers, separated by commas.";return response) if boundings.length!=4
+      (response[:reason] = "Total Area of this box is zero - must make a real box";return response) if boundings.area==0
+      (response[:reason] = "Latitudes cover more than one degree of area";return response) if (boundings[0]-boundings[2]).abs>1
+      (response[:reason] = "Longitudes cover more than one degree of area";return response) if (boundings[1]-boundings[3]).abs>1
+      (response[:reason] = "Latitudes are out of range (max 90 degrees)";return response) if boundings[0].abs>90 || boundings[2].abs>90
+      (response[:reason] = "Longitudes are out of range (max 180 degrees)";return response) if boundings[1].abs>180 || boundings[3].abs>180
       #break if !response[:reason].empty?
       response[:clean_params] = boundings.join(",")
     end

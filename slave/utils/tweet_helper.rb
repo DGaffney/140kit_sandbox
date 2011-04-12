@@ -99,8 +99,4 @@ class TweetHelper
     return user
   end
   
-  def self.assign_to_dataset(hash, dataset_id)
-    hash[dataset_id] = dataset_id
-    return hash
-  end
 end

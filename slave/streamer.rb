@@ -218,7 +218,7 @@ class Streamer < Instance
     datasets_per_instance = num_instances.zero? ? datasets.length : (datasets.length.to_f / num_instances.to_f).ceil
     datasets_to_claim = datasets[0..datasets_per_instance]
     if !datasets_to_claim.empty?
-     claimed_datasets = lock_all(datasets_to_claim)
+     claimed_datasets = Dataset.lock(datasets_to_claim)
      if !claimed_datasets.empty?
        update_datasets(claimed_datasets)
        return true

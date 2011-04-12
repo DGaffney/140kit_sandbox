@@ -7,7 +7,7 @@ Researcher.fix {{
   :last_access => Time.now-rand(100).days,
   :info => /[:sentence:]/.gen[0..500],
   :website_url => "http://#{/\w+/.gen}.#{/\w{3}/.gen}",
-  :location => /[:sentence:]/.gen[0..50]
+  :location => /\w+/.gen[0..49]
 }}
 #Need to find out if you don't need to do all this horrifying copypasting.
 Researcher.fix(:commercial_account) {{
@@ -19,7 +19,7 @@ Researcher.fix(:commercial_account) {{
   :last_access => Time.now-rand(100).days,
   :info => /[:sentence:]/.gen[0..500],
   :website_url => "http://#{/\w+/.gen}.#{/\w{3}/.gen}",
-  :location => /[:sentence:]/.gen[0..50]
+  :location => /\w+/.gen[0..49]
 }}
 Researcher.fix(:admin) {{
   :user_name            => unique {/\w+/.gen},
@@ -30,7 +30,7 @@ Researcher.fix(:admin) {{
   :last_access => Time.now-rand(100).days,
   :info => /[:sentence:]/.gen[0..500],
   :website_url => "http://#{/\w+/.gen}.#{/\w{3}/.gen}",
-  :location => /[:sentence:]/.gen[0..50]
+  :location => /\w+/.gen[0..49]
 }}
 Researcher.fix(:user) {{
   :user_name            => unique {/\w+/.gen},
@@ -41,5 +41,5 @@ Researcher.fix(:user) {{
   :last_access => Time.now-rand(100).days,
   :info => /[:sentence:]/.gen[0..500],
   :website_url => "http://#{/\w+/.gen}.#{/\w{3}/.gen}",
-  :location => /[:sentence:]/.gen[0..50]
+  :location => /\w+/.gen[0..49]
 }}

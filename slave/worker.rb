@@ -17,10 +17,7 @@ class Worker < Instance
   
   def do_at_exit
     puts "Exiting."
-    # save_queue
-    # unlock(@user_account)
-    # unlock_all(@datasets)
-    destroy_locks
+    unlock_all
     self.destroy
   end
   
@@ -51,7 +48,7 @@ class Worker < Instance
   def select_curation
     curations = Curation.unlocked.all(:analyzed => false).reject {|c| c.datasets.collect {|d| d.scrape_finished }.include?(false) }
     for curation in curations
-      return curation if lock(curation)
+      return curation if curation.owned_by_me?
     end
     return nil
   end
@@ -97,7 +94,7 @@ class Worker < Instance
     # WARNING: TODO: rest_allowed not implemented yet
     while AnalysisMetadata.unlocked.count(:finished => false)!=0
       metadata = AnalysisMetadata.unlocked.first(:finished => false)
-      if !metadata.nil? && lock(metadata)
+      if !metadata.nil? && metadata.owned_by_me?
         route(metadata)
       end
     end

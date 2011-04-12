@@ -36,7 +36,7 @@ class RawCsv < AnalysisMetadata
     self.finalize(curation)
   end
 
-  def self.query_to_csv(model, conditional, filename="/"+model.pluralize+".csv", path=ENV['TMP_PATH'])
+  def self.query_to_csv(model, conditional, filename="/"+model.storage_name+".csv", path=ENV['TMP_PATH'])
     first = true
     keys = nil
     Sh::mkdir(path)

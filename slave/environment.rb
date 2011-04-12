@@ -15,6 +15,7 @@ require 'eventmachine'
 require 'em-http'
 require 'json'
 require 'ntp'
+require 'open-uri'
 require 'twitter'
 
 DIR = Dir::pwd

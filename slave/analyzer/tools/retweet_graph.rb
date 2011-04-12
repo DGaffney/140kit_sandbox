@@ -25,12 +25,13 @@ class RetweetGraph < AnalysisMetadata
     FilePathing.tmp_folder(curation, self.underscore)
     conditional = Analysis.curation_conditional(curation)
     #may turn into a huge PITA if we actually implement per-node and per-edge attributes as we could end up making many calls to db to pull out additional attributes
-    options = {:dynamic => true, :formats => ["gexf", "graphml"], :node_attributes => [:statuses_count, :followers_count, :friends_count], :edge_attributes => []}
-    BasicHistogram.generate_graphs([{:analysis_metadata_id => self.analysis_metadata&&self.analysis_metadata.id, :style => "network_graph", :title => "conversational_tweets"}.merge(options)], curation) do |fs, graph, curation|
+    options = {:dynamic => true, :formats => ["gexf", "graphml"], :node_attributes => [:statuses_count, :followers_count, :friends_count], :edge_attributes => [:style]}
+    BasicHistogram.generate_graphs([{:analysis_metadata_id => self.analysis_metadata&&self.analysis_metadata.id, :style => "network_graph", :title => "conversational_tweets"}.merge(options)], curation) do |fs, graph, conditional|
       self.generate_edges(fs, graph, conditional)
       self.generate_graph_files(fs, graph)
     end
-    graph = Graph.first_or_create({:curation_id => curation_id, :analysis_metadata_id => self.analysis_metadata&&self.analysis_metadata.id}.merge(graph_attrs))
+    self.push_tmp_folder(curation.stored_folder_name)
+    self.finalize(curation)
   end
   
   def self.generate_edges(fs, graph, conditional)
@@ -65,11 +66,12 @@ class RetweetGraph < AnalysisMetadata
         Graphml::Writer::generate_temp_data(fs, edges)
         Gexf::Writer::generate_temp_data(fs, edges)
       end
+      offset+=limit
       start_nodes = graph.edges.aggregate(:start_node, :all.count, {:limit => limit, :offset => offset, :order => :start_node})
-      start_node_sets = self.calculate_start_node_sets_by_limit(start_nodes, start_node_limit)
+      start_node_sets = self.calculate_start_node_sets_by_limit(start_nodes, limit)
     end
-    Graphml::Writer::finalize_temp_data
-    Gexf::Writer::finalize_temp_data
+    Graphml::Writer::finalize_temp_data(fs)
+    Gexf::Writer::finalize_temp_data(fs)
   end
   
   def self.calculate_start_node_sets_by_limit(start_nodes, start_node_limit)

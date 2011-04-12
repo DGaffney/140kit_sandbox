@@ -1,4 +1,9 @@
 class Pretty
+  
+  def self.language_map
+    {"en" => "English", "ja" => "Japanese", "it" => "Italian", "de" => "German", "fr" => "French", "kr" => "Korean", "es" => "Spanish"}
+  end
+
   def self.pretty_up_labels(graph, graph_points)
     case graph.title
     when "tweets_location"
@@ -28,8 +33,7 @@ class Pretty
   end
 
   def self.language(language)
-    language_map = {"en" => "English", "ja" => "Japanese", "it" => "Italian", "de" => "German", "fr" => "French", "kr" => "Korean", "es" => "Spanish"}
-    return language_map[language]
+    return self.language_map[language]
   end
     
   def self.source(source)
@@ -40,6 +44,7 @@ class Pretty
   end
 
   def self.time_generalize(graph_points)
+    debugger
     sorted_times = graph_points.collect{|g| Time.parse(g[:label].to_s).to_i}.sort
     length = sorted_times.last-sorted_times.first
     if length < 60

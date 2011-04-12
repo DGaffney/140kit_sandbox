@@ -44,12 +44,9 @@ class TimeBasedSummary < AnalysisMetadata
       when "mysql"
         user_timeline = DataMapper.repository.adapter.select("select date_format(created_at, '#{time_query}') as created_at from users where"+Analysis.conditions_to_mysql_query(conditional)+"group by date_format(created_at, '#{time_query}') order by created_at desc")
         tweet_timeline = DataMapper.repository.adapter.select("select date_format(created_at, '#{time_query}') as created_at from tweets where"+Analysis.conditions_to_mysql_query(conditional)+"group by date_format(created_at, '#{time_query}') order by created_at desc")
-      when "sqlite"
+      when "sqlite3"
         user_timeline = DataMapper.repository.adapter.select("select date_format(created_at, '#{time_query}') as created_at from users where"+Analysis.conditions_to_mysql_query(conditional)+"group by date_format(created_at, '#{time_query}') order by created_at desc")
         tweet_timeline = DataMapper.repository.adapter.select("select date_format(created_at, '#{time_query}') as created_at from tweets where"+Analysis.conditions_to_mysql_query(conditional)+"group by date_format(created_at, '#{time_query}') order by created_at desc")
-      when "memory"
-        user_timeline = User.all(conditional).select{|u| u.created_at.year}.uniq
-        tweet_timeline = Tweet.all(conditional).select{|u| u.created_at.year}.uniq
       end
       self.time_based_analytics("tweets", time_query, tweet_timeline, curation, time_granularity, save_path)
       self.time_based_analytics("users", time_query, user_timeline, curation, time_granularity, save_path)

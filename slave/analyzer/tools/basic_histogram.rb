@@ -45,7 +45,7 @@ class BasicHistogram < AnalysisMetadata
     self.finalize(curation)
   end
 
-  def self.generate_graphs(frequency_set, curation)
+  def self.generate_graphs(frequency_set, curation, analytic=self)
     frequency_set = [frequency_set].flatten
     curation_id = curation && curation.id || nil
     graphs = []
@@ -54,7 +54,7 @@ class BasicHistogram < AnalysisMetadata
       fs[:title] = fs[:title] || fs[:model].pluralize+"_"+fs[:attribute].to_s
       fs[:conditional] = fs[:conditional] || {}
       graph_attrs = Hash[fs.select{|k,v| Graph.attributes.include?(k)}]
-      graph = Graph.first_or_create({:curation_id => curation_id, :analysis_metadata_id => self.analysis_metadata&&self.analysis_metadata.id}.merge(graph_attrs))
+      graph = Graph.first_or_create({:curation_id => curation_id, :analysis_metadata_id => analytic.analysis_metadata(curation).id}.merge(graph_attrs))
       graph.graph_points.destroy #can't call .new? as a condition for this, as it's created now.
       graph.edges.destroy #can't call .new? as a condition for this, as it's created now.
       conditional = Analysis.curation_conditional(curation).merge(fs[:conditional])

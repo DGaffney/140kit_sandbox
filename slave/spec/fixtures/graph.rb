@@ -27,5 +27,7 @@ Graph.fix{{
   :year => rand(Time.now.year-2005)+2005,
   :month => rand(12),
   :date => rand(28), #in case we end up in february.
-  :hour => rand(24)
+  :hour => rand(24),
+  :analysis_metadata_id => (analysis_metadata=AnalysisMetadata.pick).id,
+  :curation_id => analysis_metadata.curation_id
 }}
