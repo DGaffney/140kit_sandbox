@@ -8,7 +8,7 @@ describe U do
   end
   
   it "should return_data from a series of urls" do
-    urls = ["http://twitter.com/account/rate_limit_status.json", "http://search.twitter.com/trends/current.json"]
+    urls = ["http://twitter.com/account/rate_limit_status.json"]
     urls.each do |url|
       U.return_data(url).should_not == nil
     end

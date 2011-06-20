@@ -1,5 +1,6 @@
 module Graphml
-  def self.header(key)
+  CLASSES = {"Fixnum" => "int", "Float" => "float", "Bignum" => "double", "Integer" => "int", "String" => "string", "TrueClass" => "bool", "FalseClass" => "bool", "NilClass" => "int"}
+  def self.header(key="#{rand(10000)}")
     %{<?xml version="1.0" encoding="UTF-8"?>\n<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" \nxsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">\n\t<graph id="#{key}" edgedefault="directed">}
   end
   
@@ -76,8 +77,7 @@ module Graphml
   end
 
   def self.graphml_class(ruby_class)
-    classes = {"Fixnum" => "int", "Float" => "float", "Bignum" => "double", "Integer" => "int", "String" => "string", "TrueClass" => "bool", "FalseClass" => "bool", "NilClass" => "int"}
-    return classes[ruby_class.to_s] || "int"
+    return CLASSES[ruby_class.to_s] || "int"
   end
   
   module Writer

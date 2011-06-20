@@ -1,6 +1,5 @@
 describe Tweet do 
   before :all do
-    debugger
     researcher = Researcher.gen
     researcher.save!
     dataset = Dataset.gen

@@ -40,4 +40,8 @@ describe Array do
   it "should calculate centroid properly" do
     [0,1,1,2].centroid.should == [1,1]
   end
+  
+  it "should produce all_combinations" do
+    [0,1,1,2].all_combinations.should == [[0, 1, 1, 2], [0, 1, 1], [0, 1, 2], [1, 1, 2], [0, 1], [0, 2], [1, 1], [1, 2], [0], [1], [2]]
+  end
 end

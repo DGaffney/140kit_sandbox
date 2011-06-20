@@ -1,27 +1,7 @@
 class WordFrequency < AnalysisMetadata
   DEFAULT_CHUNK_SIZE = 1000
-  
-  def self.set_variables(analysis_metadata, curation)
-    remaining_variables = []
-    analysis_metadata.analytical_offering.variables.each do |variable|
-      analytical_offering_variable = AnalyticalOfferingVariable.new
-      analytical_offering_variable.analytical_offering_variable_descriptor_id = variable.id
-      analytical_offering_variable.analysis_metadata_id = analysis_metadata.id
-      case variable.name
-      when "curation_id"
-        analytical_offering_variable.value = curation.id
-        analytical_offering_variable.save
-      when "save_path"
-        analytical_offering_variable.value = "analytical_results/#{analysis_metadata.function}"
-        analytical_offering_variable.save
-      else
-        remaining_variables << variable
-      end
-    end
-    return remaining_variables
-  end
 
-  def self.run(curation_id, save_path)
+  def self.run(curation_id)
     curation = Curation.first({:id => curation_id})
     FilePathing.tmp_folder(curation, self.underscore)
     conditional = Analysis.curation_conditional(curation)
@@ -29,9 +9,10 @@ class WordFrequency < AnalysisMetadata
     # self.generate_word_frequencies_from_entities({:frequency_type => "hashtags"}, conditional)
     # self.generate_word_frequencies_from_entities({:frequency_type => "user_mentions"}, conditional)
     BasicHistogram.generate_graphs([
-      {:title => "urls", :frequency_type => "urls", :style => "word_frequencies", :analysis_metadata_id => self.analysis_metadata.id}, 
-      {:title => "hashtags", :frequency_type => "hashtags", :style => "word_frequencies", :analysis_metadata_id => self.analysis_metadata.id}, 
-      {:title => "user_mentions", :frequency_type => "user_mentions", :style => "word_frequencies", :analysis_metadata_id => self.analysis_metadata.id}
+      {:title => "urls", :frequency_type => "urls", :style => "word_frequencies", :analysis_metadata_id => self.analysis_metadata(curation)&&self.analysis_metadata(curation).id}, 
+      {:title => "hashtags", :frequency_type => "hashtags", :style => "word_frequencies", :analysis_metadata_id => self.analysis_metadata(curation)&&self.analysis_metadata(curation).id}, 
+      {:title => "user_mention_screen_names", :frequency_type => "user_mention_screen_names", :style => "word_frequencies", :analysis_metadata_id => self.analysis_metadata(curation)&&self.analysis_metadata(curation).id},
+      {:title => "user_mention_ids", :frequency_type => "user_mention_ids", :style => "word_frequencies", :analysis_metadata_id => self.analysis_metadata(curation)&&self.analysis_metadata(curation).id}
     ], curation, self) do |fs, graph, conditional|
       self.generate_word_frequencies_from_entities(fs, graph, conditional)
     end
@@ -46,29 +27,33 @@ class WordFrequency < AnalysisMetadata
     full_path_with_file = sub_directory == "/" ? path+"/"+graph.title+".csv" : path+sub_directory+"/"+graph.title+".csv"
     Sh::mkdir(path+sub_directory) if sub_directory != "/"
     FasterCSV.open(full_path_with_file, "w") do |csv|
-      records = Tweet.all(conditional).entities.aggregate(:value, :all.count, {:limit => limit, :offset => offset}.merge(self.conditional_from_frequency_type(fs[:frequency_type])))
-      graph_points = records.collect{|record| {:label => record.first, :value => record.last, :graph_id => graph.id, :curation_id => graph.curation_id}}
-      graph_points = graph.sanitize_points(graph_points)
+      records = Entity.aggregate(:value, :all.count, {:limit => limit, :offset => offset}.merge(conditional).merge(self.conditional_from_frequency_type(fs[:frequency_type])))
       while !records.empty?
+        graph_points = records.collect{|record| {:label => record.first, :value => record.last, :graph_id => graph.id, :curation_id => graph.curation_id, :analysis_metadata_id => graph.analysis_metadata_id}}
+        graph_points = graph.sanitize_points(graph_points)
+        GraphPoint.save_all(graph_points)
         csv << ["term", "count"]
         graph_points.each do |graph_point|
           csv << [graph_point[:label],graph_point[:value]]
         end
-        GraphPoint.save_all(graph_points)
         offset+=limit
-        records = Tweet.all(conditional).entities.aggregate(:value, :all.count, {:limit => limit, :offset => offset}.merge(self.conditional_from_frequency_type(fs[:frequency_type])))
+        records = Entity.aggregate(:value, :all.count, {:limit => limit, :offset => offset}.merge(conditional).merge(self.conditional_from_frequency_type(fs[:frequency_type])))
       end
     end
+    graph.written = true
+    graph.save!
   end
   
   def self.conditional_from_frequency_type(frequency_type)
     case frequency_type
     when "urls"
-      {:kind => "urls", :name => "url"}
+      {:name => "url"}
     when "hashtags"
-      {:kind => "hashtags", :name => "text"}
-    when "user_mentions"
-      {:kind => "user_mentions", :name => "screen_name"}
+      {:name => "text"}
+    when "user_mention_screen_names"
+      {:name => "screen_name"}
+    when "user_mention_ids"
+      {:name => "id"}
     end
   end
 

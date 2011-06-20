@@ -28,6 +28,10 @@ describe AnalyticalOfferingVariable do
     aov = AnalyticalOfferingVariable.first
     aov.kind.class.should == String
   end
+  it "should return a description" do
+    aov = AnalyticalOfferingVariable.first
+    aov.description.class.should == String
+  end
   it "should return a position" do
     aov = AnalyticalOfferingVariable.first
     aov.position.class.should == Fixnum

@@ -18,13 +18,37 @@ describe Dataset do
   it "should valid_params for valid locations params" do
     Dataset.valid_params("locations", "-42,70,-43,71").should == {:reason=>"", :clean_params=>"-42.0,70.0,-43.0,71.0"}
   end
+  
+  it "should valid_params for valid import params twapper" do
+    Dataset.valid_params("import", "www.twapperkeeper.com/sample-data.json").should == {:reason=>"", :clean_params=>"www.twapperkeeper.com/sample-data.json"}
+  end
+
+  it "should valid_params for valid import params 140kit" do
+    Dataset.valid_params("import", "www.140kit.com/sample-data.json").should == {:reason=>"", :clean_params=>"www.140kit.com/sample-data.json"}
+  end
+
+  it "should valid_params for valid audience_profile params" do
+    Dataset.valid_params("audience_profile", "dgaff").should == {:reason=>"", :clean_params=>"dgaff"}
+  end
+
+  it "should not valid_params for invalid import params" do
+    Dataset.valid_params("import", "www.").should == {:reason=>"File does not exist locally", :clean_params=>""}
+  end
+
+  it "should not valid_params for invalid audience_profile params" do
+    Dataset.valid_params("audience_profile", "aofijaewfojewifaowighalweriuhgalewrgiuahwlgiuah").should == {:reason=>"No User found with name aofijaewfojewifaowighalweriuhgalewrgiuahwlgiuah", :clean_params=>""}
+  end
+
+  it "should not valid_params for empty audience_profile params" do
+    Dataset.valid_params("audience_profile", "").should == {:reason=>"No User found with name ", :clean_params=>""}
+  end
 
   it "should not valid_params for invalid track params" do
     Dataset.valid_params("track", "").should == {:reason=>"The term can't be empty", :clean_params=>""}
   end
 
   it "should not valid_params for invalid follow params" do
-    Dataset.valid_params("follow", "iwjeojefwopi").should == {:reason=>"The follow list contained no users", :clean_params=>""}
+    Dataset.valid_params("follow", "iwjeojefwopi").should == {:reason=>"No User found with name iwjeojefwopi", :clean_params=>""}
   end
 
   it "should not valid_params for locations of wrong coord length" do
@@ -49,5 +73,36 @@ describe Dataset do
 
   it "should not valid_params for locations of out of range longitude" do
     Dataset.valid_params("locations", "-42,189,-43,190").should == {:reason=>"Longitudes are out of range (max 180 degrees)", :clean_params=>""}
+  end
+  
+  it "should full delete a dataset" do
+    tweets = []
+    entities = []
+    users = []
+    friendships = []
+    dataset = Dataset.gen
+    1.upto(100) do |gen_sample|
+      user = User.gen
+      user.dataset_id = dataset.id
+      user.save
+      users << user
+      tweet = Tweet.gen
+      tweet.dataset_id = dataset.id
+      tweet.save
+      tweets << tweet
+      entity = Entity.gen
+      entity.dataset_id = dataset.id
+      entity.save
+      entities << entity
+      friendship = Friendship.gen
+      friendship.dataset_id = dataset.id
+      friendship.save
+      friendships << friendship
+    end
+    dataset.full_delete.should == true
+    Tweet.count(:id => tweets.collect{|t| t.id}).should == 0
+    Entity.count(:id => entities.collect{|e| e.id}).should == 0
+    User.count(:id => users.collect{|u| u.id}).should == 0
+    Friendship.count(:id => friendships.collect{|f| f.id}).should == 0
   end
 end

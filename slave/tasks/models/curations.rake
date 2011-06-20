@@ -12,17 +12,20 @@ namespace :curation do
     dataset.scrape_type = answer
     clean_params = validate_params(answer)
     dataset.params = clean_params
-    puts "How long would you like to have this collection run? (Enter in number of seconds. I know, that's annoying.)"
-    answer = Sh::clean_gets
-    while answer.to_i==0
-      puts "Sorry, we couldn't parse that value. Just numbers, please, you know, like '300'."
+    if dataset.scrape_type != "import" && dataset.scrape_type != "audience_profile"
+      puts "How long would you like to have this collection run? (Enter in number of seconds. I know, that's annoying.)"
       answer = Sh::clean_gets
+      while answer.to_i==0
+        puts "Sorry, we couldn't parse that value. Just numbers, please, you know, like '300'."
+        answer = Sh::clean_gets
+      end
+      dataset.length = answer
     end
-    dataset.length = answer
     dataset.save
     curation = create_curation(dataset, researcher)
     select_analysis_metadata(curation)
   end
+
   desc "Manage existing Curations"
   task :manage => :environment do
     puts "First, I'll need to get the name of the researcher whose curations you want to manage:"
@@ -50,7 +53,7 @@ namespace :curation do
           puts "From here, you can do all sorts of stuff:"
           puts "Type 'list' to see current stats about this curation"
           puts "Type 'analyze' to select analysis processes for the curation"
-          puts "Type 'clear function_name' to clear an analysis process for the curation"
+          puts "Type 'remove function_name' to clear an analysis process for the curation"
           puts "Type 'clear' to clear all analysis processes for the curation"
           puts "Type 'finish' to exit the curation and return to management."
           answer = Sh::clean_gets
@@ -65,14 +68,8 @@ namespace :curation do
               end
             elsif answer == "analyze"
               select_analysis_metadata(curation)
-            elsif answer[0..5] == "clear "
-              analysis_metadata = curation.analysis_metadatas.select{|am| am.function == answer.gsub("clear ", "")}.first
-              if analysis_metadata
-                analysis_metadata.clear
-                puts "Analysis Metadata #{answer.gsub("clear ", "")} cleared from curation #{curation.id}."
-              else
-                puts "Analysis Metadata of function name #{answer.gsub("clear ", "")} not found on curation #{curation.id}"
-              end
+            elsif answer[0..6] == "remove "
+              remove_analysis_metadata(answer, curation)
             elsif answer == "clear"
               curation.analysis_metadatas.each do |am|
                 am.clear
@@ -182,6 +179,24 @@ namespace :curation do
         puts "Sorry, that was not valid input. Reason: #{reason}"
         answer = Sh::clean_gets
         response = Dataset.valid_params("locations", answer)
+      end
+    when "import"
+      puts "An import scrape will pull data from a file location (can be a compressed file or folder, a folder, a file, or a url from either 140kit or TwapperKeeper legacy datasets). Please enter your import location:"
+      answer = Sh::clean_gets
+      response = Dataset.valid_params("import", answer)
+      while !response[:reason].empty?
+        puts "Sorry, that was not valid input. Reason: #{reason}"
+        answer = Sh::clean_gets
+        response = Dataset.valid_params("import", answer)
+      end
+    when "audience_profile"
+      puts "An audience profiler scrape will collect all tweets and user information from public users who follow a particular account. Additionally, it will add in follower network information at a regular interval. Enter the user name of the account you wish to profile:"
+      answer = Sh::clean_gets
+      response = Dataset.valid_params("audience_profile", answer)
+      while !response[:reason].empty?
+        puts "Sorry, that was not valid input. Reason: #{reason}"
+        answer = Sh::clean_gets
+        response = Dataset.valid_params("audience_profile", answer)
       end
     end
     return response[:clean_params]

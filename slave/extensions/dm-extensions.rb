@@ -1,19 +1,20 @@
 require 'rubygems'
 require 'dm-core'
-require './extensions/array'
+require File.dirname(__FILE__)+'/array'
 
 module DataMapperExtensions
-  
+  require 'faster_csv'
   MAX_ROW_COUNT_PER_BATCH = 1000
-  
+  include DataObjects::Quoting
   
   def save_all(objs, storage_prefix="insert ignore into ") # takes array of objs, hashes, or a mix of both
+    return false if objs.empty?
     hashes = objs.collect {|h| h.is_a?(Hash) ? h : h.attributes }
     hashes.chunk(((hashes.length-1)/MAX_ROW_COUNT_PER_BATCH)+1)
     keys = hashes.collect {|h| h.keys }.flatten.uniq
     qs = "("+[].fill("?", 0, keys.length).join(", ")+")"
     sql_vals = [].fill(qs, 0, hashes.length).join(", ")
-    sql = "#{storage_prefix} #{self.storage_name} (#{keys.join(", ")}) values #{sql_vals}"
+    sql = "#{storage_prefix} #{self.storage_name} (#{keys.uniq.join(", ")}) values #{sql_vals}"
     vals = []
     hashes.each do |h|
       vals += keys.collect {|k| h[k] }
@@ -32,12 +33,13 @@ module DataMapperExtensions
   end
 
   def update_all(objs, storage_prefix="replace into ") # takes array of objs, hashes, or a mix of both
+    return false if objs.empty?
     hashes = objs.collect {|h| h.is_a?(Hash) ? h : h.attributes }
     hashes.chunk(((hashes.length-1)/MAX_ROW_COUNT_PER_BATCH)+1)
     keys = hashes.collect {|h| h.keys }.flatten.uniq
     qs = "("+[].fill("?", 0, keys.length).join(", ")+")"
     sql_vals = [].fill(qs, 0, hashes.length).join(", ")
-    sql = "#{storage_prefix} #{self.storage_name} (#{keys.join(", ")}) values #{sql_vals}"
+    sql = "#{storage_prefix} #{self.storage_name} (#{keys.uniq.join(", ")}) values #{sql_vals}"
     vals = []
     hashes.each do |h|
       vals += keys.collect {|k| h[k] }
@@ -54,7 +56,7 @@ module DataMapperExtensions
       end
     end
   end
-  
+
 end
 
 DataMapper::Model.append_extensions(DataMapperExtensions)

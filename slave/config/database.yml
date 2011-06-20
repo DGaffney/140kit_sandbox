@@ -2,5 +2,12 @@ development:
   adapter: mysql
   username: root
   password: 
-  host: 127.0.0.1
+  host: localhost
+  database: 140kit
+
+research: 
+  adapter: mysql
+  username: root
+  password: 
+  host: localhost
   database: 140kit

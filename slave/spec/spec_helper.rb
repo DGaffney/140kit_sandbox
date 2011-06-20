@@ -15,7 +15,7 @@ else
 end
 
 DataMapper.auto_migrate!
-load 'config/seed.rb'
+load ENV['PWD']+'/config/seed.rb'
 
 Spec::Runner.configure do |config|
   config.mock_with :mocha

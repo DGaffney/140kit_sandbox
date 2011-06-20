@@ -1,68 +1,86 @@
 class GenderEstimation < AnalysisMetadata
-  def self.set_variables(analysis_metadata, curation)
-    remaining_variables = []
-    analysis_metadata.analytical_offering.variables.each do |variable|
-      analytical_offering_variable = AnalyticalOfferingVariable.new
-      analytical_offering_variable.analytical_offering_variable_descriptor_id = variable.id
-      analytical_offering_variable.analysis_metadata_id = analysis_metadata.id
-      case variable.name
-      when "curation_id"
-        analytical_offering_variable.value = curation.id
-        analytical_offering_variable.save
-      when "save_path"
-        analytical_offering_variable.value = "analytical_results/#{analysis_metadata.function}"
-        analytical_offering_variable.save
-      else
-        remaining_variables << variable
+  DEFAULT_CHUNK_SIZE = 1000
+
+  def self.run(curation_id)
+    curation = Curation.first(:id => curation_id)
+    conditional = Analysis.curation_conditional(curation)
+    FilePathing.tmp_folder(curation, self.underscore)
+    tk_environment = load_config_file("api_keys")["trueknowledge"]
+    path=ENV['TMP_PATH']
+    Sh::mkdir(path)
+    analysis_metadata = self.analysis_metadata(curation)
+    graphs = []
+    BasicHistogram.generate_graphs([
+      {:analysis_metadata_id => analysis_metadata&&analysis_metadata.id, :style => "histogram", :title => "user_gender_mapping"},
+      {:analysis_metadata_id => analysis_metadata&&analysis_metadata.id, :style => "histogram", :title => "user_gender_breakdown"}], curation) do |fs, graph, conditional|
+        graphs << graph
+    end
+    gender_graph, gender_results = graphs
+    graph_points = []
+    gender_results_tracker = {}
+    limit = DEFAULT_CHUNK_SIZE||1000
+    offset = 0
+    users = User.all({:limit => limit, :offset => offset}.merge(conditional))
+    full_path_with_file = path+"/"+gender_graph.title+".csv"
+    FasterCSV.open(full_path_with_file, "w") do |csv|
+      csv << ["Account", "Twitter ID", "Name", "Gender"]
+      while !users.empty?
+        users.each do |user|
+          begin
+            query = %(query+gender_common%0Agender+%5Bis+the+likely+gender+inferred+from+the+name%5D+%5Bpersonal+name%3A+%5B%22#{URI.encode(user.name)}%22%5D%5D%0Agender+%5Bcommonly+translates+as%5D+gender_common)
+            api_url = "http://api.trueknowledge.com/query/?api_account_id=#{tk_environment["username"]}&api_password=#{tk_environment["password"]}&query=#{query}"
+            result = (value_string = Nokogiri.parse(open(api_url).read.gsub(":", "_")).at("tk_id")).nil? ? "inconclusive" : value_string.children.first.gsub(/\\|\[|\]|\"/, "")
+            graph_point = {}
+            graph_point[:label] = user.twitter_id
+            graph_point[:value] = result
+            graph_point[:graph_id] = gender_graph.id
+            graph_point[:curation_id] = curation.id
+            graph_point[:analysis_metadata_id] = analysis_metadata&&analysis_metadata.id
+            csv << [user.screen_name, user.twitter_id, user.name, result]
+            gender_results_tracker[result].nil? ? gender_results_tracker[result]=1 : gender_results_tracker[result]+=1
+            graph_points << graph_point
+          rescue Timeout::Error
+            next
+          rescue OpenURI::HTTPError
+            next
+          end
+        end
+        offset+=offset
+        users = User.all({:limit => limit, :offset => offset}.merge(conditional))
+        if graph_points.length > DEFAULT_CHUNK_SIZE
+          GraphPoint.save_all(graph_points)
+          graph_points = []
+        end
       end
     end
-    return remaining_variables
+    full_path_with_file = sub_directory == "/" ? path+"/"+gender_graph.title+".csv" : path+sub_directory+"/"+gender_graph.title+".csv"    
+    FasterCSV.open(full_path_with_file, "w") do |csv|
+      csv << ["Gender", "Total"]
+      gender_results_tracker.each_pair do |k,v|
+        graph_point = {}
+        graph_point[:label] = k
+        graph_point[:value] = v
+        graph_point[:graph_id] = gender_results.id
+        graph_point[:curation_id] = curation.id    
+        graph_point[:analysis_metadata_id] = analysis_metadata&&analysis_metadata.id
+        csv << [k,v]
+        graph_points << graph_point
+      end
+    end
+    GraphPoint.save_all(graph_points)
+    self.push_tmp_folder(curation.stored_folder_name)
+    self.finalize(curation)
+  end
+end
+
+module Hpricot
+
+  # Monkeypatch to fix an Hpricot bug that causes HTML entities to be decoded
+  # incorrectly.
+  def self.uxs(str)
+    str.to_s.
+      gsub(/&(\w+);/) { [Hpricot::NamedCharacters[$1] || ??].pack("U*") }.
+      gsub(/\&\#(\d+);/) { [$1.to_i].pack("U*") }
   end
 
-  
-  def self.run(collection_id, save_path)
-    collection = Collection.find({:id => collection_id})
-    gender_graph = generate_graph({:style => "gender", :title => "User Gender Mapping", :collection_id => collection_id})
-    gender_results = generate_graph({:style => "gender", :title => "User Gender Breakdown", :collection_id => collection_id})
-    gender_mapping = []
-    gender_results_mapping = []
-    gender_results_tracker = {}
-    objects = Database.spooled_result("select name,twitter_id from users "+Analysis.conditional(collection))
-    first_hash = objects.fetch_hash
-    keys = first_hash.keys
-    while row = objects.fetch_hash do
-      query = %(query+gender_common%0Agender+%5Bis+the+likely+gender+inferred+from+the+name%5D+%5Bpersonal+name%3A+%5B%22#{URI.encode(row["name"])}%22%5D%5D%0Agender+%5Bcommonly+translates+as%5D+gender_common)
-      c = "http://api.trueknowledge.com/query/?api_account_id=#{Environment.tk_username}&api_password=#{Environment.tk_password}&query=#{query}"
-      begin
-        result = (value_string = Hpricot(open(c).read).at("tk:id")).nil? ? "inconclusive" : value_string.innerHTML.gsub(/[\[\]\&quot\;]/, "")
-      rescue Timeout::Error
-        puts "FAIL"
-        retry
-      end
-      graph_point = {}
-      graph_point["label"] = row["twitter_id"]
-      graph_point["value"] = result
-      graph_point["graph_id"] = gender_graph.id
-      graph_point["collection_id"] = collection.id
-      gender_results_tracker[result].nil? ? gender_results_tracker[result]=1 : gender_results_tracker[result]+=1
-      gender_mapping << graph_point
-      if gender_mapping.length > MAX_ROW_COUNT_PER_BATCH
-        Database.update_all({:graph_points => gender_mapping}, Environment.new_db_connect)
-        gender_mapping = []
-      end
-    end
-    gender_results_tracker.each_pair do |k,v|
-      graph_point = {}
-      graph_point["label"] = k
-      graph_point["value"] = v
-      graph_point["graph_id"] = gender_results.id
-      graph_point["collection_id"] = collection.id    
-      gender_results_mapping << graph_point
-    end
-    objects.free
-    Database.terminate_spooling
-    Database.update_all({:graph_points => gender_mapping})
-    Database.update_all({:graph_points => gender_resupts_mapping})
-    Database.update_attributes(:graphs, [gender_graph, gender_results], {:written => true}, Environment.new_db_connect)
-  end
 end

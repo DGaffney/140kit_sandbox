@@ -55,4 +55,14 @@ class Array
     side_two = (self[1].to_f-self[3].to_f).abs
     return side_one*side_two
   end
+  
+  def all_combinations(length_range=1..self.length)
+    permutations = []
+    length_range.max.downto(length_range.min) do |length|
+      self.permutation(length).each do |perm|
+        permutations << perm.sort if !permutations.include?(perm.sort)
+      end
+    end
+    return permutations
+  end
 end

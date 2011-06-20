@@ -27,20 +27,17 @@ namespace :analysis_metadata do
           analysis_metadata.curation = curation
           analysis_metadata.save
           create_analysis_metadata(analysis_metadata, curation)
-          puts "Added #{answer} to curation. #{curation.analysis_metadatas.length} total analytics now tacked on. To remove, type 'remove function_name'"
+          stored = analysis_metadata.verify_uniqueness
+          if stored
+            puts "Added #{answer.gsub("add ", "")} to curation. #{curation.analysis_metadatas.length} total analytics now tacked on. To remove, type 'remove function_name'" 
+          else
+            puts "Failed to add #{answer.gsub("add ", "")} to curation. #{curation.analysis_metadatas.length} total analytics now tacked on. To remove, type 'remove function_name'" 
+          end
         else
           puts "Sorry, something was screwy in finding that function. Try again."
         end
       elsif answer[0..5]=="remove"
-        analytical_offering = AnalyticalOffering.first(:function => answer.gsub("remove ", ""))
-        if analytical_offering
-          analysis_metadata = AnalysisMetadata.first(:curation_id => curation.id, :function => analytical_offering.function)
-          analysis_metadata.destroy
-          curation.analysis_metadatas = curation.analysis_metadatas-[analysis_metadata]
-          puts "Removed #{answer} from curation. #{curation.analysis_metadatas.length} total analytics now tacked on. To add, type 'add function_name'"
-        else
-          puts "Sorry, something was screwy in finding that function. Try again."
-        end
+        remove_analysis_metadata(answer, curation)
       else puts "Command not recognized. Try again."
       end
       answer = Sh::clean_gets
@@ -48,28 +45,52 @@ namespace :analysis_metadata do
   end
 
   def create_analysis_metadata(analysis_metadata, curation)
-    analysis_metadata.set_variables(curation).each do |variable|
+    analysis_metadata.set_variables.each do |variable|
       puts "Name: "+variable.name
       puts "Description: "+variable.description
       puts "Data Type: "+variable.kind
-      puts "Enter your variable now, or type 'cancel' to cancel adding this analytical process."
+      inspected_value = (variable.value.nil?||variable.value.class!=String) ? variable.value.inspect : variable.value
+      puts "Current value: "+inspected_value
+      puts "Enter your variable now, press enter to select default, or type 'cancel' to cancel adding this analytical process."
       answer = Sh::clean_gets
       if answer!="cancel"
-        response = analysis_metadata.verify_variable(variable, answer, curation)
-        while !response[:reason].empty?
+        response = analysis_metadata.verify_variable(variable, answer)
+        while !response[:reason].nil? && !response[:reason].empty?
           puts response[:reason]
           answer = Sh::clean_gets
-          response = analysis_metadata.verify_variable(variable, answer, curation)
+          response = analysis_metadata.verify_variable(variable, answer)
         end
-        analytical_offering_variable = AnalyticalOfferingVariable.new
-        analytical_offering_variable.value = response[:variable]
-        analytical_offering_variable.analytical_offering_variable_descriptor = variable
-        analytical_offering_variable.analysis_metadata = analysis_metadata
-        analytical_offering_variable.save
+        variable.value = response[:variable]
       else
         analysis_metadata.destroy
         break
       end
+      variable.save
+    end
+  end
+  
+  def remove_analysis_metadata(answer, curation)
+    analytical_offering = AnalyticalOffering.first(:function => answer.gsub("remove ", ""))
+    if analytical_offering
+      analysis_metadatas = AnalysisMetadata.all(:curation_id => curation.id, :analytical_offering_id => analytical_offering.id)
+      puts "This curation has #{analysis_metadatas.length} instances of that analysis process. Review this list, then enter the ID of the analysis metadata you wish to destroy. Type 'cancel' to cancel the removal."
+      analysis_metadatas.each do |analysis_metadata|
+        puts "\n\tAnalysis Metadata: ID: #{analysis_metadata.id}; Variables: #{analysis_metadata.variables.collect{|variable| "\n\t\tVariable: #{variable.name}; Value: #{variable.value}"}}"
+      end
+      possible_answers = analysis_metadatas.collect{|analysis_metadata| analysis_metadata.id.to_s}
+      answer = Sh::clean_gets
+      while !possible_answers.include?(answer) && answer!="cancel"
+        puts "Sorry, that was not one of the IDs specified. Please try again."
+        answer = Sh::clean_gets
+      end
+      analysis_metadata = AnalysisMetadata.first(:id => answer)
+      if answer!="cancel"
+        analysis_metadata.clear
+        curation.analysis_metadatas = curation.analysis_metadatas-[analysis_metadata]
+        puts "Removed #{answer} from curation. #{curation.analysis_metadatas.length} total analytics now tacked on. To add, type 'add function_name'"
+      end
+    else
+      puts "Sorry, something was screwy in finding that function. Try again."
     end
   end
 end

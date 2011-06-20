@@ -1,6 +1,5 @@
 describe TweetHelper do
   it "should prepped_tweet_and_user correctly" do
-    debugger
     result = TweetHelper.prepped_tweet_and_user(tweet_data)
     result.class.should == Array
     result.length.should == 2

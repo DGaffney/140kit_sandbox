@@ -14,9 +14,10 @@ class Dataset
   has n, :tweets
   has n, :users
   has n, :curations, :through => Resource
+  has 1, :importer_task
   
   def self.scrape_types
-    ['track', 'follow', 'locations']
+    ['track', 'follow', 'locations', 'import', 'audience_profile']
   end
   
   def self.valid_params(scrape_type, params)
@@ -38,7 +39,7 @@ class Dataset
         ids << user_id if user_id != 0
         if user_id == 0
           response[:reason] = "No User found with name #{user}"
-          break
+          return response
         end
       end
       response[:reason] = "The follow list contained no users" if ids.empty?
@@ -53,7 +54,42 @@ class Dataset
       (response[:reason] = "Longitudes are out of range (max 180 degrees)";return response) if boundings[1].abs>180 || boundings[3].abs>180
       #break if !response[:reason].empty?
       response[:clean_params] = boundings.join(",")
+    when "import"
+      if params.include?("140kit.com") || params.include?("twapperkeeper.com")
+        self.resolve_raw_dataset_url(params)
+      else
+        if !File.exists?(params)
+          response[:reason] = "File does not exist locally"
+        end
+      end
+      response[:clean_params] = params if response[:reason].blank?
+    when "audience_profile"
+      user_id = Twit.user(params).id rescue 0
+      if user_id == 0
+        response[:reason] = "No User found with name #{params}"
+        return response
+      end
+      response[:reason] = "The audience profile list contained no users" if params.empty?
+      response[:clean_params] = params
     end
     return response
+  end
+  
+  def self.resolve_raw_dataset_url(params)
+    #here we would want to figure out the machine/id of the dataset, touch the file, verify that it exists, and then run against that url as the params.
+    if params.include?("140kit.com")
+      return params
+    elsif params.include?("twapperkeeper.com")
+      return params
+    end
+  end
+  
+  def full_delete
+    Tweet.all(:dataset_id => self.id).destroy
+    Entity.all(:dataset_id => self.id).destroy
+    User.all(:dataset_id => self.id).destroy
+    Friendship.all(:dataset_id => self.id).destroy
+    ImporterTask.all(:dataset_id => self.id).destroy
+    self.destroy
   end
 end

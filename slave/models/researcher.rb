@@ -62,7 +62,7 @@ class Researcher
   end
   
   def validate_on_create
-    if !self.user_name.scan(/[\.\;\:\?\<\>\,\+\=\_\-\{\}\[\]\(\)\|\\\*\&\^%\$#\@\!\~\`]/).empty?
+    if !self.user_name.scan(/[\.\;\:\?\<\>\,\+\=\_\-\{\}\[\]\(\)\|\\\*\&\^%\$#\@\!\~\`\ ]/).empty?
       return false, "You can only use alpha numeric characters in your user name (a-z, 0-9)."
     end
     return true, "Name looks good."

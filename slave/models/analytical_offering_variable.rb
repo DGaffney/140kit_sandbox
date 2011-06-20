@@ -18,6 +18,10 @@ class AnalyticalOfferingVariable
   def kind
     return analytical_offering_variable_descriptor.kind
   end
+
+  def description
+    return analytical_offering_variable_descriptor.description
+  end
   
   def position
     return analytical_offering_variable_descriptor.position

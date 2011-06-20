@@ -36,10 +36,11 @@ class Instance
     puts "Booting #{env} environment."
     db = db[env]
     DataMapper.finalize
-    DataMapper.setup(:default, "#{db["adapter"]}://#{db["username"]}:#{db["password"]}@#{db["host"]}/#{db["database"]}")
+    DataMapper.setup(:default, "#{db["adapter"]}://#{db["username"]}:#{db["password"]}@#{db["host"]}:#{db["port"] || 3000}/#{db["database"]}")
   end
   
   def check_in
+    Sh::mkdir(ENV['TMP_PATH'])
     @check_in_thread = Thread.new { loop { self.touch; sleep(CHECK_IN_FREQUENCY*60) } }
   end
   

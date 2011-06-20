@@ -6,9 +6,8 @@ module Analysis::Dependencies
         dependencies = Analysis::Dependencies.send(method_name.to_s+"_dependencies")
         dependencies.each do |dependency|
           require dependency
+          puts "Required #{dependency}"
         end
-        puts "Required #{dependencies.length} dependencies:"
-        puts dependencies.join(", ")
         return dependencies
       else
         return "No dependencies defined."
@@ -17,21 +16,41 @@ module Analysis::Dependencies
       super
     end
   end
-  
+
+  def self.click_tweet_count_comparison_dependencies
+    ['fastercsv']
+  end  
+
+  def self.jaccard_to_csv_dependencies
+    ['fastercsv']
+  end
+
   def self.raw_csv_dependencies
     ['fastercsv']
   end
   
+  def self.advanced_histogram_dependencies
+    ['fastercsv']
+  end
+
   def self.basic_histogram_dependencies
     ['fastercsv']
   end
 
+  def self.size_counter_dependencies
+    ['fastercsv']
+  end
+  
   def self.time_based_summary_dependencies
     ['fastercsv']
   end
   
   def self.word_frequency_dependencies
     ['fastercsv']
+  end
+  
+  def self.gender_estimation_dependencies
+    ['nokogiri']
   end
   
 end

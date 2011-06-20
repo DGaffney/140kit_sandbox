@@ -1,26 +1,7 @@
 class TimeBasedSummary < AnalysisMetadata
-  def self.set_variables(analysis_metadata, curation)
-    remaining_variables = []
-    analysis_metadata.analytical_offering.variables.each do |variable|
-      analytical_offering_variable = AnalyticalOfferingVariable.new
-      analytical_offering_variable.analytical_offering_variable_descriptor_id = variable.id
-      analytical_offering_variable.analysis_metadata_id = analysis_metadata.id
-      case variable.name
-      when "curation_id"
-        analytical_offering_variable.value = curation.id
-        analytical_offering_variable.save
-      when "save_path"
-        analytical_offering_variable.value = "analytical_results/#{analysis_metadata.function}"
-        analytical_offering_variable.save
-      else
-        remaining_variables << variable
-      end
-    end
-    return remaining_variables
-  end
-  
-  def self.verify_variable(metadata, variable_descriptor, answer, curation)
-    case variable_descriptor.name
+
+  def self.verify_variable(metadata, analytical_offering_variable, answer)
+    case analytical_offering_variable.name
     when "granularity"
       valid_responses = ["year", "month", "date", "hour"]
       response = {}
@@ -31,7 +12,14 @@ class TimeBasedSummary < AnalysisMetadata
     return {:variable => answer}
   end
   
-  def self.run(curation_id, save_path, granularity)
+  def self.set_variables(analysis_metadata, analytical_offering_variable, curation)
+    case analytical_offering_variable.function
+    when "granularity"
+      return "date"
+    end
+  end
+  
+  def self.run(curation_id, granularity)
     curation = Curation.first({:id => curation_id})
     FilePathing.tmp_folder(curation, self.underscore)
     conditional = Analysis.curation_conditional(curation)
@@ -45,8 +33,8 @@ class TimeBasedSummary < AnalysisMetadata
         user_timeline = DataMapper.repository.adapter.select("select date_format(created_at, '#{time_query}') as created_at from users where"+Analysis.conditions_to_mysql_query(conditional)+"group by date_format(created_at, '#{time_query}') order by created_at desc")
         tweet_timeline = DataMapper.repository.adapter.select("select date_format(created_at, '#{time_query}') as created_at from tweets where"+Analysis.conditions_to_mysql_query(conditional)+"group by date_format(created_at, '#{time_query}') order by created_at desc")
       when "sqlite3"
-        user_timeline = DataMapper.repository.adapter.select("select date_format(created_at, '#{time_query}') as created_at from users where"+Analysis.conditions_to_mysql_query(conditional)+"group by date_format(created_at, '#{time_query}') order by created_at desc")
-        tweet_timeline = DataMapper.repository.adapter.select("select date_format(created_at, '#{time_query}') as created_at from tweets where"+Analysis.conditions_to_mysql_query(conditional)+"group by date_format(created_at, '#{time_query}') order by created_at desc")
+        user_timeline = DataMapper.repository.adapter.select("select strftime('#{time_query}', created_at) as created_at from users where"+Analysis.conditions_to_mysql_query(conditional)+"group by strftime('#{time_query}', created_at) order by created_at desc")
+        tweet_timeline = DataMapper.repository.adapter.select("select strftime('#{time_query}', created_at) as created_at from tweets where"+Analysis.conditions_to_mysql_query(conditional)+"group by strftime('#{time_query}', created_at) order by created_at desc")
       end
       self.time_based_analytics("tweets", time_query, tweet_timeline, curation, time_granularity, save_path)
       self.time_based_analytics("users", time_query, user_timeline, curation, time_granularity, save_path)
@@ -56,15 +44,29 @@ class TimeBasedSummary < AnalysisMetadata
   end
 
   def self.resolve_time_query(time_granularity)
-    case time_granularity
-    when "year"
-      return {"year" => "%Y"}
-    when "month"
-      return {"year" => "%Y", "month" => "%Y-%m"}
-    when "date"
-      return {"year" => "%Y", "month" => "%Y-%m", "date" => "%Y-%m-%e"}
-    when "hour"
-      return {"year" => "%Y", "month" => "%Y-%m", "date" => "%Y-%m-%e", "hour" => "%Y-%m-%e %H"}
+    case DataMapper.repository.adapter.options["adapter"]
+    when "mysql"
+      case time_granularity
+      when "year"
+        return {"year" => "%Y"}
+      when "month"
+        return {"year" => "%Y", "month" => "%Y-%m"}
+      when "date"
+        return {"year" => "%Y", "month" => "%Y-%m", "date" => "%Y-%m-%e"}
+      when "hour"
+        return {"year" => "%Y", "month" => "%Y-%m", "date" => "%Y-%m-%e", "hour" => "%Y-%m-%e %H"}
+      end
+    when "sqlite3"
+      case time_granularity
+      when "year"
+        return {"year" => "%Y"}
+      when "month"
+        return {"year" => "%Y", "month" => "%Y-%m"}
+      when "date"
+        return {"year" => "%Y", "month" => "%Y-%m", "date" => "%Y-%m-%d"}
+      when "hour"
+        return {"year" => "%Y", "month" => "%Y-%m", "date" => "%Y-%m-%d", "hour" => "%Y-%m-%d %H"}
+      end
     end
   end
 

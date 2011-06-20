@@ -64,6 +64,7 @@ GEM
     hashie (0.4.0)
     hoe (2.9.4)
       rake (>= 0.8.7)
+    hpricot (0.8.3)
     htmlentities (4.2.4)
     jeweler (1.5.2)
       bundler (~> 1.0.0)
@@ -75,6 +76,7 @@ GEM
     multi_json (0.0.5)
     multi_xml (0.2.1)
     multipart-post (1.0.1)
+    nokogiri (1.4.4)
     ntp (1.0.0)
       hoe (>= 1.2.0)
     rack (1.1.0)
@@ -120,10 +122,12 @@ DEPENDENCIES
   em-http-request
   eventmachine
   fastercsv
+  hpricot
   htmlentities
   jeweler
   json
   mocha
+  nokogiri
   ntp
   rdebug
   rspec

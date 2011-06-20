@@ -5,7 +5,7 @@ Curation.fixture {{
   :analyzed => [true,false][rand(2)],
   :created_at => researcher.created_at+rand(((Time.now-researcher.created_at)/60/60/24)).days+rand(86400),
   :updated_at => researcher.created_at+rand(((Time.now-researcher.created_at)/60/60/24)+1).days+rand(86400),
-  :archived => [true,false][rand(2)]
+  :archived => false
 }}
 Curation.fixture(:finished){{
   :name            => /\w+/.gen,

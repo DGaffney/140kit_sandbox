@@ -1,4 +1,5 @@
 module Gexf
+  CLASSES = {"Fixnum" => "double", "Float" => "float", "Bignum" => "double", "Integer" => "int", "String" => "string", "TrueClass" => "bool", "FalseClass" => "bool", "NilClass" => "int"}
   def self.header(mode="dynamic", time_format="double", default_edge_type="directed")
     %{<gexf xmlns="http://www.gexf.net/1.1draft"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -167,8 +168,7 @@ module Gexf
   end
   
   def self.gexf_class(ruby_class)
-    classes = {"Fixnum" => "double", "Float" => "float", "Bignum" => "double", "Integer" => "int", "String" => "string", "TrueClass" => "bool", "FalseClass" => "bool", "NilClass" => "int"}
-    return classes[ruby_class.to_s] || "int"
+    return CLASSES[ruby_class.to_s] || "int"
   end
   
   module Writer
@@ -300,7 +300,7 @@ module Gexf
     def self.group_edges_by_end_node(fs, start_node_name, edges)
       edge_sets = {}
       if fs[:edge_attributes]&&fs[:edge_attributes].include?(:style)
-        styles = ["mention", "retweet"]
+        styles = ["mention", "retweet", "mention_entity", "retweet_entity"]
         styles.each do |style|
           edges = edges.select{|edge| edge.start_node==start_node_name && edge.style==style}
           edges.each do |edge|
