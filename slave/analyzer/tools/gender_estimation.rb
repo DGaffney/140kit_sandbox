@@ -1,7 +1,24 @@
 class GenderEstimation < AnalysisMetadata
   DEFAULT_CHUNK_SIZE = 1000
 
-  def self.run(curation_id)
+  def self.verify_variable(metadata, analytical_offering_variable, answer)
+    case analytical_offering_variable.name
+    when "sample_size"
+      response = {}
+      response[:reason] = "The value must be an integer"
+      response[:variable] = answer
+      return response if answer.to_i!=0
+    end
+    return {:variable => answer}
+  end
+  
+  def self.set_variables(analysis_metadata, analytical_offering_variable, curation)
+    case analytical_offering_variable.function
+    when "sample_size"
+      return curation.users_count/10
+    end
+  end
+  def self.run(curation_id, sample_size)
     curation = Curation.first(:id => curation_id)
     conditional = Analysis.curation_conditional(curation)
     FilePathing.tmp_folder(curation, self.underscore)

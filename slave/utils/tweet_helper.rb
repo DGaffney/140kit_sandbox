@@ -34,14 +34,14 @@ class TweetHelper
   
   def self.prepped_tweet_and_user(json)
     tweet = self.prep_tweet(json)
-    user = self.prep_user(json)
+    user = self.prep_user(json[:user])
     return tweet, user
   end
   
   def self.prep_tweet(json)
     tweet = {}
     json.each do |k,v|
-      case k
+      case k.to_sym
       when :id
         tweet[:twitter_id] = v
       when :user
@@ -54,11 +54,11 @@ class TweetHelper
       when :created_at
         tweet[:created_at] = DateTime.parse(v)
       else
-        tweet[k] = v if @@allowed_tweet_fields.include?(k)
+        tweet[k.to_sym] = v if @@allowed_tweet_fields.include?(k.to_sym)
       end
       tweet[:user_id] = json[:user][:id]
       tweet[:lat], tweet[:lon] = self.derive_lat_lon(json)
-      tweet[:in_reply_to_status_id] = self.derive_in_reply_to_status_id(json)
+      tweet[:in_reply_to_status_id], tweet[:in_reply_to_user_id], tweet[:in_reply_to_screen_name] = self.derive_retweet_status(json)
     end
     return tweet
   end
@@ -77,23 +77,29 @@ class TweetHelper
     return lat, lon
   end
   
-  def self.derive_in_reply_to_status_id(json)
+  def self.derive_retweet_status(json)
     in_reply_to_status_id = nil
-    in_reply_to_status_id = json[:in_repy_to_status_id] ||
+    in_reply_to_status_id = json[:in_reply_to_status_id] ||
     json[:retweeted_status]&&json[:retweeted_status][:id]
-    return in_reply_to_status_id
+    in_reply_to_user_id = nil
+    in_reply_to_user_id = json[:in_reply_to_user_id] ||
+    json[:retweeted_status]&&json[:retweeted_status][:user]&&json[:retweeted_status][:user][:id]
+    in_reply_to_screen_name = nil
+    in_reply_to_screen_name = json[:in_reply_to_screen_name] ||
+    json[:retweeted_status]&&json[:retweeted_status][:user]&&json[:retweeted_status][:user][:screen_name]
+    return in_reply_to_status_id, in_reply_to_user_id, in_reply_to_screen_name
   end
   
   def self.prep_user(json)
     user = {}
-    json[:user].each do |k,v|
-      case k
+    json.each do |k,v|
+      case k.to_sym
       when :id
         user[:twitter_id] = v
       when :created_at
         user[:created_at] = Time.parse(v)
       else
-        user[k] = v if @@allowed_user_fields.include?(k)
+        user[k.to_sym] = v if @@allowed_user_fields.include?(k.to_sym)
       end
     end
     return user

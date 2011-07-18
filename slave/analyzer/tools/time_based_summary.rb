@@ -20,10 +20,12 @@ class TimeBasedSummary < AnalysisMetadata
   end
   
   def self.run(curation_id, granularity)
+    granularity = granularity||"date"
     curation = Curation.first({:id => curation_id})
     FilePathing.tmp_folder(curation, self.underscore)
     conditional = Analysis.curation_conditional(curation)
     time_queries = self.resolve_time_query(granularity)
+    debugger
     time_queries.each_pair do |time_granularity,time_query|
       user_timeline = nil
       tweet_timeline = nil

@@ -72,6 +72,34 @@ require DIR+'/analyzer/analysis'
 Twit = Twitter::Client.new
 Struct.new("Condition", :name, :process, :vars)
 
+at_exit { do_at_exit }
+
+def do_at_exit
+  puts "Exiting..."
+  safe_close
+  puts "Safely exited."
+end
+
+def safe_close
+  pid = ENV['PID']
+  hostname = Sh::hostname
+  instance_id = ENV['INSTANCE_ID']
+  instance = Instance.first(:hostname => hostname, :pid => pid) || Instance.first(:instance_id => instance_id)
+  if instance
+    case instance.instance_type
+    when "analyzer"
+      instance.store_data(1)
+      instance.unlock_all
+    when "streamer"
+      instance.store_data(1)
+      instance.unlock_all
+    end
+    instance.destroy
+  else
+    Lock.all(:instance_id => instance_id).destroy
+  end
+end
+
 def connect_to_db(environment_name)
   database = YAML.load(File.read(File.dirname(__FILE__)+'/config/database.yml'))
   if database.has_key?(environment_name)

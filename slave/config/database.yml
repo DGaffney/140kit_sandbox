@@ -1,13 +1,27 @@
-development: 
+---
+# This is a sample database file for the DataMapper ORM
+development: &defaults
   adapter: mysql
   username: root
   password: 
   host: localhost
   database: 140kit
 
-research: 
-  adapter: mysql
-  username: root
-  password: 
-  host: localhost
+test:
+  <<:       *defaults
   database: 140kit
+
+  # repositories:
+  #   repo1:
+  #     database: sample_1_test.db
+
+production:
+  <<:       *defaults
+  database: production.db
+
+  # repositories:
+  #   repo1:
+  #     database: sample_production.db
+
+rake:
+  <<: *defaults
