@@ -1,0 +1,16 @@
+<h1><%= @curation.name %></h1>
+<h2>Overview</h2>
+<ul>
+  <li>Researcher:<%= link_to @curation.researcher.user_name, url(:researcher, @curation.researcher)%></li>
+  <li>Created at:<%= @curation.created_at %></li>
+  <li><%= link_to @curation.tweets_count==1 ? @curation.tweets_count.to_s+" Tweet" : @curation.tweets_count.to_s+" Tweets", url(:tweets, :curation_id => @curation.id) %></li>
+  <li><%= link_to @curation.users_count==1 ? @curation.users_count.to_s+" User" : @curation.users_count.to_s+" Users", url(:users, :curation_id => @curation.id) %></li>
+  <li><%= link_to @curation.entities_count==1 ? @curation.entities_count.to_s+" Entity" : @curation.entities_count.to_s+" Entities", url(:entities, :curation_id => @curation.id) %></li>
+  <li><%= link_to @curation.datasets.count==1 ? @curation.datasets.count.to_s+" Dataset" : @curation.datasets.count.to_s+" Datasets", url(:datasets, :curation_id => @curation.id) %></li>
+</ul>
+<h2>Analysis</h2>
+<ul>
+  <% for metadata in @curation.analysis_metadatas %>
+    <li><%= metadata.function %></li>
+  <% end %>
+</ul>

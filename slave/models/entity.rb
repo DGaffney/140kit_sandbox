@@ -8,4 +8,16 @@ class Entity
   property :value, Text, :unique_index => [:unique_entity], :index => [:value, :dataset_id_value, :twitter_id_value, :kind_value, :name_value, :dataset_id_kind_value, :twitter_id_kind_value, :twitter_id_kind_name_value, :dataset_id_kind_name_value, :dataset_id_twitter_id_kind_value, :dataset_id_twitter_id_kind_name_value]
   belongs_to :tweet, :parent_key => :twitter_id, :child_key => :twitter_id
   belongs_to :dataset, :child_key => :dataset_id
+  
+  def curations
+    self.dataset.curations-[self.curation]
+  end
+  
+  def curation
+    self.dataset.curations.first(:single_dataset => true)
+  end
+  
+  def user
+    self.tweet.user
+  end
 end

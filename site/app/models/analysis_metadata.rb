@@ -1,0 +1,1 @@
+../../../slave/models/analysis_metadata.rb

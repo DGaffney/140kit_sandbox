@@ -37,4 +37,16 @@ class User
   property :listed_count, Integer, :index => [:listed_count_dataset, :listed_count]
   property :follow_request_sent, Boolean, :index => [:follow_request_sent_dataset, :follow_request_sent], :default => false
   belongs_to :dataset, Integer, :unique_index => [:unique_user], :index => [:location_dataset, :url_dataset, :protected_dataset, :followers_count_dataset, :profile_background_color_dataset, :profile_text_color_dataset, :profile_link_color_dataset, :profile_sidebar_fill_color_dataset, :profile_sidebar_border_color_dataset, :friends_count_dataset, :created_at_dataset, :favorites_count_dataset, :utc_offset_dataset, :time_zone_dataset, :profile_background_tile_dataset, :profile_use_background_image_dataset, :show_all_inline_media_dataset, :is_translator_dataset, :notifications_dataset, :geo_enabled_dataset, :verified_dataset, :following_dataset, :statuses_count_dataset, :contributors_enabled_dataset, :lang_dataset, :listed_count_dataset, :follow_request_sent_dataset, :default_profile_dataset, :default_profile_image_dataset]
+  
+  def tweets
+    Tweet.all(:user_id => self.twitter_id, :dataset_id => self.dataset_id)
+  end
+  
+  def curations
+    self.dataset.curations-[self.curation]
+  end
+  
+  def curation
+    self.dataset.curations.first(:single_dataset => true)
+  end
 end

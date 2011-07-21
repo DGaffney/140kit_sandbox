@@ -39,7 +39,8 @@ ENV['TMP_PATH'] = DIR+"/tmp_files/#{ENV['INSTANCE_ID']}/scratch_processes"
 require DIR+'/model'
 models = [
   "analysis_metadata", "analytical_offering", "analytical_offering_variable", "analytical_offering_variable_descriptor", "auth_user", "curation",
-  "dataset", "edge", "friendship", "entity", "graph", "graph_point", "importer_task", "instance", "jaccard_coefficient", "lock", "mail", "researcher", "tweet", "user", "whitelisting"
+  "dataset", "edge", "friendship", "entity", "graph", "graph_point", "importer_task", "instance", "jaccard_coefficient", "lock", "mail", "parameter", "post", 
+  "researcher", "ticket", "tweet", "user", "whitelisting", "worker_description"
 ]
 models.collect{|model| require DIR+'/models/'+model}
 
@@ -87,7 +88,7 @@ def safe_close
   instance = Instance.first(:hostname => hostname, :pid => pid) || Instance.first(:instance_id => instance_id)
   if instance
     case instance.instance_type
-    when "analyzer"
+    when "worker"
       instance.store_data(1)
       instance.unlock_all
     when "streamer"

@@ -2,8 +2,6 @@ class Dataset
   include DataMapper::Resource
   property :id, Serial
   property :scrape_type, String, :index => [:scrape_type]
-  property :start_time, Time
-  property :length, Integer
   property :created_at, Time
   property :updated_at, Time
   property :scrape_finished, Boolean, :default => false
@@ -16,6 +14,10 @@ class Dataset
   has n, :users
   has n, :curations, :through => Resource
   has 1, :importer_task
+  
+  def curation
+    curations.first(:single_dataset => true)
+  end
   
   def self.scrape_types
     ['track', 'follow', 'locations', 'import', 'audience_profile']

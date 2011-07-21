@@ -1,5 +1,6 @@
 class AnalysisMetadata
   include DataMapper::Resource
+  storage_names[:default] = 'analysis_metadatum'
   property :id,   Serial
   property :finished, Boolean, :default => false
   property :rest, Boolean, :default => false

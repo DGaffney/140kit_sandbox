@@ -34,6 +34,10 @@ class Curation
     return datasets.collect{|d| d.users_count}.sum
   end
   
+  def analysis_metadatas
+    AnalysisMetadata.all(:curation_id => self.id)
+  end
+  
   def full_delete(include_datasets=false)
     AnalysisMetadata.all(:curation_id => self.id).each do |analysis_metadata|
       AnalyticalOfferingVariable.all(:analysis_metadata_id => analysis_metadata.id).destroy

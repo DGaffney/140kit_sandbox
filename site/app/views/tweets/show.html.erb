@@ -1,0 +1,46 @@
+<h1>Tweet from <%= link_to @tweet.screen_name, url(:user, @tweet.user) %></h1>
+<h2>Detail:</h2>
+<ul>
+<% for attribute in @tweet.attributes %>
+  <li><%= attribute.first.to_s.to_capitals %>: <%= attribute.last || "None Reported" %></li>
+<% end %>
+</li>
+</ul>
+<h2>References</h2>
+<ul>
+  <li>From <%= link_to "Dataset "+@tweet.dataset_id.to_s, url(:dataset, @tweet.dataset_id) %></li>
+  <li>Appears in the following curations:
+    <ul>
+      <li><b><%= link_to @tweet.curation.name, url(:curation, @tweet.curation) %> (Primary)</b></li>
+      <% for curation in @tweet.curations %>
+        <li><%= link_to curation.name, url(:curation, curation) %></li>
+      <% end %>
+    </ul>
+  </li>
+</ul>
+<h2>Metadata</h2>
+<table>
+  <tr>
+    <th>Type</th>
+    <th>Value</th>
+  </tr>
+  <% for entity in @tweet.entities %>
+      <% case entity.name %>
+      <% when "screen_name" %>
+      <tr>
+        <td><%= entity.kind.to_capitals %></td>
+        <td><%= link_to entity.value, "http://twitter.com/#{entity.value}", :target => "_blank" %></td>
+      </tr>
+      <% when "url" %>
+      <tr>
+        <td><%= entity.kind.to_capitals %></td>
+        <td><%= link_to entity.value, "#{entity.value}", :target => "_blank" %></td>
+      </tr>
+      <% when "text" %>
+      <tr>
+        <td><%= entity.kind.to_capitals %></td>
+        <td><%= link_to "#"+entity.value, "http://search.twitter.com/search?q=%23#{entity.value}", :target => "_blank" %></td>
+      </tr>
+      <% end %>
+  <% end %>
+</table>

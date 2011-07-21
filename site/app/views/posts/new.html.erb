@@ -1,0 +1,7 @@
+<%= error_messages_for @article %>
+<h1>New Article</h1>
+
+<%= form_for :post, :action => url(:posts) do -%>
+  <%= partial 'form' %>
+  <%= submit 'Save Post' %> or <%= link_to 'Cancel', url(:posts) %>
+<% end =%>

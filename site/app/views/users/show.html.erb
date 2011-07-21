@@ -1,0 +1,32 @@
+<h1><%= @user.screen_name %> (<%= @user.name %>)</h1>
+<ul>
+  <% for attribute in @user.attributes %>
+  <li><%= attribute.first.to_s.to_capitals %>: <%= attribute.last || "None Reported" %></li>
+  <% end %>
+</ul>
+<% if @tweets.empty? %>
+  <h1>No tweets found.</h1>
+<% else %>
+  <%
+    useful_parameters = ["dataset_id", "curation_id"]
+    passed_parameters = Mash[params.select{|x,y| useful_parameters.include?(x)}]
+  %>
+  <table>
+    <tr>
+      <th>Twitter Internal ID</th>
+      <th>Screen Name</th>
+      <th>Text</th>
+      <th>Created at</th>
+      <th>Dataset</th>
+    </tr>
+    <% for tweet in @tweets %>
+      <tr>
+        <td><%= link_to tweet.twitter_id, url(:tweet, tweet.id, passed_parameters) %></td>
+        <td><%= link_to tweet.screen_name, "http://twitter.com/#{tweet.screen_name}", :target => "_blank" %></td>
+        <td><%= tweet.text %></td>
+        <td><%= tweet.created_at %> (<%= time_ago_in_words(tweet.created_at) %>)</td>
+        <td><%= link_to tweet.dataset_id, url(:dataset, tweet.dataset_id) %>
+      </tr>
+    <% end %>
+  </table>
+<% end %>

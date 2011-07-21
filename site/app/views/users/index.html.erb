@@ -1,0 +1,30 @@
+<% if @users.empty? %>
+  <h1>No users found.</h1>
+<% else %>
+  <%
+    useful_parameters = ["dataset_id", "curation_id"]
+    passed_parameters = Mash[params.select{|x,y| useful_parameters.include?(x)}]
+  %>
+  <table>
+    <tr>
+      <th>Twitter Internal ID</th>
+      <th>Screen Name</th>
+      <th>Name</th>
+      <th># Tweets</th>
+      <th># Followers</th>
+      <th># Friends</th>
+      <th>Created at</th>
+    </tr>
+    <% for user in @users %>
+      <tr>
+        <td><%= link_to user.twitter_id, url(:user, user.id, passed_parameters) %></td>
+        <td><%= link_to user.screen_name, "http://twitter.com/#{user.screen_name}", :target => "_blank" %></td>
+        <td><%= user.name %></td>
+        <td><%= user.statuses_count.with_delimiter %></td>
+        <td><%= user.followers_count.with_delimiter %></td>
+        <td><%= user.friends_count.with_delimiter %></td>
+        <td><%= user.created_at %> (<%= time_ago_in_words(user.created_at) %>)</td>
+      </tr>
+    <% end %>
+  </table>
+<% end %>

@@ -62,7 +62,7 @@ module Locking
       Lock.all(:classname => self, :instance_id.not => "SYSTEM").destroy
     end
     
-    def lock(objects)
+    def lock(objects=self)
       objects = [objects].flatten
       locked_objects = []
       objects.each do |object|
@@ -73,7 +73,7 @@ module Locking
       return locked_objects
     end
     
-    def unlock(objects)
+    def unlock(objects=self)
       objects = [objects].flatten
       unlocked_objects = []
       objects.each do |object|
@@ -84,7 +84,7 @@ module Locking
       return unlocked_objects
     end
     
-    def unlock!(objects)
+    def unlock!(objects=self)
       objects = [objects].flatten
       unlocked_objects = []
       objects.each do |object|

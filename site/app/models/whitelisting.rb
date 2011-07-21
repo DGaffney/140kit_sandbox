@@ -1,0 +1,1 @@
+../../../slave/models/whitelisting.rb

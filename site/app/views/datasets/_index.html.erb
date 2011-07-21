@@ -1,0 +1,26 @@
+<% if @datasets.empty? -%>
+  <h1>No datasets found.</h1>
+<% else -%>
+  <table>
+  <tr>
+    <th>Type</th>
+    <th>Created</th>
+    <th>Parameters</th>
+    <th>Users</th>
+    <th>Tweets</th>
+    <th>Entities</th>
+    <th>Finished?</th>    
+  </tr>
+    <% for dataset in @datasets %>
+      <tr>
+        <td><%= link_to dataset.scrape_type, url(:dataset, dataset) %></td>
+        <td><%= time_ago_in_words(dataset.created_at) %></td>
+        <td><%= dataset.params %></td>
+        <td><%= dataset.users_count %></td>
+        <td><%= dataset.tweets_count %></td>
+        <td><%= dataset.entities_count %></td>
+        <td><%= dataset.scrape_finished ? "Yes" : "No" %></td>
+      </tr>
+    <% end %>
+  </table>
+<% end -%>

@@ -1,0 +1,19 @@
+<h1>Worker Types</h1>
+<% if @worker_descriptions.empty? -%>
+  <h1>No Worker Types found.</h1>
+<% else -%>
+  <table>
+  <tr>
+    <th>Name</th>
+    <th>Type</th>
+    <th>Active</th>
+  </tr>
+    <% for worker_description in @worker_descriptions %>
+        <tr>
+          <td><%= link_to worker_description.name, url(:worker_description, worker_description) %></td>
+          <td><%= worker_description.type %></td>
+          <td><%= worker_description.active ? "Yes" : "No" %></td>
+        </tr>
+    <% end %>
+  </table>
+<% end -%>
