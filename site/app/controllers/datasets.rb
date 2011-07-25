@@ -1,16 +1,18 @@
 class Datasets < Application
   # provides :xml, :yaml, :js
 
-  def index(limit=100,offset=0)
+  def index
+    limit = params[:limit] || 100
+    offset = params[:offset] || 0
     useful_parameters = ["curation_id"]
     passed_parameters = Mash[params.select{|x,y| useful_parameters.include?(x)}]
-    @dataset = []
+    @datasets = []
     if passed_parameters[:curation_id]
       @datasets = Curation.get(passed_parameters[:curation_id]).datasets
     else
-     @dataset = Dataset.all({:limit => limit, :offset => offset}.merge(passed_parameters))
+     @datasets = Dataset.all({:limit => limit.to_i, :offset => offset.to_i}.merge(passed_parameters))
     end 
-    display @dataset
+    display @datasets
   end
 
   def show(id)

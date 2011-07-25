@@ -1,0 +1,5 @@
+<% if `ls #{File.dirname(__FILE__)}/analytics`.split("\n").include?(@analysis_metadata.function) %>
+  <%= partial "analysis_metadatas/analytics/#{@analysis_metadata.function}/index" %>
+<% else %>
+  <%= partial "analysis_metadatas/analytics/index" %>
+<% end %>

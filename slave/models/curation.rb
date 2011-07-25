@@ -38,6 +38,10 @@ class Curation
     AnalysisMetadata.all(:curation_id => self.id)
   end
   
+  def analysis_metadatas_scoped(analytical_offering)
+    self.analysis_metadatas.select{|analysis_metadata| analysis_metadata.function == analytical_offering.function}
+  end
+  
   def full_delete(include_datasets=false)
     AnalysisMetadata.all(:curation_id => self.id).each do |analysis_metadata|
       AnalyticalOfferingVariable.all(:analysis_metadata_id => analysis_metadata.id).destroy

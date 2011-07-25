@@ -1,16 +1,18 @@
 class Entities < Application
   # provides :xml, :yaml, :js
 
-  def index(limit=100, offset=0)
+  def index
+    limit = params[:limit] || 100
+    offset = params[:offset] || 0
     @entities = []
     if params[:dataset_id]
-      @entities = Entity.all(:dataset_id => params[:dataset_id], :limit => limit, :offset => offset)
+      @entities = Entity.all(:dataset_id => params[:dataset_id], :limit => limit.to_i, :offset => offset.to_i)
     elsif params[:curation_id]
-      @entities = Entity.all(:dataset_id => Curation.first(:id => params[:curation_id]).datasets.collect(&:id), :limit => limit, :offset => offset)
+      @entities = Entity.all(:dataset_id => Curation.first(:id => params[:curation_id]).datasets.collect(&:id), :limit => limit.to_i, :offset => offset.to_i)
     elsif params[:entitie_id]
-      @entities = Entity.all(:entitie_id => params[:entitie_id], :limit => limit, :offset => offset)
+      @entities = Entity.all(:entitie_id => params[:entitie_id], :limit => limit.to_i, :offset => offset.to_i)
     else
-      @entities = Entity.all(:limit => limit, :offset => offset)
+      @entities = Entity.all(:limit => limit.to_i, :offset => offset.to_i)
     end
     display @entities
   end

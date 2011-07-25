@@ -10,7 +10,17 @@
 </ul>
 <h2>Analysis</h2>
 <ul>
-  <% for metadata in @curation.analysis_metadatas %>
-    <li><%= metadata.function %></li>
+  <% for analytical_offering in @analytical_offerings %>
+    <li><%= analytical_offering.title %> (<% if @curation.analysis_metadatas_scoped(analytical_offering).length == 0 %>None added. <%= link_to "Add one now?", url(:analysis_metadata, :new, :analytical_offering_id => analytical_offering.id, :curation_id => @curation.id) %><% else %><%= @curation.analysis_metadatas_scoped(analytical_offering).length == 1 ? "#{@curation.analysis_metadatas_scoped(analytical_offering).length} analysis" : "#{@curation.analysis_metadatas_scoped(analytical_offering).length} analyses"%> processed. <%= link_to "Another with different settings?", url(:analysis_metadata, :new, :analytical_offering_id => analytical_offering.id, :curation_id => @curation.id) %><% end %>)</li>
+    <% if @curation.analysis_metadatas_scoped(analytical_offering).length != 0 %>
+    <ul>
+      <% for analysis_metadata in @curation.analysis_metadatas_scoped(analytical_offering) %>
+        <% vars = "Variables: "
+           analysis_metadata.variables.collect{|var| analysis_metadata.variables.last==var ? vars+="#{var.name}: #{var.value}" : vars+="#{var.name}: #{var.value}, "}
+        -%>
+        <li><%= link_to vars, url(:analysis_metadata, analysis_metadata) %></li>
+      <% end %>
+    </ul>
+    <% end %>
   <% end %>
 </ul>

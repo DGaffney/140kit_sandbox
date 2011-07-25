@@ -7,6 +7,7 @@
     <th>Created</th>
     <th>Researcher</th>
     <th>Number of Datasets</th>
+    <th>Number of Analytics</th>
     <th>Users</th>
     <th>Tweets</th>
     <th>Entities</th>
@@ -18,6 +19,7 @@
           <td><%= time_ago_in_words(curation.created_at) %></td>
           <td><%= link_to curation.researcher.user_name, url(:researcher, curation.researcher) %></td>
           <td><%= curation.datasets.count %></td>
+          <td><%= curation.analysis_metadatas.count %></td>
           <td><%= curation.users_count %></td>
           <td><%= curation.tweets_count %></td>
           <td><%= curation.entities_count %></td>

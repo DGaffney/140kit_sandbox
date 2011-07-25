@@ -2,17 +2,22 @@ class Curations < Application
   # provides :xml, :yaml, :js
 
   def index
+    limit = params[:limit] || 100
+    offset = params[:offset] || 0
     @curations = []
     if params[:dataset_id]
-      @curations = Dataset.first(:id => params[:dataset_id]).curations
+      @curations = Dataset.first(:id => params[:dataset_id]).curations(:limit => limit.to_i, :offset => offset.to_i)
+    elsif params[:researcher_id]
+      @curations = Researcher.first(:id => params[:researcher_id]).curations(:limit => limit.to_i, :offset => offset.to_i)
     else
-      @curations = Curation.all(:archived => false)
+      @curations = Curation.all(:archived => false, :limit => limit.to_i, :offset => offset.to_i)
     end
     display @curations
   end
 
   def show(id)
     @curation = Curation.get(id)
+    @analytical_offerings = AnalyticalOffering.all
     raise NotFound unless @curation
     display @curation
   end

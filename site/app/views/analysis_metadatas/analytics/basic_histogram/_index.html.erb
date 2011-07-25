@@ -1,0 +1,27 @@
+<h1><%= @analysis_metadata.function %> (for Curation <%= @analysis_metadata.curation.name %>)</h1>
+<script type="text/javascript"> 
+  var wrapper;
+
+  function init() {
+    <% for graph in @analysis_metadata.graphs %>
+    <% if @analysis_metadata.graphs.first == graph %>
+    wrapper = new google.visualization.ChartWrapper({
+      dataSourceUrl: "http://<%= request.env["SERVER_NAME"]+":"+request.env["SERVER_PORT"] %>/graphs/google/<%= graph.id %>.json",
+      containerId: 'graphDraw_<%= graph.title %>',
+      chartType: '<%= graph.chart_type_for(graph) %>',
+      options: <%= graph.options_for(graph) %>
+    });
+    wrapper.draw();
+    <% end %>
+    <% end %>
+  }    
+
+  google.setOnLoadCallback(init);
+
+</script>
+<% for graph in @analysis_metadata.graphs %>
+  <% if graph == @analysis_metadata.graphs.first %>
+	<div id="graphDraw_<%= graph.title %>" style="height:500px;width:915px;"></div> 
+  <%= link_to graph.title, "" %>
+  <% end %>
+<% end %>

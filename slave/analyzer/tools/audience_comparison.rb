@@ -1,2 +1,0 @@
-class AudienceComparison
-end

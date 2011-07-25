@@ -55,5 +55,10 @@ class Graphs < Application
       raise InternalServerError
     end
   end
+  
+  def api_show(id)
+    @graph = Graph.get(id)
+    render @graph.google_json_header(params[:tqx])+@graph.google_json_column_declarations+@graph.graph_points_to_google_json+@graph.google_json_footer, :format => :json
+  end
 
 end # Graph

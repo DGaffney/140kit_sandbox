@@ -27,14 +27,17 @@
 
 Merb.logger.info("Compiling routes...")
 Merb::Router.prepare do
+  resources :analysis_metadatas
   resources :worker_descriptions
   match("/").to(:controller => "posts", :action => "welcome")
+  resources :curations
   resources :tickets
   resources :posts
   resources :whitelistings
   resources :users
   resources :tweets
   match("/researchers/:user_name").to(:controller => "researchers", :action => "show").name(:researchers)
+  match("/graphs/google/:id.json").to(:controller => "graphs", :action => "api_show").name(:api_show)
   resources :researchers
   resources :mails
   resources :locks
@@ -47,7 +50,6 @@ Merb::Router.prepare do
   resources :entities
   resources :edges
   resources :datasets
-  resources :curations
   resources :auth_users
   resources :analytical_offering_variable_descriptors
   resources :analytical_offering_variables

@@ -13,6 +13,10 @@ class AnalysisMetadata
   has n, :graph_points
   has n, :edges
   
+  def curation
+    Curation.first(:id => curation_id)
+  end
+
   def verify_uniqueness
     duplicate_analysis_metadatas = AnalysisMetadata.all(:curation_id => self.curation_id, :analytical_offering_id => self.analytical_offering.id, :finished => false).select{|analysis_metadata| analysis_metadata.run_vars==self.run_vars}-[self]
     if !duplicate_analysis_metadatas.empty?
@@ -92,9 +96,9 @@ class AnalysisMetadata
   def set_variable(analytical_offering_variable)
     case analytical_offering_variable.name
     when "curation_id"
-      return curation.id
+      return curation_id
     else
-      function_class.set_variables(self, analytical_offering_variable, self.curation)
+      function_class.set_variables(self, analytical_offering_variable, Curation.first(curation_id))
     end
   end
 
@@ -105,15 +109,15 @@ class AnalysisMetadata
   def verify_variable(analytical_offering_variable, answer)
     case analytical_offering_variable.name
     when "curation_id"
-      answer = answer.empty? ? self.curation.id : answer.to_i
+      answer = answer.empty? ? self.curation_id : answer.to_i
       response = {}
       response[:reason] = "The curation id you specified (#{answer}) does now correspond to an existing curation. Please try again."
       response[:variable] = answer
       return response if Curation.first(:id => answer).nil?
     else
-      return function_class.verify_variable(self, analytical_offering_variable, answer)
+      return function_class.verify_variable(self, analytical_offering_variable, answer).merge({:analytical_offering_variable_descriptor_id => analytical_offering_variable.id})
     end
-    return {:variable => answer}
+    return {:variable => answer, :analytical_offering_variable_descriptor_id => analytical_offering_variable.id}
   end
   
   def self.verify_variable(metadata, variable_descriptor, answer)

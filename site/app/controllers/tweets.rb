@@ -1,16 +1,18 @@
 class Tweets < Application
   # provides :xml, :yaml, :js
 
-  def index(limit=100, offset=0)
+  def index
+    limit = params[:limit] || 100
+    offset = params[:offset] || 0
     @tweets = []
     if params[:dataset_id]
-      @tweets = Tweet.all(:dataset_id => params[:dataset_id], :limit => limit, :offset => offset)
+      @tweets = Tweet.all(:dataset_id => params[:dataset_id], :limit => limit.to_i, :offset => offset.to_i)
     elsif params[:curation_id]
-      @tweets = Tweet.all(:dataset_id => Curation.first(:id => params[:curation_id]).datasets.collect(&:id), :limit => limit, :offset => offset)
+      @tweets = Tweet.all(:dataset_id => Curation.first(:id => params[:curation_id]).datasets.collect(&:id), :limit => limit.to_i, :offset => offset.to_i)
     elsif params[:user_id]
-      @tweets = Tweet.all(:user_id => params[:user_id], :limit => limit, :offset => offset)
+      @tweets = Tweet.all(:user_id => params[:user_id], :limit => limit.to_i, :offset => offset.to_i)
     else
-      @tweets = Tweet.all(:limit => limit, :offset => offset)
+      @tweets = Tweet.all(:limit => limit.to_i, :offset => offset.to_i)
     end
     display @tweets
   end

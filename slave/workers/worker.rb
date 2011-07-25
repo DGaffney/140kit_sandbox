@@ -38,7 +38,6 @@ class Worker < Instance
   end
   
   def work_routine
-    debugger
     @curation = select_curation
     update_counts
     update_curation
@@ -48,6 +47,7 @@ class Worker < Instance
   end
   
   def select_curation
+    puts "select_curation..."
     curations = Curation.unlocked.all(:analyzed => false).reject {|c| c.datasets.collect {|d| d.scrape_finished }.include?(false) }.shuffle
     for curation in curations
       curation.lock
@@ -57,6 +57,7 @@ class Worker < Instance
   end
   
   def update_counts
+    puts "update_counts..."
     for dataset in Dataset.all(:scrape_finished => false)
       dataset.tweets_count = Tweet.count(:dataset_id => dataset.id)
       dataset.entities_count = Entity.count(:dataset_id => dataset.id)
@@ -66,6 +67,7 @@ class Worker < Instance
   end
   
   def update_curation
+    puts "update_curation..."
     if @curation
       for dataset in @curation.datasets
         if dataset.users_count != User.count(:dataset_id => dataset.id)
@@ -79,6 +81,7 @@ class Worker < Instance
   end
   
   def clean_orphans
+    puts "clean_orphans..."
     begin
       Instance.all(:hostname => ENV['HOSTNAME']).each do |instance|
         if Sh::sh("kill -0 #{instance.pid}", false, false).select{|response| !response.empty?}.length == 1
@@ -92,25 +95,14 @@ class Worker < Instance
     Lock.all(:instance_id.not => Instance.all.collect{|instance| instance.instance_id}).destroy
   end
   
-  def spawn_analysis_metadatas
-    analytical_offerings = AnalyticalOffering.all(:enabled => true)
-    new_analysis_metadatas = []
-    analytical_offerings.each do |analytic|
-      #FIXME: no access level checking
-      metadata = {  :function => analytic.function,
-                    :save_path => analytic.save_path,
-                    :curation_id => @curation.id,
-                    :rest => analytic.rest }
-      new_analysis_metadatas << metadata
-    end
-    AnalysisMetadata.save_all(new_analysis_metadatas)
-  end
-  
   def do_analysis_jobs
+    puts "do_analysis_jobs..."
     # WARNING: TODO: rest_allowed not implemented yet
     while AnalysisMetadata.unlocked.count(:finished => false)!=0
       metadata = AnalysisMetadata.unlocked.first(:finished => false)
+      metadata.lock
       if !metadata.nil? && metadata.owned_by_me?
+        $instance.metadata = metadata
         route(metadata)
       end
     end

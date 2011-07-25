@@ -28,3 +28,15 @@
     <% end %>
   </table>
 <% end %>
+<% 
+  limit = params[:limit] ? params[:limit].to_i : 100
+  offset = params[:offset] ? params[:offset].to_i : 0
+-%>
+<% if @users.length == 100 %>
+  <% if offset != 0 %>
+    <%= link_to "Prev", url(:users, passed_parameters.merge({:limit => limit, :offset => offset})) %> | 
+  <% end %>
+  <%= link_to "Next", url(:users, passed_parameters.merge({:limit => limit, :offset => offset+limit})) %>
+<% elsif @users.length < 100 && params[:offset].nil? %>
+<% elsif @users.length < 100 && !params[:offset].nil? %>
+<% end %>

@@ -1,16 +1,18 @@
 class Users < Application
   # provides :xml, :yaml, :js
 
-  def index(limit=100, offset=0)
+  def index
+    limit = params[:limit] || 100
+    offset = params[:offset] || 0
     @users = []
     if params[:dataset_id]
-      @users = User.all(:dataset_id => params[:dataset_id], :limit => limit, :offset => offset)
+      @users = User.all(:dataset_id => params[:dataset_id], :limit => limit.to_i, :offset => offset.to_i)
     elsif params[:curation_id]
-      @users = User.all(:dataset_id => Curation.first(:id => params[:curation_id]).datasets.collect(&:id), :limit => limit, :offset => offset)
+      @users = User.all(:dataset_id => Curation.first(:id => params[:curation_id]).datasets.collect(&:id), :limit => limit.to_i, :offset => offset.to_i)
     elsif params[:user_id]
-      @users = User.all(:user_id => params[:user_id], :limit => limit, :offset => offset)
+      @users = User.all(:user_id => params[:user_id], :limit => limit.to_i, :offset => offset.to_i)
     else
-      @users = User.all(:limit => limit, :offset => offset)
+      @users = User.all(:limit => limit.to_i, :offset => offset.to_i)
     end
     display @users
   end
