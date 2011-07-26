@@ -26,7 +26,6 @@ class Streamer < Instance
   end
   
   def stream
-    debugger
     puts "Streaming..."
     check_in
     assign_user_account
@@ -57,7 +56,6 @@ class Streamer < Instance
   def assign_user_account
     puts "Assigning user account."
     message = true
-    debugger
     while @screen_name.nil?
       user = AuthUser.unlocked.first
       if !user.nil? && user.lock
@@ -102,6 +100,7 @@ class Streamer < Instance
     client.add_periodic_timer(CHECK_FOR_NEW_DATASETS_INTERVAL) { puts "Checking for new datasets."; client.stop if add_datasets }
     client.on_limit { |skip_count| puts "\nWe are being rate limited! We lost #{skip_count} tweets!\n" }
     client.on_error { |message| puts "\nError: #{message}\n" }
+    debugger
     client.filter(params_for_stream) do |tweet|
       puts "[tweet] #{tweet[:user][:screen_name]}: #{tweet[:text]}"
       @queue << tweet
@@ -153,6 +152,7 @@ class Streamer < Instance
   end
   
   def determine_dataset(tweet)
+	debugger
     return @datasets.first.id if @datasets.length == 1
     if @params.has_key?("locations")
       if tweet[:place]
@@ -210,6 +210,7 @@ class Streamer < Instance
   # end
   
   def add_datasets
+debugger
     datasets = Dataset.unlocked.all(:scrape_finished => false, :scrape_type => ['track', 'follow', 'locations'])
     return claim_new_datasets(datasets)
   end
@@ -242,8 +243,8 @@ class Streamer < Instance
   def update_next_dataset_ends
     update_start_times
     refresh_datasets # this is absolutely necessary even while it's called in update_start_times above. huh!
-    soonest_ending_dataset = @datasets.sort {|x,y| (x.created_at.gmt + x.params.split(",").last.to_i - DateTime.now.gmt) <=> (y.created_at.gmt + y.params.split(",").last.to_i - DateTime.now.gmt) }.first
-    @next_dataset_ends = soonest_ending_dataset.created_at.gmt + soonest_ending_dataset.params.split(",").last.to_i
+    soonest_ending_dataset = @datasets.sort {|x,y| (x.created_at.to_time.gmt + x.params.split(",").last.to_i - DateTime.now.to_time.gmt) <=> (y.created_at.to_time.gmt + y.params.split(",").last.to_i - DateTime.now.to_time.gmt) }.first
+    @next_dataset_ends = soonest_ending_dataset.created_at.to_time.gmt + soonest_ending_dataset.params.split(",").last.to_i
   end
 
   def update_start_times

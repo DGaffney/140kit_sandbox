@@ -28,7 +28,8 @@ class Researchers < Application
 
   def create(researcher)
     @researcher = Researcher.new(researcher)
-    if @researcher.save
+    @researcher.send(:encrypt_password)
+    if @researcher.send(:remember_me)
       redirect resource(@researcher), :message => {:notice => "Researcher was successfully created"}
     else
       message[:error] = "Researcher failed to be created"

@@ -80,7 +80,7 @@ class Graph
   end
   
   def self.google_json_footer
-    "]}});"
+    "}});"
   end
   
   def self.google_json_header(tqx)

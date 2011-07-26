@@ -36,8 +36,9 @@ Merb::Router.prepare do
   resources :whitelistings
   resources :users
   resources :tweets
-  match("/researchers/:user_name").to(:controller => "researchers", :action => "show").name(:researchers)
   match("/graphs/google/:id.json").to(:controller => "graphs", :action => "api_show").name(:api_show)
+  match("/signup").to(:controller => "researchers", :action => "new").name(:researchers)
+  match("/researchers/:user_name").to(:controller => "researchers", :action => "show").name(:researchers)
   resources :researchers
   resources :mails
   resources :locks

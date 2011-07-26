@@ -1,15 +1,15 @@
 class Researcher
   include DataMapper::Resource
   property :id, Serial
-  property :user_name, String
-  property :email, Text, :default => "user@localhost.com"
+  property :user_name, String, :format => /[A-Za-z0-9_]*/, :length => 3..40
+  property :email, Text, :default => "user@localhost.com", :format => :email_address
   property :reset_code, String
   property :role, String, :default => "Admin"
   property :join_date, Time, :default => Time.now
   property :last_login, Time
   property :last_access, Time
   property :info, Text, :default => "I like to study the internet"
-  property :website_url, Text, :default => "http://140kit.com/"
+  property :website_url, Text, :default => "http://140kit.com/", :format => :url
   property :location, String, :default => "The Internet"
   property :salt, String
   property :remember_token, String
@@ -23,8 +23,10 @@ class Researcher
   has n, :datasets, :through => :curations
   attr_accessor :password
   
+  alias :login :user_name
   alias :created_at :join_date
-  
+  validates_length      :password, :within => 4..40, :if => :password_required?
+    
   def self.authenticate(user_name, password)
     u = first(:user_name => user_name) # need to get the salt
     u && u.authenticated?(password) ? u : nil

@@ -34,7 +34,7 @@
         <li>Term: <%= @dataset.params.split(",").first %></li>
         <li>Length: <%= @dataset.params.split(",").last.to_i.humanized_length %>, Starting at <%= @dataset.created_at %></li>
       <% when "follow" %>
-        <li>Account: <a href="http://twitter.com/<%= @dataset.params.split(",").first %>" target="_blank"><%= @dataset.params.split(",").first %></a></li>
+        <li>Account: <a href="http://twitter.com/<%= @results[:original].split(",").first %>" target="_blank"><%= @results[:original].split(",").first %></a></li>
         <li>Length: <%= @dataset.params.split(",").last.to_i.humanized_length %>, Starting at <%= @dataset.created_at %></li>
       <% when "locations" %>
         <li>Coordinates: <%= @dataset.params.split(",")[0..@dataset.params.split(",").length-2]%></li>

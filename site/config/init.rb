@@ -55,7 +55,7 @@ Merb::BootLoader.before_app_loads do
   ENV['PID'] = Process.pid.to_s #because ENV only allows strings.
   ENV['INSTANCE_ID'] = Digest::SHA1.hexdigest("#{ENV['HOSTNAME']}#{ENV['PID']}")
   ENV['TMP_PATH'] = DIR+"/tmp_files/#{ENV['INSTANCE_ID']}/scratch_processes"
-  
+  Twit = Twitter::Client.new
   # This will get executed after dependencies have been loaded but before your app's classes have loaded.
 end
  

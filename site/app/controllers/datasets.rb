@@ -1,6 +1,6 @@
 class Datasets < Application
   # provides :xml, :yaml, :js
-
+  before :ensure_authenticated, :exclude => [:show, :index]
   def index
     limit = params[:limit] || 100
     offset = params[:offset] || 0
@@ -40,6 +40,7 @@ class Datasets < Application
   end
 
   def create(dataset)
+    debugger
     @dataset = Dataset.new(dataset)
     @curation = Curation.new(:single_dataset => true, :researcher_id => session.user.id, :created_at => Time.now, :updated_at => Time.now, :name => "Dataset_#{@dataset.id}_#{@dataset.scrape_type}_#{@dataset.params}")
     @curation.save!
@@ -55,11 +56,12 @@ class Datasets < Application
   end
 
   def verify
+    debugger
     worker = WorkerDescription.first(:id => params[:worker_id])
     param_vals = Hash[params.select{|x,y|x.include?("param")}]
     parameters = Parameter.all(:id => param_vals.keys.collect{|x| x.gsub("param_", "")}).sort{|x,y| x.position<=>y.position}
-    @dataset = Dataset.new(:scrape_type => worker.filename, :params => parameters.collect{|param| param_vals["param_"+param.id.to_s]}.join(","), :created_at => Time.now)
-    @results = Dataset.valid_params(@dataset.scrape_type, @dataset.params)
+    @results = Dataset.valid_params(worker.filename, parameters.collect{|param| param_vals["param_"+param.id.to_s]}.join(","))
+    @dataset = Dataset.new(:scrape_type => worker.filename, :params => @results[:clean_params], :created_at => Time.now)
     render :new
   end
   

@@ -51,14 +51,19 @@ require DIR+'/utils/entity_helper'
 require DIR+'/utils/u'
 require DIR+'/lib/tweetstream'
 
-env = ENV["e"] || "development"
+env = ARGV.include?("e") ? ARGV[ARGV.index("e")+1]||"development" : "development"
+
+puts "Starting #{env} environment..."
+
 database = YAML.load(File.read(File.dirname(__FILE__)+'/config/database.yml'))
 if !database.has_key?(env)
   env = "development"
 end
 database = database[env]
+puts database.inspect
+puts DataMapper.setup(:default, "#{database["adapter"]}://#{database["username"]}:#{database["password"]}@#{database["host"]}:#{database["port"] || 3000}/#{database["database"]}").inspect
 DataMapper.finalize
-DataMapper.setup(:default, "#{database["adapter"]}://#{database["username"]}:#{database["password"]}@#{database["host"]}:#{database["port"] || 3000}/#{database["database"]}")
+
 require DIR+'/extensions/dm-extensions'
 
 storage = YAML.load(File.read(File.dirname(__FILE__)+'/config/storage.yml'))

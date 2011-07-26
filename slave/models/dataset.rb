@@ -29,13 +29,18 @@ class Dataset
     response[:clean_params] = ""
     case scrape_type
     when "track"
-      term = params
+      term = (params.split(",")[0..params.split(",").length-2]).join(",")
+      length = params.split(",").last
+      response[:reason] = "Length must be a positive integer (number of seconds)" if length.to_i <= 0
       response[:reason] = "The term must contain one letter or number" if term.scan(/\w/).flatten.empty?
       response[:reason] = "The term can't be empty" if term.scan(/\w/).flatten.empty?
       #break if !response[:reason].empty?
-      response[:clean_params] = term
+      response[:original] = params
+      response[:clean_params] = term+",#{length}"
     when "follow"
-      users = params.split(",")
+      users = params.split(",")[0..params.split(",").length-2]
+      length = params.split(",").last
+      response[:reason] = "Length must be a positive integer (number of seconds)" if length.to_i <= 0
       ids = []
       users.each do |user|
         user_id = Twit.user(user).id rescue 0
@@ -46,9 +51,12 @@ class Dataset
         end
       end
       response[:reason] = "The follow list contained no users" if ids.empty?
-      response[:clean_params] = ids.join(",")
+      response[:original] = params
+      response[:clean_params] = ids.join(",")+",#{length}"
     when "locations"
-      boundings = params.split(",").collect{|b| b.to_f}
+      boundings = (params.split(",")[0..params.split(",").length-2]).collect{|b| b.to_f}
+      length = params.split(",").last
+      response[:reason] = "Length must be a positive integer (number of seconds)" if length.to_i <= 0
       (response[:reason] = "Must input two pairs of numbers, separated by commas.";return response) if boundings.length!=4
       (response[:reason] = "Total Area of this box is zero - must make a real box";return response) if boundings.area==0
       (response[:reason] = "Latitudes cover more than one degree of area";return response) if (boundings[0]-boundings[2]).abs>1
@@ -56,7 +64,8 @@ class Dataset
       (response[:reason] = "Latitudes are out of range (max 90 degrees)";return response) if boundings[0].abs>90 || boundings[2].abs>90
       (response[:reason] = "Longitudes are out of range (max 180 degrees)";return response) if boundings[1].abs>180 || boundings[3].abs>180
       #break if !response[:reason].empty?
-      response[:clean_params] = boundings.join(",")
+      response[:original] = params
+      response[:clean_params] = boundings.join(",")+",#{length}"
     when "import"
       if params.include?("140kit.com") || params.include?("twapperkeeper.com")
         self.resolve_raw_dataset_url(params)

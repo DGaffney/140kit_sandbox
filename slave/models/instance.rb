@@ -27,7 +27,7 @@ class Instance
   end
   
   def connect_to_db
-    env = ARGV.first || "development"
+    env = ARGV.include?("e") ? ARGV[ARGV.index("e")+1]||"development" : "development"
     db = YAML.load(File.read(ENV['PWD']+'/config/database.yml'))
     if !db.has_key?(env)
       puts "No such environment #{env}."
