@@ -56,6 +56,13 @@ Merb::BootLoader.before_app_loads do
   ENV['INSTANCE_ID'] = Digest::SHA1.hexdigest("#{ENV['HOSTNAME']}#{ENV['PID']}")
   ENV['TMP_PATH'] = DIR+"/tmp_files/#{ENV['INSTANCE_ID']}/scratch_processes"
   Twit = Twitter::Client.new
+
+  storage = YAML.load(File.read(DIR+'/config/storage.yml'))
+  if !storage.has_key?(Merb::Config.environment)
+    Merb::Config.environment = "development"
+  end
+  STORAGE = storage[Merb::Config.environment]
+  TIME_OFFSET = NET::NTP.get_ntp_response()["Receive Timestamp"] - Time.now.to_f
   # This will get executed after dependencies have been loaded but before your app's classes have loaded.
 end
  

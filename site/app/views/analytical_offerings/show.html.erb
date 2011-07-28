@@ -1,4 +1,8 @@
-<h1>AnalyticalOffering controller, show action</h1>
-
-<p>Edit this file in <tt>app/views/analytical_offering/show.html.erb</tt></p>
-<p>For more information and examples of CRUD views read <a href="http://wiki.merbivore.com/howto/crud_view_example_with_merb_using_erb"> this wiki page</a>
+<h1>Analytical Offering: <%= @analytical_offering.title %></h1>
+<p><%= @analytical_offering.description %></p>
+<ul>
+  <li>Function Name: <%= @analytical_offering.function %></li>
+  <li>Language: <%= @analytical_offering.language %></li>
+  <li>Written By: <%= link_to @analytical_offering.created_by, @analytical_offering.created_by_link %></li>
+  <li><%= link_to "View Source Code", @analytical_offering.source_code_link %></li>
+</ul>

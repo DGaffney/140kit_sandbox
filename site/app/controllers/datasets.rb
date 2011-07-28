@@ -40,7 +40,6 @@ class Datasets < Application
   end
 
   def create(dataset)
-    debugger
     @dataset = Dataset.new(dataset)
     @curation = Curation.new(:single_dataset => true, :researcher_id => session.user.id, :created_at => Time.now, :updated_at => Time.now, :name => "Dataset_#{@dataset.id}_#{@dataset.scrape_type}_#{@dataset.params}")
     @curation.save!
@@ -56,7 +55,6 @@ class Datasets < Application
   end
 
   def verify
-    debugger
     worker = WorkerDescription.first(:id => params[:worker_id])
     param_vals = Hash[params.select{|x,y|x.include?("param")}]
     parameters = Parameter.all(:id => param_vals.keys.collect{|x| x.gsub("param_", "")}).sort{|x,y| x.position<=>y.position}

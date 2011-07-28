@@ -25,7 +25,7 @@ class TimeBasedSummary < AnalysisMetadata
     FilePathing.tmp_folder(curation, self.underscore)
     conditional = Analysis.curation_conditional(curation)
     time_queries = self.resolve_time_query(granularity)
-    debugger
+    save_path = ENV['TMP_PATH']
     time_queries.each_pair do |time_granularity,time_query|
       user_timeline = nil
       tweet_timeline = nil
@@ -83,7 +83,7 @@ class TimeBasedSummary < AnalysisMetadata
         :model => model.to_class, 
         :conditional => conditional, 
         :style => "histogram", 
-        :analysis_metadata_id => self.analysis_metadata.id,
+        :analysis_metadata_id => self.analysis_metadata(curation).id,
         :time_slice => time_slice, 
         :granularity => granularity, 
         :year => year, 
@@ -101,9 +101,9 @@ class TimeBasedSummary < AnalysisMetadata
         ].collect{|fs| fs.merge(general_frequency_set_conditions)}
         BasicHistogram.generate_graphs(basic_histogram_frequency_sets, curation)
         BasicHistogram.generate_graphs([
-          {:title => "urls", :frequency_type => "urls", :style => "word_frequencies", :time_slice => time_slice, :granularity => granularity, :year => year, :month => month, :date => date, :hour => hour, :analysis_metadata_id => self.analysis_metadata.id}, 
-          {:title => "hashtags", :frequency_type => "hashtags", :style => "word_frequencies", :time_slice => time_slice, :granularity => granularity, :year => year, :month => month, :date => date, :hour => hour, :analysis_metadata_id => self.analysis_metadata.id}, 
-          {:title => "user_mentions", :frequency_type => "user_mentions", :style => "word_frequencies", :time_slice => time_slice, :granularity => granularity, :year => year, :month => month, :date => date, :hour => hour, :analysis_metadata_id => self.analysis_metadata.id}
+          {:title => "urls", :frequency_type => "urls", :style => "word_frequencies", :time_slice => time_slice, :granularity => granularity, :year => year, :month => month, :date => date, :hour => hour, :analysis_metadata_id => self.analysis_metadata(curation).id}, 
+          {:title => "hashtags", :frequency_type => "hashtags", :style => "word_frequencies", :time_slice => time_slice, :granularity => granularity, :year => year, :month => month, :date => date, :hour => hour, :analysis_metadata_id => self.analysis_metadata(curation).id}, 
+          {:title => "user_mentions", :frequency_type => "user_mentions", :style => "word_frequencies", :time_slice => time_slice, :granularity => granularity, :year => year, :month => month, :date => date, :hour => hour, :analysis_metadata_id => self.analysis_metadata(curation).id}
         ], curation) do |fs, graph, conditional|
           WordFrequency.generate_word_frequencies_from_entities(fs, graph, conditional)
         end

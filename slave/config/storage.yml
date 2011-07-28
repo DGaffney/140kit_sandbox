@@ -1,6 +1,8 @@
 test:
-  type: local
-  path: results_test #This will always be relative to project root.
+  type: remote
+  path: cdn.140kit.com/files
+  user: gonkclub
+  host: 208.97.135.171
 
 development:
   type: local

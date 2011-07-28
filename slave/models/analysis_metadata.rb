@@ -240,4 +240,8 @@ class AnalysisMetadata
     response[:message_content] = "An analytical process, #{self}, has finished running on your dataset. You can view results by visiting the collection's page: <a href=\"http://140kit.com/#{curation.researcher.user_name}/collections/#{curation.id}\">http://140kit.com/#{curation.researcher.user_name}/collections/#{curation.id}</a>."
     return response
   end
+  
+  def zip_download_url
+    "http://"+STORAGE["path"]+"/"+self.curation.stored_folder_name
+  end
 end

@@ -113,6 +113,8 @@ class Worker < Instance
     case metadata.language
     when "ruby"
       Analysis::Dependencies.send(metadata.function)
+      debugger
+      puts "#{metadata.function.classify}.run(#{metadata.run_vars.join(", ")})"
       metadata.function.classify.constantize.run(*metadata.run_vars)
     else 
       raise "Language #{metadata.language} is not currently supported for analytical routing!"

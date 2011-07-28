@@ -62,7 +62,7 @@ class GenderEstimation < AnalysisMetadata
             next
           end
         end
-        offset+=offset
+        offset+=limit
         users = User.all({:limit => limit, :offset => offset}.merge(conditional))
         if graph_points.length > DEFAULT_CHUNK_SIZE
           GraphPoint.save_all(graph_points)

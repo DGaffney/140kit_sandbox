@@ -31,7 +31,6 @@ class AnalysisMetadatas < Application
   end
 
   def verify
-    debugger
     @analytical_offering = AnalyticalOffering.get(params[:analytical_offering_id])
     @curation = Curation.get(params[:curation_id])
     param_vals = Hash[params.select{|x,y|x.include?("var")}]

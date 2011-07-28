@@ -19,7 +19,7 @@ class Curation
   validates_presence_of :researcher_id, :name
   
   def stored_folder_name
-    return name.downcase.gsub(/[\ |\=|\-|\(|\)|\*|\&|\^|\%|\$|\#|\@|\!]/, "_")+"_"+id.to_s+"_"+researcher_id.to_s
+    return name.downcase.gsub(/[\ |\=|\-|\(|\)|\*|\&|\^|\%|\$|\#|\@|\!|\,]/, "_")+"_"+id.to_s+"_"+researcher_id.to_s
   end
   
   def tweets_count

@@ -100,7 +100,6 @@ class Streamer < Instance
     client.add_periodic_timer(CHECK_FOR_NEW_DATASETS_INTERVAL) { puts "Checking for new datasets."; client.stop if add_datasets }
     client.on_limit { |skip_count| puts "\nWe are being rate limited! We lost #{skip_count} tweets!\n" }
     client.on_error { |message| puts "\nError: #{message}\n" }
-    debugger
     client.filter(params_for_stream) do |tweet|
       puts "[tweet] #{tweet[:user][:screen_name]}: #{tweet[:text]}"
       @queue << tweet
@@ -152,7 +151,6 @@ class Streamer < Instance
   end
   
   def determine_dataset(tweet)
-	debugger
     return @datasets.first.id if @datasets.length == 1
     if @params.has_key?("locations")
       if tweet[:place]
@@ -210,7 +208,6 @@ class Streamer < Instance
   # end
   
   def add_datasets
-debugger
     datasets = Dataset.unlocked.all(:scrape_finished => false, :scrape_type => ['track', 'follow', 'locations'])
     return claim_new_datasets(datasets)
   end

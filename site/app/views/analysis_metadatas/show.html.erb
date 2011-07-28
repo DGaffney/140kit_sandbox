@@ -1,3 +1,5 @@
+<h1><%= link_to @analysis_metadata.function, url(:analytical_offering, @analysis_metadata.analytical_offering) %> (for Curation <%= link_to @analysis_metadata.curation.name, url(:curation, @analysis_metadata.curation) %>)</h1>
+<h2>Curation created by <%= link_to @analysis_metadata.curation.researcher.user_name, url(:researcher, @analysis_metadata.curation.researcher) %>
 <% if `ls #{File.dirname(__FILE__)}/analytics`.split("\n").include?(@analysis_metadata.function) %>
   <%= partial "analysis_metadatas/analytics/#{@analysis_metadata.function}/index" %>
 <% else %>

@@ -50,7 +50,7 @@ class WordFrequency < AnalysisMetadata
       {:name => "url"}
     when "hashtags"
       {:name => "text"}
-    when "user_mention_screen_names"
+    when "user_mentions"
       {:name => "screen_name"}
     when "user_mention_ids"
       {:name => "id"}

@@ -57,8 +57,13 @@ class Graphs < Application
   end
   
   def api_show(id)
+    x_class = params[:x_class] || "string"
+    y_class = params[:y_class] || "number"
     @graph = Graph.get(id)
-    render @graph.google_json_header(params[:tqx])+@graph.google_json_column_declarations+@graph.graph_points_to_google_json+@graph.google_json_footer, :format => :json
+    sort_by_label = (params[:sort_by_label].empty? || params[:sort_by_label]&&params[:sort_by_label] == "true")
+    debugger if id.to_i == 47
+    json = @graph.google_json_column_declarations(x_class, y_class)
+    render @graph.graph_points_to_google_json(json, x_class, y_class).to_json, :format => :json
   end
 
 end # Graph

@@ -33,8 +33,9 @@ class FilePathing
       attempt = "mv #{folder} ../#{final_path}"
       exception_message = "mkdir for #{attempt} failed after #{attempts+1} tries."
     when "remote"
+      debugger
       #This check actually fails since return of rsync message is ALWAYS empty string?
-      attempt = "rsync -r #{folder} #{Environment.storage_ssh}:#{final_path}"
+      attempt = "rsync -r #{folder} #{STORAGE["user"]}@#{STORAGE["host"]}:#{final_path}"
       exception_message = "rsync for #{attempt} failed after #{attempts+1} tries."
     end
     while !sent
