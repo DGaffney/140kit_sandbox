@@ -1,0 +1,161 @@
+GEM
+  remote: http://rubygems.org/
+  remote: http://gems.github.com/
+  specs:
+    ParseTree (3.0.8)
+      RubyInline (>= 3.7.0)
+      sexp_processor (>= 3.0.0)
+    RubyInline (3.11.0)
+      ZenTest (~> 4.3)
+    ZenTest (4.6.2)
+    addressable (2.2.6)
+    bcrypt-ruby (3.0.1)
+    cld (0.4.0)
+      ffi
+    daemons (1.1.4)
+    data_objects (0.10.7)
+      addressable (~> 2.1)
+    dm-aggregates (1.2.0)
+      dm-core (~> 1.2.0)
+    dm-chunked_query (0.3.0)
+      dm-aggregates (~> 1.0)
+      dm-core (~> 1.0)
+    dm-core (1.2.0)
+      addressable (~> 2.2.6)
+    dm-do-adapter (1.2.0)
+      data_objects (~> 0.10.6)
+      dm-core (~> 1.2.0)
+    dm-migrations (1.2.0)
+      dm-core (~> 1.2.0)
+    dm-mysql-adapter (1.2.0)
+      dm-do-adapter (~> 1.2.0)
+      do_mysql (~> 0.10.6)
+    dm-sqlite-adapter (1.2.0)
+      dm-do-adapter (~> 1.2.0)
+      do_sqlite3 (~> 0.10.6)
+    dm-sweatshop (1.2.0)
+      ParseTree (~> 3.0.7)
+      dm-core (~> 1.2.0)
+      randexp (~> 0.1.5)
+    dm-types (1.2.1)
+      bcrypt-ruby (~> 3.0.0)
+      dm-core (~> 1.2.0)
+      fastercsv (~> 1.5.4)
+      json (~> 1.6.1)
+      multi_json (~> 1.0.3)
+      stringex (~> 1.3.0)
+      uuidtools (~> 2.1.2)
+    dm-validations (1.2.0)
+      dm-core (~> 1.2.0)
+    do_mysql (0.10.7)
+      data_objects (= 0.10.7)
+    do_sqlite3 (0.10.7)
+      data_objects (= 0.10.7)
+    em-http-request (0.3.0)
+      addressable (>= 2.0.0)
+      escape_utils
+      eventmachine (>= 0.12.9)
+    escape_utils (0.2.4)
+    eventmachine (0.12.10)
+    faraday (0.7.5)
+      addressable (~> 2.2.6)
+      multipart-post (~> 1.1.3)
+      rack (>= 1.1.0, < 2)
+    faraday_middleware (0.7.0)
+      faraday (~> 0.7.3)
+    fastercsv (1.5.4)
+    ffi (1.0.10)
+    geokit (1.6.0)
+    git (1.2.5)
+    hashie (1.1.0)
+    hoe (2.12.3)
+      rake (~> 0.8)
+    htmlentities (4.3.0)
+    http_parser.rb (0.5.3)
+    jeweler (1.5.2)
+      bundler (~> 1.0.0)
+      git (>= 1.2.5)
+      rake
+    json (1.6.1)
+    mechanize (2.0.1)
+      net-http-digest_auth (~> 1.1, >= 1.1.1)
+      net-http-persistent (~> 1.8)
+      nokogiri (~> 1.4)
+      webrobots (~> 0.0, >= 0.0.9)
+    metaclass (0.0.1)
+    mocha (0.10.0)
+      metaclass (~> 0.0.1)
+    multi_json (1.0.3)
+    multi_xml (0.4.1)
+    multipart-post (1.1.3)
+    mysql2 (0.3.10)
+    net-http-digest_auth (1.2)
+    net-http-persistent (1.9)
+    nokogiri (1.5.0)
+    ntp (1.0.0)
+      hoe (>= 1.2.0)
+    oauth (0.4.5)
+    rack (1.3.5)
+    rake (0.9.2.2)
+    randexp (0.1.6)
+    rdebug (0.1)
+    rspec (1.3.1)
+    sexp_processor (3.0.7)
+    simple_oauth (0.1.5)
+    spicycode-rcov (0.8.2.1)
+    stringex (1.3.0)
+    tweetstream (1.1.2)
+      daemons (~> 1.1.4)
+      multi_json (~> 1.0.3)
+      twitter-stream (~> 0.1.14)
+    twitter (1.7.2)
+      faraday (~> 0.7.4)
+      faraday_middleware (~> 0.7.0)
+      hashie (~> 1.1.0)
+      multi_json (~> 1.0.0)
+      multi_xml (~> 0.4.0)
+      simple_oauth (~> 0.1.5)
+    twitter-stream (0.1.14)
+      eventmachine (>= 0.12.8)
+      http_parser.rb (~> 0.5.1)
+      simple_oauth (~> 0.1.4)
+    unicode (0.4.0)
+    uuidtools (2.1.2)
+    webrobots (0.0.12)
+      nokogiri (>= 1.4.4)
+    yajl-ruby (1.0.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  cld
+  dm-aggregates
+  dm-chunked_query
+  dm-core
+  dm-migrations
+  dm-mysql-adapter
+  dm-sqlite-adapter
+  dm-sweatshop
+  dm-types
+  dm-validations
+  em-http-request
+  eventmachine
+  fastercsv
+  geokit
+  htmlentities
+  jeweler (= 1.5.2)
+  json
+  mechanize
+  mocha
+  mysql2
+  nokogiri
+  ntp
+  oauth
+  rdebug
+  rspec (= 1.3.1)
+  spicycode-rcov
+  tweetstream (= 1.1.2)
+  twitter
+  unicode
+  yajl-ruby

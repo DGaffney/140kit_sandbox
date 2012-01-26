@@ -67,8 +67,8 @@ Merb::BootLoader.before_app_loads do
 end
  
 Merb::BootLoader.after_app_loads do
-  AnalyticalOffering.all(:language => "ruby", :enabled => true).each do |analytic|
-    require DIR+"/lib/tools/#{analytic.function}"    
-  end
+#  AnalyticalOffering.all(:language => "ruby", :enabled => true).each do |analytic|
+ #   require DIR+"/lib/tools/#{analytic.function}"    
+  #end
   # This will get executed after your app's classes have been loaded.
 end

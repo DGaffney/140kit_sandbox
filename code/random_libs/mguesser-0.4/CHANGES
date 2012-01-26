@@ -1,0 +1,29 @@
+06 March 2008: 0.4
+------------------
+
+* -d command line option was added, to load language
+maps from a non-default directory. A colon-separated
+list of directories is also supported. Thanks to
+Era Eriksson for the idea and for the original patch.
+
+* -t command line option was added, to specify how
+many top n-grams to print into the output map. The
+default value is 200. You can decrease the default
+value, or increase the default value (up to 4096).
+Longer map files give better detection quality,
+however work slower.
+
+* About 30 new model maps were added.
+
+19 October 2001: 0.2
+--------------------
+
+* Added a possibility to create new language maps.
+* Added Azerbaijani utf-8 language maps.
+* Minor enhancements.
+
+
+13 June 2001: 0.1
+-----------------
+
+* Initial public release

@@ -1,0 +1,90 @@
+
+WHAT'S THIS?
+-----------
+
+mguesser is a standalone part of libmnogosearch (a core of mnogo search engine
+http://www.mnogosearch.org) which allows to guess character set and language
+of a text file.
+
+
+mguesser is implemented using "N-Gram-Based Text Categorization" technique
+which is implemented in TextCat language guesser written in Perl
+(http://www.let.rug.nl/~vannoord/TextCat/). mguesser is significantly
+faster than TextCat especially on large texts.
+
+
+This package consist of C written N-gram based algorithms as well
+as a number of maps for texts in various languages and character sets. 
+Take a look into "maps" directory of this package to check the currently
+supported languages and character sets.
+
+
+
+INSTALLATION
+------------
+
+* Download source package from http://www.mnogosearch.org/guesser/
+* Unpack the distribution
+* Change directiry to the unpacked distribution, then type "make".
+
+By default, mguesser will seek for language maps in "maps" subdirectory
+of the current directory. You can change the default language map
+location in Makefile by redefining the "-DLMDIR" value.
+
+
+
+USAGE
+-----
+
+
+mguesser takes a plain text data to STDIN. Note that other "almost text" 
+formats like HTML will return bad results. In later releases I'll possibly
+add a command line switch to tell mguesser that the input data is HTML. 
+mguesser works fine for texts with size starting from 500 bytes and longer.
+Shorter texts are guessed not so well.
+
+To guess language and character set of some text file use:
+
+  mguesser < text_file
+
+mguesser will display how much your file corresponds to various language
+maps in the order of quality. mguesser returns values between 0 and 1.
+
+You can also display a specified number of the best results using -n
+command line switch. For example, this command will display 3 best results:
+
+  mguesser -n3 < text_file
+
+To make mguesser load language maps from a non-default directory, use:
+
+  mguesser -d/path/to/maps/
+  
+To load language maps from multiple directories, use a colon separated list:
+
+  mguesser -d/path/to/maps1/:/path/to/maps2/:/path/to/maps3/
+
+To create a new language map, use:
+
+  mguesser -p -c charset -l language < text_file
+
+When executed with -p command line parameter, mguesser creates
+a new language map built on text_file and prints it to STDOUT.
+Please note that to create a high quality language map,
+the source text file should be large enough. A 500 Kb text is
+usually enough to produce a high quality map.
+
+
+You can also include these files into your own applications.
+Take a look into main() function which is located in the guesser.c to
+check the order of guesser functions calls.
+
+
+
+TODO
+----
+
+ * Make it possible to guess other than text formats: HTML, XML
+ * Implement various command line switches to choose output format
+
+
+Alexander Barkov <bar@mnogosearch.org>

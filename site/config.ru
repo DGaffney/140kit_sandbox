@@ -5,6 +5,7 @@ rescue LoadError
   # Fall back on doing an unlocked resolve at runtime.
   require "rubygems"
   require "bundler"
+  require "methopara"
   Bundler.setup
 end
 

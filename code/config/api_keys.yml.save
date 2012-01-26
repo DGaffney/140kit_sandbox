@@ -1,0 +1,21 @@
+trueknowledge:
+  username: api_140kit
+  password: t4u54bf8eg8ofj3n
+yahoo:
+  consumer_key: dj0yJmk9UWM0UHIxTEFNNW5TJmQ9WVdrOVExY3hWWFZyTldNbWNHbzlOVGN3TXpnME5qSS0mcz1jb25zdW1lcnNlY3JldCZ4PTMw
+  consumer_secret: 16b2a06d320f4471e426a396756a38ba12fa3c43
+  application_url: http://oii.ox.ac.uk
+  app_domain: oii.ox.ac.uk
+  app_id: 4Zw85DDV34Ho1sZ402TXZPRqz64cGZBpYwDgroSYQ4.VkblHF_TgdgePwEi137PLETJo
+alchemy_api:
+  key: 51109565ac43dd298e1c8986248199a3599529f8,4f5155e9d567b8996c1f2c4a4f2501ccee19408c
+bing_api:
+  key: AlvWkShIKn5XfUlr6gdEAJsVWsmLUX1JW4CRvMnb-LGfCuw39VW72M6awLeImeX9	
+yahoo_2:  
+  consumer_key: dj0yJmk9cEpqNFVrMnZvYWxLJmQ9WVdrOWVIZE5hWFJpTXpJbWNHbzlPRGMwTmpNd01UWXkmcz1jb25zdW1lcnNlY3JldCZ4PWQx
+  consumer_secret: ec5ca25e34002e2abe8514e9cf1843252387632b
+  application_url: http://yourdefaulthomepage.com
+  app_domain: yourdefaulthomepage.com
+  app_id: 4Zw85DDV34Ho1sZ402TXZPRqz64cGZBpYwDgroSYQ4.VkblHF_TgdgePwEi137PLETJo
+google_1:
+  key: ABQIAAAAveJRkFl3ydUV1b9IJwJK5RR40-dCDedFw4A6PtzUPAvhJrldMhSQecDDQzsgcggUveYM_Yg9If6Fvg  
