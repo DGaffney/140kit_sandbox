@@ -1,0 +1,26 @@
+<div id="<%= "#{id_prefix}_" if !id_prefix.blank? %>metadata_<%= dataset.metadata.id %>" class="<%= dataset.metadata.class.to_s.underscore %> metadata">
+  <h4><%= link_to dataset.name, collection_url(dataset.metadata.researcher.user_name, dataset.primary_collection.id), :class => "big" %> (<%= link_to "Source Data", "#{dataset.metadata.source_data.gsub("public", "")}"%>)</h4>
+<% if !collection.blank? && !current_researcher.blank? && collection.researcher_id == current_researcher.id -%>
+    <%= render :partial => "datasets/associate_button", :locals => {:dataset => dataset, :collection => collection, :id_prefix => id_prefix} %>
+<% end -%>
+<% if display_user_header -%>
+  <h5>(From Collection: <%= link_to collection.name, collection_url(collection.primary_collection.id) %> by user: <%= collection.researcher.user_name %>)</h5>
+<% end -%>
+  <p>
+<% if !dataset.metadata.scrape.nil? -%>
+    Number of tweets: <%= number_with_delimiter(dataset.metadata.tweets_count) %> 
+    <% if dataset.metadata.tweets_count > 0 && dataset.metadata.scrape.tweets.count > 0 -%>
+      (<%= (dataset.metadata.tweets_count.to_f/dataset.metadata.scrape.tweets.count*100).round(2) %>% of total)           
+<% end -%><br />
+    Number of users: <%= number_with_delimiter(dataset.metadata.users_count) %> 
+<% if dataset.metadata.users_count > 0 && dataset.metadata.scrape.users.count > 0 -%>
+      (<%= (dataset.metadata.users_count.to_f/dataset.metadata.scrape.users.count*100).round(2) %>% of total)
+<% end -%><br />
+<% else -%>
+    This dataset's associated scrape is missing.
+<% end -%>
+    Created: <%=h distance_of_time_in_words(dataset.metadata.created_at, Time.now) %> ago 
+    (<%= dataset.metadata.created_at.strftime("%b %d, %Y, at %H:%M:%S %Z")%>)<br />
+    Last Updated: <%=h distance_of_time_in_words(dataset.metadata.created_at, Time.now) %> ago (<%= dataset.metadata.created_at.strftime("%b %d, %Y, at %H:%M:%S %Z")%>)<br />
+  </p>
+</div>

@@ -1,0 +1,32 @@
+group :core do
+  source 'http://rubygems.org'
+  source 'http://gems.github.com'
+  gem 'dm-aggregates'
+  gem 'dm-chunked_query'
+  gem 'dm-core'
+  gem 'dm-migrations'
+  gem 'dm-mysql-adapter'
+  gem 'dm-sqlite-adapter'
+  gem 'dm-sweatshop'
+  gem 'dm-types'
+  gem 'dm-validations'
+  gem 'eventmachine'
+  gem 'em-http-request', :require => 'em-http'
+  gem 'hpricot'
+  gem 'htmlentities'
+  gem 'jeweler'
+  gem 'json'
+  gem 'mocha'
+  gem 'nokogiri'
+  gem 'ntp'
+  gem 'spicycode-rcov'
+  gem 'rdebug'
+  gem 'rspec'
+  gem 'tweetstream'
+  gem 'twitter'
+  gem 'yajl-ruby'
+end
+
+group :raw_csv do
+  gem 'fastercsv'
+end

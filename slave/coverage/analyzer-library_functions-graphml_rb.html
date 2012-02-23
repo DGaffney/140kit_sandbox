@@ -1,0 +1,945 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang='en' xml:lang='en' xmlns='http://www.w3.org/1999/xhtml'><head><title>analyzer/library_functions/graphml.rb - Bogo-profile information</title>
+    <style type='text/css'>body { background-color: rgb(179,205,255); }</style>
+    <style type='text/css'>span.cross-ref-title {
+ font-size: 140%;
+}
+span.cross-ref a {
+ text-decoration: none;
+}
+span.cross-ref {
+ background-color:#f3f7fa;
+ border: 1px dashed #333;
+ margin: 1em;
+ padding: 0.5em;
+ overflow: hidden;
+}
+a.crossref-toggle {
+ text-decoration: none;
+}
+span.marked0 {
+ background-color: rgb(185, 210, 200);
+ display: block;
+}
+span.marked1 {
+ background-color: rgb(190, 215, 205);
+ display: block;
+}
+span.inferred0 {
+ background-color: rgb(255, 255, 240);
+ display: block;
+}
+span.inferred1 {
+ background-color: rgb(255, 255, 240);
+ display: block;
+}
+span.uncovered0 {
+ background-color: rgb(225, 110, 110);
+ display: block;
+}
+span.uncovered1 {
+ background-color: rgb(235, 120, 120);
+ display: block;
+}
+span.overview {
+ border-bottom: 8px solid black;
+}
+div.overview {
+ border-bottom: 8px solid black;
+}
+body {
+ font-family: verdana, arial, helvetica;
+}
+div.footer {
+ font-size: 68%;
+ margin-top: 1.5em;
+}
+h1, h2, h3, h4, h5, h6 {
+ margin-bottom: 0.5em;
+}
+h5 {
+ margin-top: 0.5em;
+}
+.hidden {
+ display: none;
+}
+div.separator {
+ height: 10px;
+}
+/* Commented out for better readability, esp. on IE */
+/*
+table tr td, table tr th {
+ font-size: 68%;
+}
+td.value table tr td {
+ font-size: 11px;
+}
+*/
+table.percent_graph {
+ height: 12px;
+ border: #808080 1px solid;
+ empty-cells: show;
+}
+table.percent_graph td.covered {
+ height: 10px;
+ background: #00f000;
+}
+table.percent_graph td.uncovered {
+ height: 10px;
+ background: #e00000;
+}
+table.percent_graph td.NA {
+ height: 10px;
+ background: #eaeaea;
+}
+table.report {
+ border-collapse: collapse;
+ width: 100%;
+}
+table.report td.heading {
+ background: #dcecff;
+ border: #d0d0d0 1px solid;
+ font-weight: bold;
+ text-align: center;
+}
+table.report td.heading:hover {
+ background: #c0ffc0;
+}
+table.report td.text {
+ border: #d0d0d0 1px solid;
+}
+table.report td.value,
+table.report td.lines_total,
+table.report td.lines_code {
+ text-align: right;
+ border: #d0d0d0 1px solid;
+}
+table.report tr.light {
+ background-color: rgb(240, 240, 245);
+}
+table.report tr.dark {
+ background-color: rgb(230, 230, 235);
+}
+</style>
+    <script type='text/javascript'>
+// <![CDATA[
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+
+  // Make cross-references hidden by default
+  document.writeln( "<style type=\"text/css\">span.cross-ref { display: none }</style>" )
+  // ]]>
+</script>
+    <style type='text/css'>span.run0 {
+  background-color: rgb(178, 204, 255);
+  display: block;
+}
+span.run1 {
+  background-color: rgb(178, 206, 255);
+  display: block;
+}
+span.run2 {
+  background-color: rgb(178, 209, 255);
+  display: block;
+}
+span.run3 {
+  background-color: rgb(178, 211, 255);
+  display: block;
+}
+span.run4 {
+  background-color: rgb(178, 214, 255);
+  display: block;
+}
+span.run5 {
+  background-color: rgb(178, 218, 255);
+  display: block;
+}
+span.run6 {
+  background-color: rgb(178, 220, 255);
+  display: block;
+}
+span.run7 {
+  background-color: rgb(178, 223, 255);
+  display: block;
+}
+span.run8 {
+  background-color: rgb(178, 225, 255);
+  display: block;
+}
+span.run9 {
+  background-color: rgb(178, 228, 255);
+  display: block;
+}
+span.run10 {
+  background-color: rgb(178, 232, 255);
+  display: block;
+}
+span.run11 {
+  background-color: rgb(178, 234, 255);
+  display: block;
+}
+span.run12 {
+  background-color: rgb(178, 237, 255);
+  display: block;
+}
+span.run13 {
+  background-color: rgb(178, 239, 255);
+  display: block;
+}
+span.run14 {
+  background-color: rgb(178, 242, 255);
+  display: block;
+}
+span.run15 {
+  background-color: rgb(178, 246, 255);
+  display: block;
+}
+span.run16 {
+  background-color: rgb(178, 248, 255);
+  display: block;
+}
+span.run17 {
+  background-color: rgb(178, 251, 255);
+  display: block;
+}
+span.run18 {
+  background-color: rgb(178, 253, 255);
+  display: block;
+}
+span.run19 {
+  background-color: rgb(178, 255, 253);
+  display: block;
+}
+span.run20 {
+  background-color: rgb(178, 255, 249);
+  display: block;
+}
+span.run21 {
+  background-color: rgb(178, 255, 247);
+  display: block;
+}
+span.run22 {
+  background-color: rgb(178, 255, 244);
+  display: block;
+}
+span.run23 {
+  background-color: rgb(178, 255, 242);
+  display: block;
+}
+span.run24 {
+  background-color: rgb(178, 255, 239);
+  display: block;
+}
+span.run25 {
+  background-color: rgb(178, 255, 235);
+  display: block;
+}
+span.run26 {
+  background-color: rgb(178, 255, 233);
+  display: block;
+}
+span.run27 {
+  background-color: rgb(178, 255, 230);
+  display: block;
+}
+span.run28 {
+  background-color: rgb(178, 255, 228);
+  display: block;
+}
+span.run29 {
+  background-color: rgb(178, 255, 225);
+  display: block;
+}
+span.run30 {
+  background-color: rgb(178, 255, 221);
+  display: block;
+}
+span.run31 {
+  background-color: rgb(178, 255, 219);
+  display: block;
+}
+span.run32 {
+  background-color: rgb(178, 255, 216);
+  display: block;
+}
+span.run33 {
+  background-color: rgb(178, 255, 214);
+  display: block;
+}
+span.run34 {
+  background-color: rgb(178, 255, 211);
+  display: block;
+}
+span.run35 {
+  background-color: rgb(178, 255, 207);
+  display: block;
+}
+span.run36 {
+  background-color: rgb(178, 255, 205);
+  display: block;
+}
+span.run37 {
+  background-color: rgb(178, 255, 202);
+  display: block;
+}
+span.run38 {
+  background-color: rgb(178, 255, 200);
+  display: block;
+}
+span.run39 {
+  background-color: rgb(178, 255, 197);
+  display: block;
+}
+span.run40 {
+  background-color: rgb(178, 255, 193);
+  display: block;
+}
+span.run41 {
+  background-color: rgb(178, 255, 191);
+  display: block;
+}
+span.run42 {
+  background-color: rgb(178, 255, 188);
+  display: block;
+}
+span.run43 {
+  background-color: rgb(178, 255, 186);
+  display: block;
+}
+span.run44 {
+  background-color: rgb(178, 255, 183);
+  display: block;
+}
+span.run45 {
+  background-color: rgb(178, 255, 179);
+  display: block;
+}
+span.run46 {
+  background-color: rgb(179, 255, 178);
+  display: block;
+}
+span.run47 {
+  background-color: rgb(182, 255, 178);
+  display: block;
+}
+span.run48 {
+  background-color: rgb(184, 255, 178);
+  display: block;
+}
+span.run49 {
+  background-color: rgb(187, 255, 178);
+  display: block;
+}
+span.run50 {
+  background-color: rgb(191, 255, 178);
+  display: block;
+}
+span.run51 {
+  background-color: rgb(193, 255, 178);
+  display: block;
+}
+span.run52 {
+  background-color: rgb(196, 255, 178);
+  display: block;
+}
+span.run53 {
+  background-color: rgb(198, 255, 178);
+  display: block;
+}
+span.run54 {
+  background-color: rgb(201, 255, 178);
+  display: block;
+}
+span.run55 {
+  background-color: rgb(205, 255, 178);
+  display: block;
+}
+span.run56 {
+  background-color: rgb(207, 255, 178);
+  display: block;
+}
+span.run57 {
+  background-color: rgb(210, 255, 178);
+  display: block;
+}
+span.run58 {
+  background-color: rgb(212, 255, 178);
+  display: block;
+}
+span.run59 {
+  background-color: rgb(215, 255, 178);
+  display: block;
+}
+span.run60 {
+  background-color: rgb(219, 255, 178);
+  display: block;
+}
+span.run61 {
+  background-color: rgb(221, 255, 178);
+  display: block;
+}
+span.run62 {
+  background-color: rgb(224, 255, 178);
+  display: block;
+}
+span.run63 {
+  background-color: rgb(226, 255, 178);
+  display: block;
+}
+span.run64 {
+  background-color: rgb(229, 255, 178);
+  display: block;
+}
+span.run65 {
+  background-color: rgb(233, 255, 178);
+  display: block;
+}
+span.run66 {
+  background-color: rgb(235, 255, 178);
+  display: block;
+}
+span.run67 {
+  background-color: rgb(238, 255, 178);
+  display: block;
+}
+span.run68 {
+  background-color: rgb(240, 255, 178);
+  display: block;
+}
+span.run69 {
+  background-color: rgb(243, 255, 178);
+  display: block;
+}
+span.run70 {
+  background-color: rgb(247, 255, 178);
+  display: block;
+}
+span.run71 {
+  background-color: rgb(249, 255, 178);
+  display: block;
+}
+span.run72 {
+  background-color: rgb(252, 255, 178);
+  display: block;
+}
+span.run73 {
+  background-color: rgb(255, 255, 178);
+  display: block;
+}
+span.run74 {
+  background-color: rgb(255, 252, 178);
+  display: block;
+}
+span.run75 {
+  background-color: rgb(255, 248, 178);
+  display: block;
+}
+span.run76 {
+  background-color: rgb(255, 246, 178);
+  display: block;
+}
+span.run77 {
+  background-color: rgb(255, 243, 178);
+  display: block;
+}
+span.run78 {
+  background-color: rgb(255, 240, 178);
+  display: block;
+}
+span.run79 {
+  background-color: rgb(255, 238, 178);
+  display: block;
+}
+span.run80 {
+  background-color: rgb(255, 234, 178);
+  display: block;
+}
+span.run81 {
+  background-color: rgb(255, 232, 178);
+  display: block;
+}
+span.run82 {
+  background-color: rgb(255, 229, 178);
+  display: block;
+}
+span.run83 {
+  background-color: rgb(255, 226, 178);
+  display: block;
+}
+span.run84 {
+  background-color: rgb(255, 224, 178);
+  display: block;
+}
+span.run85 {
+  background-color: rgb(255, 220, 178);
+  display: block;
+}
+span.run86 {
+  background-color: rgb(255, 218, 178);
+  display: block;
+}
+span.run87 {
+  background-color: rgb(255, 215, 178);
+  display: block;
+}
+span.run88 {
+  background-color: rgb(255, 212, 178);
+  display: block;
+}
+span.run89 {
+  background-color: rgb(255, 210, 178);
+  display: block;
+}
+span.run90 {
+  background-color: rgb(255, 206, 178);
+  display: block;
+}
+span.run91 {
+  background-color: rgb(255, 204, 178);
+  display: block;
+}
+span.run92 {
+  background-color: rgb(255, 201, 178);
+  display: block;
+}
+span.run93 {
+  background-color: rgb(255, 198, 178);
+  display: block;
+}
+span.run94 {
+  background-color: rgb(255, 196, 178);
+  display: block;
+}
+span.run95 {
+  background-color: rgb(255, 192, 178);
+  display: block;
+}
+span.run96 {
+  background-color: rgb(255, 189, 178);
+  display: block;
+}
+span.run97 {
+  background-color: rgb(255, 187, 178);
+  display: block;
+}
+span.run98 {
+  background-color: rgb(255, 184, 178);
+  display: block;
+}
+span.run99 {
+  background-color: rgb(255, 182, 178);
+  display: block;
+}
+span.run100 {
+  background-color: rgb(255, 178, 178);
+  display: block;
+}
+</style>
+    </head>
+  <body><h3>Bogo-profile information</h3>
+    <p>Generated on Mon Jul 18 21:49:01 -0400 2011 with <a href='http://github.com/spicycode/rcov'>rcov 0.8.2.1</a>
+      </p>
+    <hr/>
+    <table class='report'><thead><tr><td class='heading'>Name</td>
+      <td class='heading'>Total lines</td>
+      <td class='heading'>Lines of code</td>
+      <td class='heading'>Total coverage</td>
+      <td class='heading'>Code coverage</td>
+      </tr>
+    </thead>
+  <tbody><tr class='light'><td><a href='analyzer-library_functions-graphml_rb.html'>analyzer/library_functions/graphml.rb</a>
+        </td>
+      <td class='lines_total'><tt>181</tt>
+        </td>
+      <td class='lines_code'><tt>155</tt>
+        </td>
+      <td><table cellspacing='0' align='right' cellpadding='0'><tr><td><tt class='coverage_total'>100.0%</tt>
+              &nbsp;</td>
+            <td><table class='percent_graph' cellspacing='0' cellpadding='0' width='100'><tr><td class='covered' width='100'/>
+                  <td class='uncovered' width='0'/>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      <td><table cellspacing='0' align='right' cellpadding='0'><tr><td><tt class='coverage_code'>100.0%</tt>
+              &nbsp;</td>
+            <td><table class='percent_graph' cellspacing='0' cellpadding='0' width='100'><tr><td class='covered' width='100'/>
+                  <td class='uncovered' width='0'/>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+<pre><span class="run38"><a name="line1"></a>  1 module Graphml
+</span><span class="run33"><a name="line2"></a>  2   CLASSES = {&quot;Fixnum&quot; =&gt; &quot;int&quot;, &quot;Float&quot; =&gt; &quot;float&quot;, &quot;Bignum&quot; =&gt; &quot;double&quot;, &quot;Integer&quot; =&gt; &quot;int&quot;, &quot;String&quot; =&gt; &quot;string&quot;, &quot;TrueClass&quot; =&gt; &quot;bool&quot;, &quot;FalseClass&quot; =&gt; &quot;bool&quot;, &quot;NilClass&quot; =&gt; &quot;int&quot;}
+</span><span class="run43"><a name="line3"></a>  3 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-910'); return false;">  def self.header(key=&quot;#{rand(10000)}&quot;)</a><span class="cross-ref" id="XREF-910">
+<span class="cross-ref-title">  def self.header(key=&quot;#{rand(10000)}&quot;)</span>
+<a href="analyzer-library_functions-graphml_rb.html#line122">      2   analyzer/library_functions/graphml.rb:122 in '#&lt;Class:Graphml::Writer&gt;#generate_header'</a>
+      1   spec/unit/analyzer/library_functions/graphml_spec.rb:3 in '#'
+</span>
+</span><span class="run46"><a name="line4"></a>  4     %{&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;\n&lt;graphml xmlns=&quot;http://graphml.graphdrawing.org/xmlns&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; \nxsi:schemaLocation=&quot;http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd&quot;&gt;\n\t&lt;graph id=&quot;#{key}&quot; edgedefault=&quot;directed&quot;&gt;}
+</span><a name="line5"></a>  5   end
+<a name="line6"></a>  6   
+<span class="run43"><a name="line7"></a>  7 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-911'); return false;">  def self.attribute_declarations(attribute_declarations)</a><span class="cross-ref" id="XREF-911">
+<span class="cross-ref-title">  def self.attribute_declarations(attribute_declarations)</span>
+<a href="analyzer-library_functions-graphml_rb.html#line135">      2   analyzer/library_functions/graphml.rb:135 in '#&lt;Class:Graphml::Writer&gt;#generate_attribute_declarations'</a>
+      1   spec/unit/analyzer/library_functions/graphml_spec.rb:13 in '#'
+</span>
+</span><span class="run52"><a name="line8"></a>  8 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-912'); return false;">    attribute_declarations.collect{|attribute_declaration| self.attribute_declaration(attribute_declaration)}</a><span class="cross-ref" id="XREF-912">
+<span class="cross-ref-title">    attribute_declarations.collect{|attribute_declaration| self.attribute_declaration(attribute_declaration)}</span>
+<a href="analyzer-library_functions-graphml_rb.html#line12">      9   #&lt;Class:Graphml&gt;#attribute_declaration at analyzer/library_functions/graphml.rb:12</a>
+</span>
+</span><a name="line9"></a>  9   end
+<a name="line10"></a> 10   
+<a name="line11"></a> 11   #attribute looks like: {:id =&gt; name, :for =&gt; [&quot;node&quot;||&quot;edge&quot;], :attr_name =&gt; name, :attr_type =&gt; type}
+<span class="run50"><a name="line12"></a> 12 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-913'); return false;">  def self.attribute_declaration(attribute_declaration)</a><span class="cross-ref" id="XREF-913">
+<span class="cross-ref-title">  def self.attribute_declaration(attribute_declaration)</span>
+<a href="analyzer-library_functions-graphml_rb.html#line8">      9   analyzer/library_functions/graphml.rb:8 in '#&lt;Class:Graphml&gt;#attribute_declarations'</a>
+      1   spec/unit/analyzer/library_functions/graphml_spec.rb:18 in '#'
+</span>
+<a name="line13"></a> 13     attribute_declaration_data = &quot;\n\t&lt;key &quot;
+<a name="line14"></a> 14     attribute_declaration.each_pair do |k,v|
+</span><span class="run59"><a name="line15"></a> 15       k = k.to_s.gsub(&quot;_&quot;, &quot;.&quot;)
+</span><span class="run64"><a name="line16"></a> 16       if k == &quot;attr.type&quot;
+</span><span class="run49"><a name="line17"></a> 17 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-914'); return false;">        attribute_declaration_data &lt;&lt; %{ #{k}=&quot;#{self.graphml_class(v.to_s)}&quot;}</a><span class="cross-ref" id="XREF-914">
+<span class="cross-ref-title">        attribute_declaration_data &lt;&lt; %{ #{k}=&quot;#{self.graphml_class(v.to_s)}&quot;}</span>
+<a href="analyzer-library_functions-graphml_rb.html#line79">      9   #&lt;Class:Graphml&gt;#graphml_class at analyzer/library_functions/graphml.rb:79</a>
+</span>
+</span><a name="line18"></a> 18       else
+<span class="run57"><a name="line19"></a> 19         attribute_declaration_data &lt;&lt; %{ #{k}=&quot;#{v}&quot;}
+</span><a name="line20"></a> 20       end
+<a name="line21"></a> 21     end
+<span class="run55"><a name="line22"></a> 22     attribute_declaration_data &lt;&lt; &quot; /&gt;&quot;
+</span><a name="line23"></a> 23   end
+<a name="line24"></a> 24   
+<span class="run38"><a name="line25"></a> 25 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-915'); return false;">  def self.nodes(nodes)</a><span class="cross-ref" id="XREF-915">
+<span class="cross-ref-title">  def self.nodes(nodes)</span>
+      1   spec/unit/analyzer/library_functions/graphml_spec.rb:55 in '#'
+</span>
+</span><span class="run43"><a name="line26"></a> 26 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-916'); return false;">    nodes.collect{|node| self.node(node)}</a><span class="cross-ref" id="XREF-916">
+<span class="cross-ref-title">    nodes.collect{|node| self.node(node)}</span>
+<a href="analyzer-library_functions-graphml_rb.html#line30">      2   #&lt;Class:Graphml&gt;#node at analyzer/library_functions/graphml.rb:30</a>
+</span>
+</span><a name="line27"></a> 27   end
+<a name="line28"></a> 28   
+<a name="line29"></a> 29   #nodes look like {:id =&gt; screen_name}
+<span class="run60"><a name="line30"></a> 30 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-917'); return false;">  def self.node(node)</a><span class="cross-ref" id="XREF-917">
+<span class="cross-ref-title">  def self.node(node)</span>
+<a href="analyzer-library_functions-graphml_rb.html#line142">     40   analyzer/library_functions/graphml.rb:142 in '#&lt;Class:Graphml::Writer&gt;#generate_nodes'</a>
+<a href="analyzer-library_functions-graphml_rb.html#line26">      2   analyzer/library_functions/graphml.rb:26 in '#&lt;Class:Graphml&gt;#nodes'</a>
+      1   spec/unit/analyzer/library_functions/graphml_spec.rb:85 in '#'
+</span>
+<a name="line31"></a> 31     node_data = &quot;&quot;
+<a name="line32"></a> 32     metadata_keys = [:attributes]
+</span><span class="run70"><a name="line33"></a> 33 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-918'); return false;">    non_metadata_node = Hash[node.select{|k,v| !metadata_keys.include?(k)}]</a><span class="cross-ref" id="XREF-918">
+<span class="cross-ref-title">    non_metadata_node = Hash[node.select{|k,v| !metadata_keys.include?(k)}]</span>
+     43   Array#to_hash at /Library/Ruby/Gems/1.8/gems/dm-core-1.0.2/lib/dm-core/core_ext/array.rb:14
+</span>
+</span><span class="run65"><a name="line34"></a> 34     if node[:attributes] &amp;&amp; !node[:attributes].empty?
+</span><span class="run64"><a name="line35"></a> 35       node_data &lt;&lt; %{\n\t\t&lt;node #{non_metadata_node.collect{|k,v| &quot; #{k}=\&quot;#{v}\&quot;&quot;}.to_s}&gt;}
+</span><span class="run56"><a name="line36"></a> 36       node[:attributes].each do |attribute|
+</span><span class="run64"><a name="line37"></a> 37 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-919'); return false;">        node_data &lt;&lt; self.attribute(attribute)</a><span class="cross-ref" id="XREF-919">
+<span class="cross-ref-title">        node_data &lt;&lt; self.attribute(attribute)</span>
+<a href="analyzer-library_functions-graphml_rb.html#line67">     72   #&lt;Class:Graphml&gt;#attribute at analyzer/library_functions/graphml.rb:67</a>
+</span>
+</span><a name="line38"></a> 38       end
+<span class="run56"><a name="line39"></a> 39       node_data &lt;&lt; &quot;\n\t\t&lt;/node&gt;&quot;
+</span><a name="line40"></a> 40     else
+<span class="run62"><a name="line41"></a> 41       node_data &lt;&lt; %{\n\t\t&lt;node #{non_metadata_node.collect{|k,v| &quot; #{k}=\&quot;#{v}\&quot;&quot;}.to_s}/&gt;}
+</span><a name="line42"></a> 42     end
+<span class="run65"><a name="line43"></a> 43     node_data
+</span><a name="line44"></a> 44   end
+<a name="line45"></a> 45 
+<span class="run38"><a name="line46"></a> 46 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-920'); return false;">  def self.edges(edges)</a><span class="cross-ref" id="XREF-920">
+<span class="cross-ref-title">  def self.edges(edges)</span>
+      1   spec/unit/analyzer/library_functions/graphml_spec.rb:125 in '#'
+</span>
+</span><span class="run43"><a name="line47"></a> 47 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-921'); return false;">    edges.collect{|edge| self.edge(edge)}</a><span class="cross-ref" id="XREF-921">
+<span class="cross-ref-title">    edges.collect{|edge| self.edge(edge)}</span>
+<a href="analyzer-library_functions-graphml_rb.html#line51">      2   #&lt;Class:Graphml&gt;#edge at analyzer/library_functions/graphml.rb:51</a>
+</span>
+</span><a name="line48"></a> 48   end
+<a name="line49"></a> 49 
+<a name="line50"></a> 50   #edges look like: {:id =&gt; edge_id, :source =&gt; start_node, :target =&gt; end_node}  
+<span class="run57"><a name="line51"></a> 51 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-922'); return false;">  def self.edge(edge)</a><span class="cross-ref" id="XREF-922">
+<span class="cross-ref-title">  def self.edge(edge)</span>
+<a href="analyzer-library_functions-graphml_rb.html#line149">     23   analyzer/library_functions/graphml.rb:149 in '#&lt;Class:Graphml::Writer&gt;#generate_edges'</a>
+<a href="analyzer-library_functions-graphml_rb.html#line47">      2   analyzer/library_functions/graphml.rb:47 in '#&lt;Class:Graphml&gt;#edges'</a>
+      1   spec/unit/analyzer/library_functions/graphml_spec.rb:158 in '#'
+</span>
+</span><span class="run56"><a name="line52"></a> 52     edge_data = &quot;&quot;
+<a name="line53"></a> 53     metadata_keys = [:attributes]
+</span><span class="run68"><a name="line54"></a> 54 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-923'); return false;">    non_metadata_edge = Hash[edge.select{|k,v| !metadata_keys.include?(k)}]</a><span class="cross-ref" id="XREF-923">
+<span class="cross-ref-title">    non_metadata_edge = Hash[edge.select{|k,v| !metadata_keys.include?(k)}]</span>
+     26   Array#to_hash at /Library/Ruby/Gems/1.8/gems/dm-core-1.0.2/lib/dm-core/core_ext/array.rb:14
+</span>
+</span><span class="run61"><a name="line55"></a> 55     if edge[:attributes] &amp;&amp; !edge[:attributes].empty?
+</span><span class="run67"><a name="line56"></a> 56       edge_data &lt;&lt; %{\n\t\t&lt;edge#{non_metadata_edge.collect{|k,v| &quot; #{k}=\&quot;#{v}\&quot;&quot;}.to_s}&gt;}
+</span><span class="run56"><a name="line57"></a> 57       edge[:attributes].each do |attribute|
+</span><span class="run57"><a name="line58"></a> 58 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-924'); return false;">        edge_data &lt;&lt; self.attribute(attribute)</a><span class="cross-ref" id="XREF-924">
+<span class="cross-ref-title">        edge_data &lt;&lt; self.attribute(attribute)</span>
+<a href="analyzer-library_functions-graphml_rb.html#line67">     29   #&lt;Class:Graphml&gt;#attribute at analyzer/library_functions/graphml.rb:67</a>
+</span>
+</span><a name="line59"></a> 59       end
+<span class="run56"><a name="line60"></a> 60       edge_data &lt;&lt; &quot;\n\t\t&lt;/edge&gt;&quot;
+</span><a name="line61"></a> 61     else
+<span class="run46"><a name="line62"></a> 62       edge_data &lt;&lt; %{\n\t\t&lt;edge#{non_metadata_edge.collect{|k,v| &quot; #{k}=\&quot;#{v}\&quot;&quot;}.to_s}/&gt;}
+</span><a name="line63"></a> 63     end
+<span class="run61"><a name="line64"></a> 64     edge_data
+</span><a name="line65"></a> 65   end
+<a name="line66"></a> 66     
+<span class="run66"><a name="line67"></a> 67 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-925'); return false;">  def self.attribute(attribute)</a><span class="cross-ref" id="XREF-925">
+<span class="cross-ref-title">  def self.attribute(attribute)</span>
+<a href="analyzer-library_functions-graphml_rb.html#line37">     72   analyzer/library_functions/graphml.rb:37 in '#&lt;Class:Graphml&gt;#node'</a>
+<a href="analyzer-library_functions-graphml_rb.html#line58">     29   analyzer/library_functions/graphml.rb:58 in '#&lt;Class:Graphml&gt;#edge'</a>
+      1   spec/unit/analyzer/library_functions/graphml_spec.rb:163 in '#'
+</span>
+<a name="line68"></a> 68     attribute_data = %{}
+<a name="line69"></a> 69     attribute.each_pair do |k,v|
+</span><span class="run68"><a name="line70"></a> 70       attribute_data &lt;&lt; %{\n\t\t\t&lt;data key=&quot;#{k}&quot;&gt;#{v}&lt;/data&gt;}
+</span><a name="line71"></a> 71     end
+<span class="run71"><a name="line72"></a> 72     attribute_data
+</span><a name="line73"></a> 73   end
+<a name="line74"></a> 74   
+<span class="run43"><a name="line75"></a> 75 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-926'); return false;">  def self.footer</a><span class="cross-ref" id="XREF-926">
+<span class="cross-ref-title">  def self.footer</span>
+<a href="analyzer-library_functions-graphml_rb.html#line113">      2   analyzer/library_functions/graphml.rb:113 in '#&lt;Class:Graphml::Writer&gt;#finalize_temp_data'</a>
+      1   spec/unit/analyzer/library_functions/graphml_spec.rb:22 in '#'
+</span>
+</span><span class="run46"><a name="line76"></a> 76     &quot;\n\t&lt;/graph&gt;\n&lt;/graphml&gt;&quot;
+</span><a name="line77"></a> 77   end
+<a name="line78"></a> 78 
+<span class="run54"><a name="line79"></a> 79 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-927'); return false;">  def self.graphml_class(ruby_class)</a><span class="cross-ref" id="XREF-927">
+<span class="cross-ref-title">  def self.graphml_class(ruby_class)</span>
+<a href="analyzer-library_functions-graphml_rb.html#line17">      9   analyzer/library_functions/graphml.rb:17 in '#&lt;Class:Graphml&gt;#attribute_declaration'</a>
+      8   spec/unit/analyzer/library_functions/graphml_spec.rb:168 in '#'
+</span>
+</span><span class="run58"><a name="line80"></a> 80     return CLASSES[ruby_class.to_s] || &quot;int&quot;
+</span><a name="line81"></a> 81   end
+<a name="line82"></a> 82   
+<span class="run38"><a name="line83"></a> 83   module Writer
+</span><a name="line84"></a> 84     #where fs is a frequency set as defined in retweet_graphs, graph is a given graph object that data is worked from, and file is the entity being written to.
+<span class="run41"><a name="line85"></a> 85 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-928'); return false;">    def self.initialize_temp_data(fs, graph, path=ENV['TMP_PATH'])</a><span class="cross-ref" id="XREF-928">
+<span class="cross-ref-title">    def self.initialize_temp_data(fs, graph, path=ENV['TMP_PATH'])</span>
+      1   spec/unit/analyzer/library_functions/graphml_spec.rb:208 in '#'
+<a href="analyzer-tools-network_grapher_rb.html#line27">      1   analyzer/tools/network_grapher.rb:27 in '#&lt;Class:NetworkGrapher&gt;#generate_graph_files'</a>
+</span>
+</span><span class="run43"><a name="line86"></a> 86       File.delete(path+&quot;/temp_node.graphml&quot;) if File.exists?(path+&quot;/temp_node.graphml&quot;)
+<a name="line87"></a> 87       File.delete(path+&quot;/temp_edge.graphml&quot;) if File.exists?(path+&quot;/temp_edge.graphml&quot;)
+<a name="line88"></a> 88       File.delete(path+&quot;/temp_header.graphml&quot;) if File.exists?(path+&quot;/temp_header.graphml&quot;)
+<a name="line89"></a> 89 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-929'); return false;">      self.generate_temp_header(fs, graph, path)</a><span class="cross-ref" id="XREF-929">
+<span class="cross-ref-title">      self.generate_temp_header(fs, graph, path)</span>
+<a href="analyzer-library_functions-graphml_rb.html#line92">      2   #&lt;Class:Graphml::Writer&gt;#generate_temp_header at analyzer/library_functions/graphml.rb:92</a>
+</span>
+</span><a name="line90"></a> 90     end
+<a name="line91"></a> 91 
+<span class="run41"><a name="line92"></a> 92 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-930'); return false;">    def self.generate_temp_header(fs, graph, path=ENV['TMP_PATH'])</a><span class="cross-ref" id="XREF-930">
+<span class="cross-ref-title">    def self.generate_temp_header(fs, graph, path=ENV['TMP_PATH'])</span>
+<a href="analyzer-library_functions-graphml_rb.html#line89">      2   analyzer/library_functions/graphml.rb:89 in '#&lt;Class:Graphml::Writer&gt;#initialize_temp_data'</a>
+</span>
+</span><span class="run38"><a name="line93"></a> 93       header_data = File.open(path+&quot;/temp_header.graphml&quot;, &quot;a+&quot;)
+<a name="line94"></a> 94 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-931'); return false;">      self.generate_header(fs, header_data)</a><span class="cross-ref" id="XREF-931">
+<span class="cross-ref-title">      self.generate_header(fs, header_data)</span>
+<a href="analyzer-library_functions-graphml_rb.html#line120">      2   #&lt;Class:Graphml::Writer&gt;#generate_header at analyzer/library_functions/graphml.rb:120</a>
+</span>
+<a name="line95"></a> 95 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-932'); return false;">      self.generate_attribute_declarations(fs, header_data)</a><span class="cross-ref" id="XREF-932">
+<span class="cross-ref-title">      self.generate_attribute_declarations(fs, header_data)</span>
+<a href="analyzer-library_functions-graphml_rb.html#line126">      2   #&lt;Class:Graphml::Writer&gt;#generate_attribute_declarations at analyzer/library_functions/graphml.rb:126</a>
+</span>
+</span><span class="run43"><a name="line96"></a> 96       header_data.close
+</span><a name="line97"></a> 97     end
+<a name="line98"></a> 98 
+<span class="run41"><a name="line99"></a> 99 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-933'); return false;">    def self.generate_temp_data(fs, edges, path=ENV['TMP_PATH'])</a><span class="cross-ref" id="XREF-933">
+<span class="cross-ref-title">    def self.generate_temp_data(fs, edges, path=ENV['TMP_PATH'])</span>
+      1   spec/unit/analyzer/library_functions/graphml_spec.rb:253 in '#'
+<a href="analyzer-tools-network_grapher_rb.html#line38">      1   analyzer/tools/network_grapher.rb:38 in '#&lt;Class:NetworkGrapher&gt;#generate_graph_files'</a>
+</span>
+</span><span class="run38"><a name="line100"></a>100       node_data = File.open(path+&quot;/temp_node.graphml&quot;, &quot;a+&quot;)
+<a name="line101"></a>101 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-934'); return false;">      self.generate_nodes(fs, edges, node_data)</a><span class="cross-ref" id="XREF-934">
+<span class="cross-ref-title">      self.generate_nodes(fs, edges, node_data)</span>
+<a href="analyzer-library_functions-graphml_rb.html#line138">      2   #&lt;Class:Graphml::Writer&gt;#generate_nodes at analyzer/library_functions/graphml.rb:138</a>
+</span>
+<a name="line102"></a>102       node_data.close
+<a name="line103"></a>103       edge_data = File.open(path+&quot;/temp_edge.graphml&quot;, &quot;a+&quot;)
+<a name="line104"></a>104 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-935'); return false;">      self.generate_edges(fs, edges, edge_data)</a><span class="cross-ref" id="XREF-935">
+<span class="cross-ref-title">      self.generate_edges(fs, edges, edge_data)</span>
+<a href="analyzer-library_functions-graphml_rb.html#line146">      2   #&lt;Class:Graphml::Writer&gt;#generate_edges at analyzer/library_functions/graphml.rb:146</a>
+</span>
+</span><span class="run43"><a name="line105"></a>105       edge_data.close
+</span><a name="line106"></a>106     end
+<a name="line107"></a>107 
+<span class="run41"><a name="line108"></a>108 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-936'); return false;">    def self.finalize_temp_data(fs, path=ENV['TMP_PATH'])</a><span class="cross-ref" id="XREF-936">
+<span class="cross-ref-title">    def self.finalize_temp_data(fs, path=ENV['TMP_PATH'])</span>
+      1   spec/unit/analyzer/library_functions/graphml_spec.rb:291 in '#'
+<a href="analyzer-tools-network_grapher_rb.html#line45">      1   analyzer/tools/network_grapher.rb:45 in '#&lt;Class:NetworkGrapher&gt;#generate_graph_files'</a>
+</span>
+</span><span class="run38"><a name="line109"></a>109       final_file = File.open(path+&quot;/#{fs[:title]||&quot;graph&quot;}.graphml&quot;, &quot;w+&quot;)
+<a name="line110"></a>110       final_file.write(File.read(path+&quot;/temp_header.graphml&quot;))
+<a name="line111"></a>111       final_file.write(File.read(path+&quot;/temp_node.graphml&quot;))
+<a name="line112"></a>112       final_file.write(File.read(path+&quot;/temp_edge.graphml&quot;))
+<a name="line113"></a>113 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-937'); return false;">      final_file.write(Graphml::footer)</a><span class="cross-ref" id="XREF-937">
+<span class="cross-ref-title">      final_file.write(Graphml::footer)</span>
+<a href="analyzer-library_functions-graphml_rb.html#line75">      2   #&lt;Class:Graphml&gt;#footer at analyzer/library_functions/graphml.rb:75</a>
+</span>
+<a name="line114"></a>114       final_file.close
+</span><span class="run43"><a name="line115"></a>115       File.delete(path+&quot;/temp_node.graphml&quot;) if File.exists?(path+&quot;/temp_node.graphml&quot;)
+<a name="line116"></a>116       File.delete(path+&quot;/temp_edge.graphml&quot;) if File.exists?(path+&quot;/temp_edge.graphml&quot;)
+</span><span class="run46"><a name="line117"></a>117       File.delete(path+&quot;/temp_header.graphml&quot;) if File.exists?(path+&quot;/temp_header.graphml&quot;)
+</span><a name="line118"></a>118     end
+<a name="line119"></a>119     
+<span class="run41"><a name="line120"></a>120 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-938'); return false;">    def self.generate_header(fs, file)</a><span class="cross-ref" id="XREF-938">
+<span class="cross-ref-title">    def self.generate_header(fs, file)</span>
+<a href="analyzer-library_functions-graphml_rb.html#line94">      2   analyzer/library_functions/graphml.rb:94 in '#&lt;Class:Graphml::Writer&gt;#generate_temp_header'</a>
+</span>
+</span><span class="run38"><a name="line121"></a>121       key = fs[:key]||Time.now.to_i
+</span><span class="run43"><a name="line122"></a>122 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-939'); return false;">      file.write(Graphml::header(key))</a><span class="cross-ref" id="XREF-939">
+<span class="cross-ref-title">      file.write(Graphml::header(key))</span>
+<a href="analyzer-library_functions-graphml_rb.html#line3">      2   #&lt;Class:Graphml&gt;#header at analyzer/library_functions/graphml.rb:3</a>
+</span>
+</span><a name="line123"></a>123     end
+<a name="line124"></a>124 
+<a name="line125"></a>125     #{:id =&gt; name, :for =&gt; [&quot;node&quot;||&quot;edge&quot;], :attr_name =&gt; name, :attr_type =&gt; type}
+<span class="run41"><a name="line126"></a>126 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-940'); return false;">    def self.generate_attribute_declarations(fs, file)</a><span class="cross-ref" id="XREF-940">
+<span class="cross-ref-title">    def self.generate_attribute_declarations(fs, file)</span>
+<a href="analyzer-library_functions-graphml_rb.html#line95">      2   analyzer/library_functions/graphml.rb:95 in '#&lt;Class:Graphml::Writer&gt;#generate_temp_header'</a>
+</span>
+</span><span class="run38"><a name="line127"></a>127       attribute_declarations = []
+<a name="line128"></a>128       classes_for_attributes = {:statuses_count =&gt; Fixnum, :followers_count =&gt; Fixnum, :friends_count =&gt; Fixnum, :style =&gt; String}
+<a name="line129"></a>129       fs[:node_attributes].each do |node_attribute|
+</span><span class="run49"><a name="line130"></a>130         attribute_declarations &lt;&lt; {:id =&gt; node_attribute, :for =&gt; :node, :attr_name =&gt; node_attribute.to_s.split(&quot;_&quot;).collect{|w| w.capitalize}.join(&quot; &quot;), :attr_type =&gt; classes_for_attributes[node_attribute]}
+</span><a name="line131"></a>131       end
+<span class="run38"><a name="line132"></a>132       fs[:edge_attributes].each do |edge_attribute|
+</span><span class="run43"><a name="line133"></a>133         attribute_declarations &lt;&lt; {:id =&gt; edge_attribute, :for =&gt; :edge, :attr_name =&gt; edge_attribute.to_s.split(&quot;_&quot;).collect{|w| w.capitalize}.join(&quot; &quot;), :attr_type =&gt; classes_for_attributes[edge_attribute]}
+</span><a name="line134"></a>134       end
+<span class="run43"><a name="line135"></a>135 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-941'); return false;">      file.write(Graphml::attribute_declarations(attribute_declarations))</a><span class="cross-ref" id="XREF-941">
+<span class="cross-ref-title">      file.write(Graphml::attribute_declarations(attribute_declarations))</span>
+<a href="analyzer-library_functions-graphml_rb.html#line7">      2   #&lt;Class:Graphml&gt;#attribute_declarations at analyzer/library_functions/graphml.rb:7</a>
+</span>
+</span><a name="line136"></a>136     end
+<a name="line137"></a>137 
+<span class="run41"><a name="line138"></a>138 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-942'); return false;">    def self.generate_nodes(fs, edges, file)</a><span class="cross-ref" id="XREF-942">
+<span class="cross-ref-title">    def self.generate_nodes(fs, edges, file)</span>
+<a href="analyzer-library_functions-graphml_rb.html#line101">      2   analyzer/library_functions/graphml.rb:101 in '#&lt;Class:Graphml::Writer&gt;#generate_temp_data'</a>
+</span>
+</span><span class="run56"><a name="line139"></a>139 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-943'); return false;">      node_names = edges.collect{|edge| [edge.start_node, edge.end_node]}.flatten.uniq</a><span class="cross-ref" id="XREF-943">
+<span class="cross-ref-title">      node_names = edges.collect{|edge| [edge.start_node, edge.end_node]}.flatten.uniq</span>
+     23   #&lt;Module:0x103c8bd20&gt;#end_node at /Library/Ruby/Gems/1.8/gems/dm-core-1.0.2/lib/dm-core/model/property.rb:215
+     23   #&lt;Module:0x103cb2768&gt;#start_node at /Library/Ruby/Gems/1.8/gems/dm-core-1.0.2/lib/dm-core/model/property.rb:215
+      1   DataMapper::Collection#each at /Library/Ruby/Gems/1.8/gems/dm-core-1.0.2/lib/dm-core/collection.rb:507
+</span>
+</span><span class="run43"><a name="line140"></a>140       node_names.each do |node_name|
+</span><span class="run60"><a name="line141"></a>141 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-944'); return false;">        node = {:id =&gt; node_name, :label =&gt; node_name}.merge(self.generate_node_metadata(fs,node_name))</a><span class="cross-ref" id="XREF-944">
+<span class="cross-ref-title">        node = {:id =&gt; node_name, :label =&gt; node_name}.merge(self.generate_node_metadata(fs,node_name))</span>
+<a href="analyzer-library_functions-graphml_rb.html#line155">     40   #&lt;Class:Graphml::Writer&gt;#generate_node_metadata at analyzer/library_functions/graphml.rb:155</a>
+</span>
+<a name="line142"></a>142 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-945'); return false;">        file.write(Graphml::node(node))</a><span class="cross-ref" id="XREF-945">
+<span class="cross-ref-title">        file.write(Graphml::node(node))</span>
+<a href="analyzer-library_functions-graphml_rb.html#line30">     40   #&lt;Class:Graphml&gt;#node at analyzer/library_functions/graphml.rb:30</a>
+</span>
+</span><a name="line143"></a>143       end
+<a name="line144"></a>144     end
+<a name="line145"></a>145 
+<span class="run41"><a name="line146"></a>146 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-946'); return false;">    def self.generate_edges(fs, edges, file)</a><span class="cross-ref" id="XREF-946">
+<span class="cross-ref-title">    def self.generate_edges(fs, edges, file)</span>
+<a href="analyzer-library_functions-graphml_rb.html#line104">      2   analyzer/library_functions/graphml.rb:104 in '#&lt;Class:Graphml::Writer&gt;#generate_temp_data'</a>
+</span>
+</span><span class="run43"><a name="line147"></a>147 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-947'); return false;">      edges.each do |edge|</a><span class="cross-ref" id="XREF-947">
+<span class="cross-ref-title">      edges.each do |edge|</span>
+      1   DataMapper::Collection#each at /Library/Ruby/Gems/1.8/gems/dm-core-1.0.2/lib/dm-core/collection.rb:507
+</span>
+</span><span class="run56"><a name="line148"></a>148 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-948'); return false;">        edge_data = {:id =&gt; edge.edge_id, :source =&gt; edge.start_node, :target =&gt; edge.end_node}.merge(self.generate_edge_metadata(fs, edge))</a><span class="cross-ref" id="XREF-948">
+<span class="cross-ref-title">        edge_data = {:id =&gt; edge.edge_id, :source =&gt; edge.start_node, :target =&gt; edge.end_node}.merge(self.generate_edge_metadata(fs, edge))</span>
+     23   #&lt;Module:0x103cb2768&gt;#start_node at /Library/Ruby/Gems/1.8/gems/dm-core-1.0.2/lib/dm-core/model/property.rb:215
+     23   #&lt;Module:0x103c8bd20&gt;#end_node at /Library/Ruby/Gems/1.8/gems/dm-core-1.0.2/lib/dm-core/model/property.rb:215
+     23   #&lt;Module:0x103c49768&gt;#edge_id at /Library/Ruby/Gems/1.8/gems/dm-core-1.0.2/lib/dm-core/model/property.rb:215
+<a href="analyzer-library_functions-graphml_rb.html#line170">     23   #&lt;Class:Graphml::Writer&gt;#generate_edge_metadata at analyzer/library_functions/graphml.rb:170</a>
+</span>
+<a name="line149"></a>149 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-949'); return false;">        file.write(Graphml::edge(edge_data))</a><span class="cross-ref" id="XREF-949">
+<span class="cross-ref-title">        file.write(Graphml::edge(edge_data))</span>
+<a href="analyzer-library_functions-graphml_rb.html#line51">     23   #&lt;Class:Graphml&gt;#edge at analyzer/library_functions/graphml.rb:51</a>
+</span>
+</span><a name="line150"></a>150       end
+<a name="line151"></a>151     end
+<a name="line152"></a>152 
+<a name="line153"></a>153     #SQL CALL GOTCHA: many attributes will need to make many calls to the database in the case for nodes (and to a lesser extent, edges)
+<a name="line154"></a>154     #This will make REALLY LONG generation times for large graphs, but may be unavoidable.
+<span class="run60"><a name="line155"></a>155 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-950'); return false;">    def self.generate_node_metadata(fs, node_name)</a><span class="cross-ref" id="XREF-950">
+<span class="cross-ref-title">    def self.generate_node_metadata(fs, node_name)</span>
+<a href="analyzer-library_functions-graphml_rb.html#line141">     40   analyzer/library_functions/graphml.rb:141 in '#&lt;Class:Graphml::Writer&gt;#generate_nodes'</a>
+</span>
+<a name="line156"></a>156       attributes = {:attributes =&gt; []}
+<a name="line157"></a>157       fs[:node_attributes].each do |node_attribute|
+</span><span class="run63"><a name="line158"></a>158         case node_attribute
+<a name="line159"></a>159         when :statuses_count
+</span><span class="run55"><a name="line160"></a>160 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-951'); return false;">          attributes[:attributes] &lt;&lt; {:statuses_count =&gt; User.first(:screen_name =&gt; node_name)&amp;&amp;User.first(:screen_name =&gt; node_name).statuses_count||nil}</a><span class="cross-ref" id="XREF-951">
+<span class="cross-ref-title">          attributes[:attributes] &lt;&lt; {:statuses_count =&gt; User.first(:screen_name =&gt; node_name)&amp;&amp;User.first(:screen_name =&gt; node_name).statuses_count||nil}</span>
+     31   DataMapper::Model#first at /Library/Ruby/Gems/1.8/gems/dm-core-1.0.2/lib/dm-core/model.rb:364
+      9   #&lt;Module:0x1033997d0&gt;#statuses_count at /Library/Ruby/Gems/1.8/gems/dm-core-1.0.2/lib/dm-core/model/property.rb:215
+</span>
+</span><span class="run60"><a name="line161"></a>161         when :followers_count
+</span><span class="run55"><a name="line162"></a>162 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-952'); return false;">          attributes[:attributes] &lt;&lt; {:followers_count =&gt; User.first(:screen_name =&gt; node_name)&amp;&amp;User.first(:screen_name =&gt; node_name).followers_count||nil}</a><span class="cross-ref" id="XREF-952">
+<span class="cross-ref-title">          attributes[:attributes] &lt;&lt; {:followers_count =&gt; User.first(:screen_name =&gt; node_name)&amp;&amp;User.first(:screen_name =&gt; node_name).followers_count||nil}</span>
+     31   DataMapper::Model#first at /Library/Ruby/Gems/1.8/gems/dm-core-1.0.2/lib/dm-core/model.rb:364
+      9   #&lt;Module:0x103662e30&gt;#followers_count at /Library/Ruby/Gems/1.8/gems/dm-core-1.0.2/lib/dm-core/model/property.rb:215
+</span>
+<a name="line163"></a>163         when :friends_count
+<a name="line164"></a>164 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-953'); return false;">          attributes[:attributes] &lt;&lt; {:friends_count =&gt; User.first(:screen_name =&gt; node_name)&amp;&amp;User.first(:screen_name =&gt; node_name).friends_count||nil}</a><span class="cross-ref" id="XREF-953">
+<span class="cross-ref-title">          attributes[:attributes] &lt;&lt; {:friends_count =&gt; User.first(:screen_name =&gt; node_name)&amp;&amp;User.first(:screen_name =&gt; node_name).friends_count||nil}</span>
+     31   DataMapper::Model#first at /Library/Ruby/Gems/1.8/gems/dm-core-1.0.2/lib/dm-core/model.rb:364
+      9   #&lt;Module:0x1034acd98&gt;#friends_count at /Library/Ruby/Gems/1.8/gems/dm-core-1.0.2/lib/dm-core/model/property.rb:215
+</span>
+</span><a name="line165"></a>165         end
+<a name="line166"></a>166       end
+<span class="run65"><a name="line167"></a>167       attributes
+</span><a name="line168"></a>168     end
+<a name="line169"></a>169 
+<span class="run56"><a name="line170"></a>170 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-954'); return false;">    def self.generate_edge_metadata(fs, edge)</a><span class="cross-ref" id="XREF-954">
+<span class="cross-ref-title">    def self.generate_edge_metadata(fs, edge)</span>
+<a href="analyzer-library_functions-graphml_rb.html#line148">     23   analyzer/library_functions/graphml.rb:148 in '#&lt;Class:Graphml::Writer&gt;#generate_edges'</a>
+</span>
+<a name="line171"></a>171       attributes = {:attributes =&gt; []}
+<a name="line172"></a>172       fs[:edge_attributes].each do |edge_attribute|
+<a name="line173"></a>173         case edge_attribute
+<a name="line174"></a>174         when :style
+<a name="line175"></a>175 <a class="crossref-toggle" href="#" onclick="toggleCode('XREF-955'); return false;">          attributes[:attributes] &lt;&lt; {:style =&gt; edge.style}</a><span class="cross-ref" id="XREF-955">
+<span class="cross-ref-title">          attributes[:attributes] &lt;&lt; {:style =&gt; edge.style}</span>
+     23   #&lt;Module:0x103b8d5e0&gt;#style at /Library/Ruby/Gems/1.8/gems/dm-core-1.0.2/lib/dm-core/model/property.rb:215
+</span>
+</span><a name="line176"></a>176         end
+<a name="line177"></a>177       end
+<span class="run61"><a name="line178"></a>178       attributes
+</span><a name="line179"></a>179     end
+<a name="line180"></a>180   end
+<a name="line181"></a>181 end
+</pre><hr/>
+    <p>Generated using the <a href='http://eigenclass.org/hiki.rb?rcov'>rcov code coverage analysis tool for Ruby</a>
+   version 0.8.2.1.</p>
+<p><a href='http://validator.w3.org/check/referer'><img src='http://www.w3.org/Icons/valid-xhtml10' height='31' alt='Valid XHTML 1.0!' width='88'/>
+        </a>
+      <a href='http://jigsaw.w3.org/css-validator/check/referer'><img src='http://jigsaw.w3.org/css-validator/images/vcss' alt='Valid CSS!' style='border:0;width:88px;height:31px'/>
+        </a>
+      </p>
+    </body>
+  </html>

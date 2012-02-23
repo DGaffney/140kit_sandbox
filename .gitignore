@@ -1,0 +1,13 @@
+*.log
+*.yml
+*.DS_Store
+*.zip
+*.sqlite
+*.sql
+
+slave/tmp_files/
+slave/config/database.yml
+api/script/*
+front-end/public/images/0000/*
+front-end/public/files/source_data/*
+front-end/vendor/plugins/newrelic_rpm/*

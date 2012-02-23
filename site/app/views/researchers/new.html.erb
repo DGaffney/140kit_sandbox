@@ -1,0 +1,15 @@
+<%= error_messages_for @researcher %>
+<%= form_for @researcher, :action => url(:researchers) do %>
+  <p>
+    <%= text_field :user_name, :label => "User Name" %>
+  </p>
+  <p>
+    <%= password_field :password, :label => "Password" %>
+  </p>
+  <p>
+    <%= password_field :password_confirmation, :label => "Password Confirmation" %>
+  </p>
+  <p>
+    <%= submit "Sign up" %>
+  </p>
+<% end =%>

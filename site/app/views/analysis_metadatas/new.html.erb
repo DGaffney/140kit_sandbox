@@ -1,0 +1,56 @@
+<h1>Adding <%= link_to @analytical_offering.title, url(:analytical_offering, @analytical_offering) %> to <%= link_to @curation.name, url(:curation, @curation) %></h1>
+<h2>About this analytic</h2>
+<ul>
+  <li>Created By: <%= link_to @analytical_offering.created_by, @analytical_offering.created_by_link, :target => "_blank" %></li>
+  <li>Language: <%= @analytical_offering.language %></li>
+  <li>Requires access level of: <%= @analytical_offering.access_level %></li>
+  <li>Uses REST API: <%= @analytical_offering.rest %></li>
+  <li><%= link_to "View source", @analytical_offering.source_code_link, :target => "_blank" %></li>
+</ul>
+<p><%= @analytical_offering.description %></p>
+<h1>Add this analytic</h1>
+<% if @reasons %>
+  <h2>Sorry,</h2>
+  <p>It looks like there were some issues with your inputs for the analytic. Please review and revise.</p>
+<% end %>
+<% if params[:unique] %>
+  <h2>Sorry,</h2>
+  <p>There is currently an analysis of identical value already stored for this curation. You can only have one analytic per curation given an identical set of variables.</p>
+<% end %>
+<%= form_for :temp_analysis_metadata, :action => :verify do %>
+  <% 
+    default_values = @analysis_metadata.set_variables 
+    user_modifiable_variables = @analytical_offering.variables.select{|variable| variable.user_modifiable}
+    non_user_modifiable_variables = @analytical_offering.variables.select{|variable| !variable.user_modifiable}
+  %>
+  <% if !user_modifiable_variables.empty? %>
+    <h2>User Modifiable Variables</h2>
+    <% for variable in user_modifiable_variables %>
+      <p>
+        Name: <%= variable.name %><br />
+        <%= variable.description %><br />
+        <% if @reasons %>
+          <span style="color:red">
+            Problem encountered: <%= @reasons.select{|reason| reason[:analytical_offering_variable_descriptor_id] == variable.id}.first[:reason] %><br />
+            Your original input: <%= @reasons.select{|reason| reason[:analytical_offering_variable_descriptor_id] == variable.id}.first[:variable] %><br />
+          </span>
+        <% end %>
+        <%= text_field "var_#{variable.id.to_s}".to_sym, :value => params["var_#{variable.id.to_s}".to_sym] %>
+      </p>
+    <% end %>
+  <% end %>
+  <% if !non_user_modifiable_variables.empty? %>
+    <h2>System Variables</h2>
+    <b>Note: These variables are non-modifiable, and are shown simply to illustrate which variables will be sent into the analytical process</b>
+    <% for variable in non_user_modifiable_variables %>
+      <p>
+        <%= text_field "var_#{variable.id.to_s}".to_sym, :readonly => "text", :value => default_values.select{|value| value.analytical_offering_variable_descriptor_id == variable.id}.first.value, :label => variable.name %>
+        <br /><%= variable.description %><br />
+      </p>
+    <% end %>
+  <% end %>
+  <%= hidden_field :curation_id, :value => @curation.id %>
+  <%= hidden_field :analytical_offering_id, :value => @analytical_offering.id %>
+  <%= submit 'Save Post' %> or <%= link_to 'Cancel', url(:curation, @curation) %>
+<% end =%>
+

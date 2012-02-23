@@ -1,0 +1,1 @@
+../../../slave/models/analytical_offering.rb

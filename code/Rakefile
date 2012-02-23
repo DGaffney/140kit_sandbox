@@ -1,0 +1,41 @@
+require 'rubygems'
+require 'rake'
+
+begin
+  gem 'jeweler', '~> 1.5.2'
+  require 'jeweler'
+
+  Jeweler::Tasks.new do |gem|
+    gem.name        = '140kit_slave'
+    gem.summary     = 'Twitter data pulling/management/analysis'
+    gem.description = gem.summary
+    gem.email       = '140kit@gmail.com'
+    gem.homepage    = 'http://140kit.com/'
+    gem.authors     = [ 'Devin Gaffney', 'Ian Pearce' ]
+    gem.has_rdoc    = 'yard'
+
+    gem.rubyforge_project = '140kit'
+  end
+
+  Jeweler::GemcutterTasks.new
+
+  FileList['tasks/**/*.rake'].each { |task| import task }
+rescue LoadError
+  puts 'Jeweler (or a dependency) not available. Install it with: gem install jeweler -v 1.5.2'
+end
+
+desc "Setup your environment"
+task :set_up do
+  Sh::sh("bundle install")
+  Rake::Task["db:migrate"].execute
+  Rake::Task["db:seed"].execute
+end
+
+desc "Load up environment and start a console"
+task :load => :environment do
+  require 'irb'
+  ARGV.clear
+  IRB.start
+end
+
+task :environment => "environment:load"

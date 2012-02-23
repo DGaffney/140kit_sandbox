@@ -1,0 +1,30 @@
+= 140kit Slave processes
+
+The code in this section of the app is the real meat of the project - the sites merely use data stored as a result of these processes, which are split into two groups, Workers and Streamers
+
+The Streamers are responsible for the collection of data via the Twitter API, and the Workers generate analytical information as a result of these collection processes.
+
+== How to install
+
+To user this code, cd to the slave directory, and run the following commands to get your system up to speed:
+
+  bundle install
+  
+Then, you'll need to create a mysql table - unfortunately we can't do that automagically.
+
+After making the table, update your config/database.yml to reflect that. 
+
+run these rake commands:
+rake
+rake db:migrate
+rake db:seed
+rake curation:new
+
+
+After following the prompts therein, continue on by running a streaming instance to collect tweets for you:
+
+ruby streamer.rb
+
+And after that process is complete, start up a worker to analyze the data:
+
+ruby worker.rb

@@ -1,0 +1,2 @@
+describe Entity do
+end

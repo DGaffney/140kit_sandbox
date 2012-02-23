@@ -1,0 +1,8 @@
+<h1>Analytical Offering: <%= @analytical_offering.title %></h1>
+<p><%= @analytical_offering.description %></p>
+<ul>
+  <li>Function Name: <%= @analytical_offering.function %></li>
+  <li>Language: <%= @analytical_offering.language %></li>
+  <li>Written By: <%= link_to @analytical_offering.created_by, @analytical_offering.created_by_link %></li>
+  <li><%= link_to "View Source Code", @analytical_offering.source_code_link %></li>
+</ul>

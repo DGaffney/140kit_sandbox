@@ -1,0 +1,195 @@
+<% 
+def options_for(graph)
+  case graph.title
+  when "location_avg_followers_counts"
+    "{title: 'Overview', titleX: 'Length', titleY: 'Average', height: 500, width:915, region: 'world', dataMode: 'markers'}"
+  when "location_avg_friends_counts"
+    "{title: 'Overview', titleX: 'Length', titleY: 'Average', height: 500, width:915, region: 'world', dataMode: 'markers'}"
+  when "location_avg_statuses_counts"
+    "{title: 'Overview', titleX: 'Length', titleY: 'Average', height: 500, width:915, region: 'world', dataMode: 'markers'}"
+  when "location_sum_followers_counts"
+    "{title: 'Overview', titleX: 'Length', titleY: 'Average', height: 500, width:915, region: 'world', dataMode: 'markers'}"
+  when "location_sum_friends_counts"
+    "{title: 'Overview', titleX: 'Length', titleY: 'Average', height: 500, width:915, region: 'world', dataMode: 'markers'}"
+  when "location_sum_statuses_counts"
+    "{title: 'Overview', titleX: 'Length', titleY: 'Average', height: 500, width:915, region: 'world', dataMode: 'markers'}"
+  else
+    "{title: 'Overview', titleX: 'Length', titleY: 'Average', height: 500, width:915, is3D: true, curveType: 'function', Vaxis: {minValue: 0.0}}"
+  end
+end
+
+def chart_type_for(graph)
+  case graph.title
+  when "tweets_per_minute"
+    "AnnotatedTimeLine"
+  when "retweets_per_minute"
+    "AnnotatedTimeLine"    
+  when "location_avg_followers_counts"
+    "GeoMap"
+  when "location_avg_friends_counts"
+    "GeoMap"
+  when "location_avg_statuses_counts"
+    "GeoMap"
+  when "location_sum_followers_counts"
+    "GeoMap"
+  when "location_sum_friends_counts"
+    "GeoMap"
+  when "location_sum_statuses_counts"
+    "GeoMap"
+  when "followers_count_friends_count"
+    "ScatterChart"
+  when "followers_count_statuses_count"
+    "ScatterChart"
+  when "friends_count_statuses_count"
+    "ScatterChart"
+  when "followers_per_day"
+    "ScatterChart"
+  when "friends_per_day"
+    "ScatterChart"
+  when "statuses_per_day"
+    "ScatterChart"
+  when "followers_per_day_avg_friends_per_day_avg"
+    "ScatterChart"
+  when "followers_per_day_avg_statuses_per_day_avg"
+    "ScatterChart"
+  when "friends_per_day_avg_statuses_per_day_avg"
+    "ScatterChart"
+  when "avg_followers_counts_avg_friends_counts"
+    "ScatterChart"
+  when "avg_followers_counts_avg_statuses_counts"
+    "ScatterChart"
+  when "avg_friends_counts_avg_statuses_counts"
+    "ScatterChart"
+  when "sum_followers_counts_sum_friends_counts"
+    "ScatterChart"
+  when "sum_followers_counts_sum_statuses_counts"
+    "ScatterChart"
+  when "sum_friends_counts_sum_statuses_counts"
+    "ScatterChart"
+  else "LineChart"
+  end
+end
+
+def params_for(graph)
+  case graph.title
+  when "tweets_per_minute"
+    "?x_class=datetime"
+  when "retweets_per_minute"
+    "?x_class=datetime"
+  when "followers_count_friends_count"
+    "?x_class=number"
+  when "followers_count_statuses_count"
+    "?x_class=number"
+  when "friends_count_statuses_count"
+    "?x_class=number"
+  when "followers_per_day"
+    "?x_class=number"
+  when "friends_per_day"
+    "?x_class=number"
+  when "statuses_per_day"
+    "?x_class=number"
+  when "followers_per_day_avg_friends_per_day_avg"
+    "?x_class=number"
+  when "followers_per_day_avg_statuses_per_day_avg"
+    "?x_class=number"
+  when "friends_per_day_avg_statuses_per_day_avg"
+    "?x_class=number"
+  when "followers_per_day_avg_friends_per_day_avg"
+    "?x_class=number"
+  when "followers_per_day_avg_statuses_per_day_avg"
+    "?x_class=number"
+  when "friends_per_day_avg_statuses_per_day_avg"
+    "?x_class=number"
+  when "avg_followers_counts_avg_friends_counts"
+    "?x_class=number"
+  when "avg_followers_counts_avg_statuses_counts"
+    "?x_class=number"
+  when "avg_friends_counts_avg_statuses_counts"
+    "?x_class=number"
+  when "sum_followers_counts_sum_friends_counts"
+    "?x_class=number"
+  when "sum_followers_counts_sum_statuses_counts"
+    "?x_class=number"
+  when "sum_friends_counts_sum_statuses_counts"
+    "?x_class=number"
+  end
+end
+
+def sort_js_for(graph)
+  case graph.title
+  when "tweets_per_minute"
+    "
+    for (i = 0; i<data.getNumberOfRows(); i++){
+      data.setValue(i, 0, new Date(data.getValue(i,0)));
+    }
+    var rowInds = data.getSortedRows([{column: 0}]).reverse();
+    var view = new google.visualization.DataView(data);
+    view.setRows(rowInds);"
+  when "retweets_per_minute"
+    "
+    for (i = 0;i<data.getNumberOfRows();i++){
+      data.setValue(i,0, new Date(data.getValue(i,0)));
+    }
+    var rowInds = data.getSortedRows([{column: 0}]).reverse();
+    var view = new google.visualization.DataView(data);
+    view.setRows(rowInds);"
+  when "location_avg_followers_counts"
+    "    var view = new google.visualization.DataView(data);"
+  when "location_avg_friends_counts"
+    "    var view = new google.visualization.DataView(data);"
+  when "location_avg_statuses_counts"
+    "    var view = new google.visualization.DataView(data);"
+  when "location_sum_followers_counts"
+    "    var view = new google.visualization.DataView(data);"
+  when "location_sum_friends_counts"
+    "    var view = new google.visualization.DataView(data);"
+  when "location_sum_statuses_counts"
+    "    var view = new google.visualization.DataView(data);"
+  else
+    "var rowInds = data.getSortedRows([{column: 1}]).reverse();
+    var view = new google.visualization.DataView(data);
+    view.setRows(rowInds);"
+  end
+end
+
+def warning_message_for(graph)
+  case graph.title
+  when "location_avg_followers_counts"
+    return "<b>Warning: this view may take a long time to load, as it has to query Google's location API for the locations.</b>"
+  when "location_avg_friends_counts"
+    return "<b>Warning: this view may take a long time to load, as it has to query Google's location API for the locations.</b>"
+  when "location_avg_statuses_counts"
+    return "<b>Warning: this view may take a long time to load, as it has to query Google's location API for the locations.</b>"
+  when "location_sum_followers_counts"
+    return "<b>Warning: this view may take a long time to load, as it has to query Google's location API for the locations.</b>"
+  when "location_sum_friends_counts"
+    return "<b>Warning: this view may take a long time to load, as it has to query Google's location API for the locations.</b>"
+  when "location_sum_statuses_counts"
+    return "<b>Warning: this view may take a long time to load, as it has to query Google's location API for the locations.</b>"
+  end
+end
+%>
+<script type="text/javascript"> 
+  function init() {
+    <% for graph in @analysis_metadata.graphs %>
+      $.ajax({
+              url: "/graphs/google/<%= graph.id %>.json<%= params_for(graph) %>",
+              type: "GET",
+              success: function (json) {
+                      var data = new google.visualization.DataTable(json);
+                      <%= sort_js_for(graph) %>
+                      var chart = new google.visualization.<%= chart_type_for(graph) %>(document.getElementById('graphDraw_<%= graph.title %>'));
+                      chart.draw(view,<%= options_for(graph) %>);
+              }
+      });
+    <% end %>
+  }    
+
+  google.setOnLoadCallback(init);
+
+</script>
+<h2><%= link_to "Download .zip of charts", @analysis_metadata.zip_download_url %></h2>
+<% for graph in @analysis_metadata.graphs %>
+  <h1><%= graph.title.to_capitals %></h1>
+	<div id="graphDraw_<%= graph.title %>" style="height:500px;width:915px;"><%= warning_message_for(graph) %></div> 
+<% end %>
