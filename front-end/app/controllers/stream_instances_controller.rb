@@ -1,2 +1,0 @@
-class StreamInstancesController < ApplicationController
-end

@@ -1,2 +1,0 @@
-class AnalyticalInstancesController < ApplicationController
-end
