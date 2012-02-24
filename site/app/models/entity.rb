@@ -1,1 +1,0 @@
-../../../slave/models/entity.rb

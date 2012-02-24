@@ -1,1 +1,0 @@
-../../../slave/models/auth_user.rb

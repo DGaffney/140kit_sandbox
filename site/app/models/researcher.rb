@@ -1,1 +1,0 @@
-../../../slave/models/researcher.rb
