@@ -1,6 +1,7 @@
 class Researcher
   include DataMapper::Resource
   property :id, Serial
+  property :name, String
   property :user_name, String, :format => /[A-Za-z0-9_]*/, :length => 3..40
   property :email, Text, :default => "user@localhost.com", :format => :email_address
   property :reset_code, String

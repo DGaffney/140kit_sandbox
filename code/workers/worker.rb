@@ -40,11 +40,21 @@ class Worker < Instance
   
   def work_routine
     @curation = select_curation
-    update_counts
-    update_curation
     #clean_orphans
     do_analysis_jobs
+    switch_curation_statuses
     @curation.unlock if @curation
+  end
+  
+  def switch_curation_statuses
+    statuses = ["tsv_storing", "tsv_stored", "needs_import", "imported", "needs_drop", "dropped"]
+    Curation.all(:status.not => ["imported", "tsv_stored", "dropped"]).each do |curation|
+      datasets = curation.datasets
+      if datasets.length == datasets.collect{|x| x.status if x.status == statuses[statuses.index(curation.status)+1]}
+        curation.status = statuses[statuses.index(curation.status)+1] 
+        curation.save!
+      end
+    end
   end
   
   def select_curation
@@ -55,30 +65,6 @@ class Worker < Instance
       return curation if curation.owned_by_me?
     end
     return nil
-  end
-  
-  def update_counts
-    puts "update_counts..."
-    for dataset in Dataset.all(:scrape_finished => false)
-      dataset.tweets_count = Tweet.count(:dataset_id => dataset.id)
-      dataset.entities_count = Entity.count(:dataset_id => dataset.id)
-      dataset.users_count = User.count(:dataset_id => dataset.id)
-      dataset.save
-    end
-  end
-  
-  def update_curation
-    puts "update_curation..."
-    if @curation
-      for dataset in @curation.datasets
-        if dataset.users_count != User.count(:dataset_id => dataset.id)
-          dataset.tweets_count = Tweet.count(:dataset_id => dataset.id)
-          dataset.entities_count = Entity.count(:dataset_id => dataset.id)
-          dataset.users_count = User.count(:dataset_id => dataset.id)
-          dataset.save!
-        end
-      end
-    end
   end
   
   def clean_orphans

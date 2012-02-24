@@ -109,42 +109,31 @@ class Filter < Instance
   
   def collect
     puts "Collecting: #{params_for_stream.inspect}"
-#    begin
-      client = TweetStream::Client.new
-      client.on_interval(CHECK_FOR_NEW_DATASETS_INTERVAL) { 
-        time = @start_time
-	datasets = @datasets
-#	rsyncing_fork = fork do 
-        Thread.new do
-	  rsync_previous_files(datasets, time)
-        end
-#	Process.detach(rsyncing_fork)
-	@start_time = Time.now
-	puts "Switching to new files..."
-	client.stop if add_datasets 
-      }
-      client.on_limit { |skip_count| puts "\nWe are being rate limited! We lost #{skip_count} tweets!\n" }
-      client.on_error { |message| puts "\nError: #{message}\n";client.stop }
-      client.filter(params_for_stream) do |tweet|
-  #      puts "[tweet] #{tweet[:user][:screen_name]}: #{tweet[:text]}"
-        print "."
-        @queue << tweet
-        if @queue.length >= BATCH_SIZE
-          tmp_queue = @queue
-          @queue = []
-          Thread.new do
-            save_queue(tmp_queue)
- e         end
-#          Process.detach(saving_fork)
-        end
-#        if @next_dataset_ends
-#          client.stop if U.times_up?(@next_dataset_ends)
-#        end
+    client = TweetStream::Client.new
+    client.on_interval(CHECK_FOR_NEW_DATASETS_INTERVAL) { 
+      time = @start_time
+      datasets = @datasets
+      Thread.new do
+        rsync_previous_files(datasets, time)
       end
-#      save_queue
-#    rescue
-#	retry
-#    end
+      @start_time = Time.now
+      puts "Switching to new files..."
+      client.stop if add_datasets 
+    }
+    client.on_limit { |skip_count| puts "\nWe are being rate limited! We lost #{skip_count} tweets!\n" }
+    client.on_error { |message| puts "\nError: #{message}\n";client.stop }
+    client.filter(params_for_stream) do |tweet|
+      # puts "[tweet] #{tweet[:user][:screen_name]}: #{tweet[:text]}"
+      print "."
+      @queue << tweet
+      if @queue.length >= BATCH_SIZE
+        tmp_queue = @queue
+        @queue = []
+        Thread.new do
+          save_queue(tmp_queue)
+        end
+      end
+    end
   end
   
   def params_for_stream
@@ -155,7 +144,7 @@ class Filter < Instance
   
   def save_queue(tmp_queue)
     if !tmp_queue.empty?
-      puts "Saving #{@queue.length} tweets."
+      print "|"
       tweets, users, entities, geos, coordinates = data_from_queue(tmp_queue)
       dataset_ids = tweets.collect{|t| t[:dataset_id]}.uniq
       dataset_ids.each do |dataset_id|
@@ -267,24 +256,6 @@ class Filter < Instance
     return (l_lon_range.include?(lon) && l_lat_range.include?(lat))
   end
   
-  # def in_bounding_box?(location_params)
-  #   t = self[:place][:bounding_box][:coordinates].first
-  #   s = location_params.split(",").map {|c| c.to_f }
-  #   a = { :left => t[0][0],
-  #         :bottom => t[0][1],
-  #         :right => t[2][0],
-  #         :top => t[2][1] }
-  #   b = { :left => s[0],
-  #         :bottom => s[1],
-  #         :right => s[2],
-  #         :top => s[3] }
-  #   abxdif = ((a[:left]+a[:right])-(b[:left]+b[:right])).abs
-  #   abydif = ((a[:top]+a[:bottom])-(b[:top]+b[:bottom])).abs
-  #   xdif = (a[:right]+b[:right])-(a[:left]+b[:left])
-  #   ydif = (a[:top]+b[:top])-(a[:bottom]+b[:bottom])
-  #   return (abxdif <= xdif && abydif <= ydif)
-  # end
-  
   def add_datasets
     datasets = Dataset.unlocked.all(:scrape_finished => false, :scrape_type => @scrape_type)
     return claim_new_datasets(datasets)
@@ -340,7 +311,7 @@ class Filter < Instance
     if !finished_datasets.empty?
       puts "Finished collecting "+finished_datasets.collect {|d| "#{d.scrape_type}:\"#{d.internal_params_label}\"" }.join(", ")
       # Dataset.update_all({:scrape_finished => true}, {:id => finished_datasets.collect {|d| d.id}})
-      Dataset.all(:id => finished_datasets.collect {|d| d.id}).update(:scrape_finished => true)
+      Dataset.all(:id => finished_datasets.collect {|d| d.id}).update(:scrape_finished => true, :status => "tsv_stored")
       @datasets -= finished_datasets
       finished_datasets.collect{|dataset| dataset.unlock}
     end
@@ -351,5 +322,3 @@ end
 filter = Filter.new
 filter.username = "dgaff"
 filter.filt
-
-

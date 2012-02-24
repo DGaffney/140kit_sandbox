@@ -20,7 +20,18 @@ module Sh
     when "remote"
       result = self.bt("ssh #{STORAGE["user"]}@#{STORAGE["host"]} '#{command}'").split("\n")
     end
-    return result    
+    return result
+  end
+  
+  def self.storage_ls(path="")
+    result = nil
+    case STORAGE["type"]
+    when "local"
+      result = self.bt("ls #{STORAGE["path"]}/#{path}").split("\n")
+    when "remote"
+      result = self.bt("ssh #{STORAGE["user"]}@#{STORAGE["host"]} 'ls #{STORAGE["path"]}/#{path}'").split("\n")
+    end
+    return result
   end
   
   def self.bt(command)
@@ -63,15 +74,6 @@ module Sh
     self.bt("ls #{folder_location}").split("\n")
   end
   
-  def self.storage_ls(folder_location, location=STORAGE["type"])
-    case location
-    when "local"
-      Sh::bt("ls #{folder_location}").split("\n")
-    when "remote"
-      Sh::bt("ssh #{STORAGE["user"]}@#{STORAGE["host"]} 'ls #{folder_location}'").split("\n")
-    end
-  end  
-  
   def self.decompress(file, to_location=".")
     existing_files = Sh::resolve_all_files(File.dirname(file))
     case File.extname(file)
@@ -98,6 +100,21 @@ module Sh
   
   def self.compression_types
     return [".zip", ".tar.gz", ".gz"]
+  end
+  
+  def self.pull_file_from_storage(path)
+    location = ""
+    case STORAGE["type"]
+    when "local"
+      Sh::mkdir("#{ENV["TMP_PATH"]}/#{path.split("/")[0..-2].join("/")}", "local")
+      Sh::sh("cp #{path} #{ENV["TMP_PATH"]}/#{path.split("/").last}")
+      location = "#{ENV["TMP_PATH"]}/#{path.split("/").last}"
+    when "remote"
+      Sh::mkdir("#{ENV["TMP_PATH"]}/#{path.split("/")[0..-2].join("/")}", "local")
+      Sh::sh("rsync #{STORAGE["user"]}@#{STORAGE["host"]}:#{STORAGE["path"]}/#{path} #{ENV["TMP_PATH"]}/#{path}")
+      location = "#{ENV["TMP_PATH"]}/#{path}"
+    end
+    return location
   end
   
   def self.resolve_all_files(folders)
