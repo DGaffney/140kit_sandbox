@@ -1,0 +1,34 @@
+/* .row*/
+  .span6.offset3
+    h2 Researchers
+    p
+      table.table
+        /* .table-striped*/
+        /* .table-bordered*/
+        thead
+          tr
+            /* th #*/
+            th Name
+            th Twitter
+            th Datasets
+        tbody
+          - @researchers.each_with_index do |researcher, i|
+            tr
+              /* td = i+1*/
+              td = link_to researcher.name, researcher
+              /* td = link_to researcher.user_name, researcher.twitter_url*/
+              td = link_to_twitter researcher
+              td = researcher.curations_count
+
+- @researchers.each_slice(4) do |slice|
+  .row
+    - for researcher in slice
+      .span3
+        .well
+          img.pull-left.twitter-pic src=researcher.twitter_pic(:normal)
+          h4 = link_to researcher.name, researcher
+          p = link_to_twitter researcher
+          p
+            strong #{researcher.curations_count}
+            |  Dataset#{'s' if researcher.curations_count != 1}
+
