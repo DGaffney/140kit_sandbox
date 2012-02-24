@@ -1,0 +1,181 @@
+/*
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, vendor/assets/stylesheets,
+ * or vendor/assets/stylesheets of plugins, if any, can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the top of the
+ * compiled file, but it's generally better to create a new file per style scope.
+ *
+ *= require_self
+ * require twitter/bootstrap
+ * require styles
+ * require_tree .
+*/
+
+// @import "twitter/bootstrap";
+
+// CSS Reset
+@import "twitter/bootstrap/reset";
+// Core variables and mixins
+@import "twitter/bootstrap/variables";
+@import "twitter/bootstrap/mixins";
+// Grid system and page structure
+@import "twitter/bootstrap/scaffolding";
+@import "twitter/bootstrap/grid";
+@import "twitter/bootstrap/layouts";
+// Base CSS
+@import "twitter/bootstrap/type";
+@import "twitter/bootstrap/code";
+@import "twitter/bootstrap/forms";
+@import "twitter/bootstrap/tables";
+// Components: common
+@import "twitter/bootstrap/sprites";
+// @import "twitter/bootstrap/dropdowns";
+@import "twitter/bootstrap/wells";
+@import "twitter/bootstrap/component-animations";
+@import "twitter/bootstrap/close";
+// Components: Buttons & Alerts
+@import "twitter/bootstrap/buttons";
+@import "twitter/bootstrap/button-groups";
+@import "twitter/bootstrap/alerts"; // Note: alerts share common CSS with buttons and thus have styles in buttons
+// Components: Nav
+@import "twitter/bootstrap/navs";
+@import "twitter/bootstrap/navbar";
+// @import "twitter/bootstrap/breadcrumbs";
+// @import "twitter/bootstrap/pagination";
+// @import "twitter/bootstrap/pager";
+// Components: Popovers
+// @import "twitter/bootstrap/modals";
+// @import "twitter/bootstrap/tooltip";
+// @import "twitter/bootstrap/popovers";
+// Components: Misc
+// @import "twitter/bootstrap/thumbnails";
+// @import "twitter/bootstrap/labels";
+// @import "twitter/bootstrap/progress-bars";
+// @import "twitter/bootstrap/accordion";
+// @import "twitter/bootstrap/carousel";
+@import "twitter/bootstrap/hero-unit";
+// Utility classes
+@import "twitter/bootstrap/utilities"; // Has to be last to override when necessary
+
+
+// CUSTOM STYLES //
+
+// @navbarLinkColor: @gray;
+// @navbarLinkColorHover: @stripeColor;
+// @navbarLinkColorActive: fade(@stripeColor, 80%);
+
+// @navbarLinkColorHover: desaturate(@stripeColor, 30%);
+@navbarLinkColorHover: @stripeColorDark;
+@navbarLinkColor: @stripeColor;
+@navbarLinkColorActive: @gray;
+
+@navbarLinkSize: 13px;
+@brandFontSize: 22px;
+@navbarHeight: 34px;
+@navbarBackground: #dddddd;
+@navbarBackgroundHighlight: lighten(@navbarBackground, 5%);
+@stripeColor: #496bbe;
+@stripeColorDark: #30477C;
+
+@gridColumnWidth: 58px;
+
+h1, h2, h3, h4, h5, h6 {
+  text-shadow: 0 1px 0 @white;
+}
+
+body {
+  padding-top: 0px;
+  background: #f0f0f0;
+  // background: #899CC9;
+}
+
+#main {
+  padding: 60px 30px 10px;
+  background: #fdfdfd;
+  // .border-radius(6px);
+  // .box-shadow;
+}
+
+.twitter-pic {
+  margin-right: 10px;
+  // .box-shadow;
+}
+
+.navbar-fixed-top {
+  position: absolute;
+}
+
+.navbar-inner {
+  .box-shadow(none);
+  overflow: hidden;
+}
+
+.navbar .brand {
+  font-weight: normal;
+  font-size: @brandFontSize;
+  // color: @navbarLinkColor;
+  color: @stripeColorDark;
+  text-shadow: 0 1px 0 @white;
+  margin-left: 5px;
+  padding: floor((@navbarHeight - @brandFontSize) / 2) 20px;
+  line-height: @brandFontSize;
+  &:hover {
+    color: @stripeColor;
+  }
+  &:active {
+    color: @navbarLinkColorActive;
+  }
+}
+
+.stripe {
+  width: 25px;
+  height: @navbarHeight;
+  background: @stripeColor;
+  #gradient > .vertical(lighten(@stripeColor, 5%), @stripeColor);
+  float: left;
+  .skew(-45deg);
+  .box-shadow;
+}
+
+.navbar .nav > li > a:hover {
+  background: transparent;
+  // color: fade(@stripeColor, 80%);
+  // background: fadeOut(@stripeColor, 95%);
+}
+
+.navbar .nav .active > a, .navbar .nav .active > a:hover {
+  background: transparent;
+  color: @navbarLinkColorHover;
+  // color: @stripeColor;
+  // background: fadeOut(@stripeColor, 95%);
+  #gradient > .vertical(darken(@navbarBackground, 5%), @navbarBackground);
+  &:active {
+    #gradient > .vertical(darken(@navbarBackground, 5%), @navbarBackground);
+    color: @navbarLinkColorActive;
+  }
+}
+
+.navbar .nav > li > a {
+  font-size: @navbarLinkSize;
+  line-height: @navbarLinkSize;
+  padding: floor((@navbarHeight - @navbarLinkSize) / 2) 20px ;
+  // margin: 0 0 0 1px;
+  text-shadow: 0 1px 0 @white;
+  &:hover {
+    background: transparent;
+    color: @navbarLinkColorHover;
+    #gradient > .vertical(darken(@navbarBackground, 5%), @navbarBackground);
+  }
+  &:active {
+    color: @navbarLinkColorActive;
+    #gradient > .vertical(darken(@navbarBackground, 5%), @navbarBackground);
+  }
+}
+
+/* .nav li a { padding:0; }*/
+/* .navbar .nav > li > a { padding:0px 0 1px; }*/
+/* .navbar .brand { padding:0 }*/
+/* .row-padded20 { padding-top:20px; padding-bottom:20px; }*/
+/* .row { padding-top:20px; padding-bottom:20px; }*/
+/* .row { margin-bottom:40px; }*/
+/* .align-center { text-align:center; }*/

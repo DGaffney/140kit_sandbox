@@ -11,3 +11,8 @@ api/script/*
 front-end/public/images/0000/*
 front-end/public/files/source_data/*
 front-end/vendor/plugins/newrelic_rpm/*
+*/config/initializers/secret_token.rb
+*/config/initializers/omniauth.rb
+*/public/assets/*
+*/public/css/*
+*/public/js/*

@@ -1,0 +1,11 @@
+- curations ||= @curations
+table.table.table-striped.table-bordered
+  thead
+    tr
+      th Name
+      th Created
+  tbody
+    - for curation in curations
+      tr
+        td = link_to curation.name, dataset_url(curation)
+        td = curation.created_at.to_s

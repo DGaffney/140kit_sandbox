@@ -1,0 +1,57 @@
+doctype 5
+html
+  head
+    title Culture and Community Involvement
+    /[if lt IE 9]
+      script src="http://html5shim.googlecode.com/svn/trunk/html5.js"
+    = stylesheet_link_tag 'application'
+    /* link rel="stylesheet" href="/css/bootstrap-responsive.min.css"*/
+    /* = javascript_include_tag :rails*/
+    = csrf_meta_tags
+  body
+
+    .navbar.navbar-fixed-top
+      .navbar-inner
+        .container
+          /* a.btn.btn-navbar data-toggle="collapse" data-target=".nav-collapse"*/
+          /*   span.i-bar*/
+          /*   span.i-bar*/
+          /*   span.i-bar*/
+          .stripe
+          a.brand href=root_path 140kit
+          .nav-collapse
+            ul.nav
+              li class=('active' if current_route?('home#index'))
+                = link_to 'Home', root_url
+              li class=('active' if current_route?('researchers#index'))
+                = link_to 'Researchers', researchers_url
+              li class=('active' if current_route?('curations#index'))
+                = link_to 'Datasets', datasets_url
+            ul.nav.pull-right
+              li
+                - if current_user
+                  = link_to "Sign out", signout_url
+                - else
+                  a href="/auth/twitter"
+                    span style='background:url(https://si0.twimg.com/images/dev/cms/intents/bird/bird_blue/bird_16_blue.png) 0 50% transparent no-repeat; padding-left:22px;' Sign in with Twitter
+
+    .container#main
+      header.jumbotron.subhead
+        /* .subnav*/
+          ul.nav.nav-pills
+            li
+              a href=researchers_url Researchers
+            li
+              a href=datasets_url Datasets
+
+      == yield
+
+      hr
+
+      footer
+        p &copy; 140kit 2012
+
+    /* script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"*/
+    /* script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"*/
+    /* script src="/js/bootstrap.min.js" type="text/javascript"*/
+    /* = javascript_include_tag 'application'*/

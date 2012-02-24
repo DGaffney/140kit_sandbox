@@ -1,0 +1,12 @@
+.row
+  .span10.offset1
+    .page-header
+      h1 Datasets
+.row
+  .span10.offset1
+    h2 Currently Running
+    == render partial: 'table', locals: {curations: @curations}
+.row
+  .span10.offset1
+    h2 Finished
+    == render partial: 'table', locals: {curations: @curations}
