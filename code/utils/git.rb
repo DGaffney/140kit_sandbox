@@ -10,7 +10,7 @@ module Git
   def self.url_repo
     branch = Git::branch
     url = Git::url
-    url = url.gsub(".com:", ".com/").gsub("git\@", "http://www.").gsub(/\.git$/, "")+"/tree/"+branch+"/"+Git::this_dir+"/"
+    url = url.gsub(".com:", ".com/").gsub("git\@", "http://www.").gsub(/\.git$/, "")+"/tree/"+branch+"/"+Git::this_dir+"/" rescue "blah"
     return url
   end
   

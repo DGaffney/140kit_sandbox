@@ -12,6 +12,17 @@ module Sh
     return result
   end
   
+  def self.storage_bt(command)
+    result = nil
+    case STORAGE["type"]
+    when "local"
+      result = self.bt(command).split("\n")
+    when "remote"
+      result = self.bt("ssh #{STORAGE["user"]}@#{STORAGE["host"]} '#{command}'").split("\n")
+    end
+    return result    
+  end
+  
   def self.bt(command)
     return `#{command}`
   end
@@ -46,6 +57,20 @@ module Sh
       Sh::sh("ssh #{STORAGE["user"]}@#{STORAGE["host"]} 'mkdir -p #{folder_location}'")
     end
   end
+  
+  
+  def self.ls(folder_location)
+    self.bt("ls #{folder_location}").split("\n")
+  end
+  
+  def self.storage_ls(folder_location, location=STORAGE["type"])
+    case location
+    when "local"
+      Sh::bt("ls #{folder_location}").split("\n")
+    when "remote"
+      Sh::bt("ssh #{STORAGE["user"]}@#{STORAGE["host"]} 'ls #{folder_location}'").split("\n")
+    end
+  end  
   
   def self.decompress(file, to_location=".")
     existing_files = Sh::resolve_all_files(File.dirname(file))
@@ -94,4 +119,5 @@ module Sh
     end
   end
 end
+
 

@@ -95,6 +95,56 @@ module Locking
       return unlocked_objects
     end
     
+    def lget(*key)
+      object = Curation.get(key)
+      count = 0
+      object.lock
+      while object && !object.owned_by_me?
+        sleep(1)
+        count+=1
+        object = Curation.get(key)
+        object.lock
+        puts "Trying to access locked resource... #{count}"
+        return nil if count == 100
+      end
+      return object
+    end
+    
+    def lall(query=nil)
+      objects = []
+      if query.nil?
+        objects = self.all
+      else
+        objects = self.all(query)
+      end
+      locks = objects.collect{|obj| {:with_id => obj.id, :classname => self.to_s, :instance_id => ENV['INSTANCE_ID']}}
+      existing_lock_ids = Lock.all(:classname => self.to_s, :with_id => objects.collect(&:id)).collect(&:with_id)
+      lockable_locks = locks.select{|l| l if !existing_lock_ids.include?(l[:with_id])}
+      Lock.save_all(lockable_locks)
+      successes = Lock.all(:instance_id => ENV['INSTANCE_ID']).collect{|x| h=x.attributes;h.delete(:id);h}
+      object_ids = (lockable_locks&successes).collect{|x| x[:with_id]}
+      objects = objects.select{|object| object if object_ids.include?(object.id)}
+      return objects
+    end
+    
+    def ulall(set)
+      Lock.all(:with_id => set.collect(&:id), :classname => self, :instance_id => ENV['INSTANCE_ID']).destroy
+    end
+    
+    def lfirst(*args)
+      object = self.unlocked.first(args)
+      count = 0
+      object.lock if !object.nil?
+      while object && !object.owned_by_me?
+        sleep(1)
+        count+=1
+        puts "Trying to access locked resource... #{count}"
+        object = self.unlocked.first(args)
+        object.lock if !object.nil?
+        return nil if count == 100
+      end
+      return object
+    end
   private
 
     def locked_ids
@@ -103,6 +153,7 @@ module Locking
   end
   
   module InstanceMethods
+    
     def lock
       lock = Lock.first(:classname => self.class.to_s, :with_id => self.id)
       return nil if lock && lock.instance_id != ENV['INSTANCE_ID']

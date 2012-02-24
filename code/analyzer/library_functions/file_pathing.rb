@@ -38,7 +38,7 @@ class FilePathing
       exception_message = "rsync for #{attempt} failed after #{attempts+1} tries."
     end
     while !sent
-      result = Sh::sh(attempt)
+      result = Sh::bt(attempt)
       sent = (result.empty? || !result.scan(/mkdir: cannot create directory `.*': File exists/).first.empty?)
       attempts+=1
       raise Exception, exception_message if attempts == ERROR_THRESHOLD

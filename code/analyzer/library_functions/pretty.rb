@@ -24,7 +24,8 @@ class Pretty
   
   def self.location(graph_points)
     graph_points.select{|graph_point| graph_point[:label] = "Not Reported" if graph_point[:label].nil?}
-    iphone_graph_points = graph_points.select{|graph_point| graph_point[:label].include?("\303\234T:") || graph_point[:label].include?("UT:") || graph_point[:label].include?("iPhone:")}
+    debugger
+    iphone_graph_points = graph_points.select{|graph_point| graph_point[:label].include?("UT:") || graph_point[:label].include?("iPhone:")}
     iphone_graph_point = iphone_graph_points.empty?  ? nil : {:label => "iPhone Location", :curation_id => graph_points.first[:curation_id], :graph_id => graph_points.first[:graph_id], :value => iphone_graph_points.length}
     pre_graph_points = graph_points.select{|graph_point| graph_point[:label].include?("Pre:")}
     pre_graph_point = pre_graph_points.empty?  ? nil : {:label => "Palm Pre Location", :curation_id => graph_points.first[:curation_id], :graph_id => graph_points.first[:graph_id], :value => pre_graph_points.length}
@@ -33,11 +34,11 @@ class Pretty
   end
 
   def self.language(language)
-    return self.language_map[language]
+    return self.language_map[language] || language
   end
     
   def self.source(source)
-    if source.include?("</a>")
+    if source && source.include?("</a>")
       source = source.scan(/>(.*)</)[0][0]
     end
     return source.gsub("\"", "\\\"")

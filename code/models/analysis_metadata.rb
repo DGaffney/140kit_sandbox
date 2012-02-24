@@ -139,7 +139,13 @@ class AnalysisMetadata
   end
   
   def function_class
-    return function.to_class
+    begin
+      return function.to_class
+    rescue
+      puts "HEY"
+      require "#{File.dirname(__FILE__)}/../analyzer/tools/#{function}.rb"
+      retry
+    end
   end
   
   def clear

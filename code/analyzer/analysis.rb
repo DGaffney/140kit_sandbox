@@ -22,21 +22,21 @@ class Analysis
     if !parameters.empty?
       parameters.each_pair {|k,v|
         if k.class == Array && k.length > 1
-          if v.class == Array && v.length > 1
-            "#{k.join(" or ")} in '#{v.join("', '")}'"
+          if v.class == Array
+            "#{k.join(" or ")} in ('#{v.join("', '")}')"
           else
             query += " (#{k.join(" or ").to_s}) = '#{v}' and "
           end
         elsif k.class == DataMapper::Query::Operator
           operator = k.operator == :gte ? ">=" : "<="
           field = k.target.to_s
-          if v.class == Array && v.length > 1
+          if v.class == Array
             query += "#{field} #{operator} ('#{v.join("', '")}') and "
           else
             query += " #{field} #{operator} '#{v}' and "
           end
         else
-          if v.class == Array && v.length > 1
+          if v.class == Array
             query += "#{k.to_s} in ('#{v.join("', '")}') and "
           else
             query += " #{k.to_s} = '#{v}' and "

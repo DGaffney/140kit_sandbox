@@ -20,7 +20,7 @@ class BasicHistogram < AnalysisMetadata
       {:model => User,  :attribute => :created_at}
     ], curation)
     self.push_tmp_folder(curation.stored_folder_name)
-    self.finalize(curation)
+    self.finalize_work(curation)
   end
 
   def self.generate_graphs(frequency_set, curation, analytic=self)
@@ -58,34 +58,47 @@ class BasicHistogram < AnalysisMetadata
     sub_directory = "/"+[fs[:year],fs[:month],fs[:date],fs[:hour]].compact.join("/")
     full_path_with_file = sub_directory == "/" ? path+"/"+fs[:title]+".csv" : path+sub_directory+"/"+fs[:title]+".csv"    
     Sh::mkdir(path+sub_directory) if sub_directory != "/"
-    FasterCSV.open(full_path_with_file, "w") do |csv|
-      if block_given?
-        yield fs, graph, conditional, csv, limit, offset
-      else
-        records = lambda{|limit, offset| 
-          data = []
-          case DataMapper.repository.adapter.options["adapter"]
-          when "mysql"
-            DataMapper.repository.adapter.select("select count(distinct(twitter_id)) as value,#{fs[:attribute].to_s} from #{fs[:model].storage_name} #{Analysis.conditions_to_mysql_query(conditional)} group by twitter_id order by count(distinct(twitter_id)) asc limit #{limit} offset #{offset}").each do |datum|
-              data << [datum.send(fs[:attribute].to_s), datum.value]
-            end
-          else
-            raise "Can't be completed without mysql!"
+    csv = CSV.open(full_path_with_file, "w")
+    if block_given?
+      yield fs, graph, conditional, csv, limit, offset
+    else
+      records = lambda{|limit, offset| 
+        data = []
+        case DataMapper.repository.adapter.options["adapter"]
+        when "mysql"
+          DataMapper.repository.adapter.select("select count(distinct(twitter_id)) as value,#{fs[:attribute].to_s} from #{fs[:model].storage_name} #{Analysis.conditions_to_mysql_query(conditional)} group by #{fs[:attribute].to_s} order by count(distinct(twitter_id)) asc limit #{limit} offset #{offset}").each do |datum|
+            data << [datum.send(fs[:attribute].to_s), datum.value]
           end
-          return data
-        }
+        else
+          raise "Can't be completed without mysql!"
+        end
+        return data
+      }
+      csv << ["label", "value"]
+      if fs[:attribute].to_s == "created_at"
+        results = DataMapper.repository.adapter.select("select count(distinct(twitter_id)) as value,date_format(#{fs[:attribute].to_s}, '%b %d, %Y, %H:%M') as #{fs[:attribute]} from #{fs[:model].storage_name} #{Analysis.conditions_to_mysql_query(conditional)} group by date_format(#{fs[:attribute].to_s}, '%b %d, %Y, %H:%M') order by count(distinct(twitter_id)) asc limit #{limit} offset #{offset}")
+        while !results.empty?
+          graph_points = results.collect{|record| {:label => record.send(fs[:attribute].to_s), :value => record.value, :graph_id => graph.id, :curation_id => graph.curation_id}}
+          GraphPoint.save_all(graph_points) if fs[:generate_graph_points]
+          graph_points.each do |graph_point|
+            csv << [graph_point[:label],graph_point[:value]]
+          end
+          offset+=limit
+          results = DataMapper.repository.adapter.select("select count(distinct(twitter_id)) as value,date_format(#{fs[:attribute].to_s}, '%b %d, %Y, %H:%M') from #{fs[:model].storage_name} #{Analysis.conditions_to_mysql_query(conditional)} group by date_format(#{fs[:attribute].to_s}, '%b %d, %Y, %H:%M') order by count(distinct(twitter_id)) asc limit #{limit} offset #{offset}")            
+        end
+      else
         results = records.call(limit, offset)
         while !results.empty?
           graph_points = results.collect{|record| {:label => record.first, :value => record.last, :graph_id => graph.id, :curation_id => graph.curation_id}}
           graph_points = graph.sanitize_points(graph_points)
           GraphPoint.save_all(graph_points) if fs[:generate_graph_points]
-          csv << ["label", "value"]
           graph_points.each do |graph_point|
             csv << [graph_point[:label],graph_point[:value]]
           end
           offset+=limit
           results = records.call(limit, offset)
         end
+        
       end
     end
     graph.written = true
@@ -100,4 +113,5 @@ class BasicHistogram < AnalysisMetadata
     return response
   end
 end
+
 

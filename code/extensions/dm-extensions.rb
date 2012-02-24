@@ -62,10 +62,10 @@ module DataMapperExtensions
     Sh::mkdir(file.split("/")[0..file.split("/").length-2].join("/"), "local")
     return false if objs.empty?
     objs = objs.sth if objs.first.class != self && objs.first.class != Hash
-    keys = objs.first.class == Hash ? objs.first.keys.collect(&:to_s).sort : objs.first.attributes.keys.collect(&:to_s).sort
+    keys = self.attributes.collect(&:to_s).sort
     f = File.open(file+".tsv", "a+") 
     csv_header = CSV.generate_line(keys, :col_sep => "\t", :row_sep => "\0", :quote_char => '"')
-    f.write(csv_header) #if Sh::sh("ls #{file.split("/")[0..file.split("/").length-2].join("/")}").include?(file.split("/").last+".csv")
+    f.write(csv_header) if f.size==0
     objs.each do |elem|
       begin
       row = CSV.generate_line(keys.collect{|k| elem[k.to_sym]}, :col_sep => "\t", :row_sep => "\0", :quote_char => '"')
@@ -81,4 +81,5 @@ module DataMapperExtensions
 end
 
 DataMapper::Model.append_extensions(DataMapperExtensions)
+
 

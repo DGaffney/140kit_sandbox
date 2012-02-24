@@ -10,6 +10,7 @@ class Dataset
   property :tweets_count, Integer, :default => 0
   property :users_count, Integer, :default => 0
   property :entities_count, Integer, :default => 0
+#  property :tweets_missed, Integer, :default => 0
   has n, :tweets
   has n, :users
   has n, :curations, :through => Resource

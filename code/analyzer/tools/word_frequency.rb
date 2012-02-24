@@ -17,7 +17,7 @@ class WordFrequency < AnalysisMetadata
       self.generate_word_frequencies_from_entities(fs, graph, conditional)
     end
     self.push_tmp_folder(curation.stored_folder_name)
-    self.finalize(curation)
+    self.finalize_work(curation)
   end
   
   def self.generate_word_frequencies_from_entities(fs, graph, conditional, path=ENV['TMP_PATH'])
@@ -26,7 +26,7 @@ class WordFrequency < AnalysisMetadata
     sub_directory = "/"+[fs[:year],fs[:month],fs[:date],fs[:hour]].compact.join("/")    
     full_path_with_file = sub_directory == "/" ? path+"/"+graph.title+".csv" : path+sub_directory+"/"+graph.title+".csv"
     Sh::mkdir(path+sub_directory) if sub_directory != "/"
-    FasterCSV.open(full_path_with_file, "w") do |csv|
+    csv = CSV.open(full_path_with_file, "w")
       records = Entity.aggregate(:value, :all.count, {:limit => limit, :offset => offset}.merge(conditional).merge(self.conditional_from_frequency_type(fs[:frequency_type])))
       while !records.empty?
         graph_points = records.collect{|record| {:label => record.first, :value => record.last, :graph_id => graph.id, :curation_id => graph.curation_id, :analysis_metadata_id => graph.analysis_metadata_id}}
@@ -39,7 +39,6 @@ class WordFrequency < AnalysisMetadata
         offset+=limit
         records = Entity.aggregate(:value, :all.count, {:limit => limit, :offset => offset}.merge(conditional).merge(self.conditional_from_frequency_type(fs[:frequency_type])))
       end
-    end
     graph.written = true
     graph.save!
   end
