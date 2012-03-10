@@ -1,7 +1,9 @@
 doctype 5
 html
   head
-    title Culture and Community Involvement
+    title
+      | 140kit
+      = ": #{@page_title}" if @page_title
     /[if lt IE 9]
       script src="http://html5shim.googlecode.com/svn/trunk/html5.js"
     = stylesheet_link_tag 'application'
@@ -22,27 +24,28 @@ html
           .nav-collapse
             ul.nav
               li class=('active' if current_route?('home#index'))
-                = link_to 'Home', root_url
+                = link_to 'Home', root_path
               li class=('active' if current_route?('researchers#index'))
-                = link_to 'Researchers', researchers_url
+                = link_to 'Researchers', researchers_path
               li class=('active' if current_route?('curations#index'))
-                = link_to 'Datasets', datasets_url
+                = link_to 'Datasets', datasets_path
             ul.nav.pull-right
               li
                 - if current_user
-                  = link_to "Sign out", signout_url
+                  = link_to "Sign out", signout_path
                 - else
                   a href="/auth/twitter"
+                    // FIXME: do not hotlink twitterbird
                     span style='background:url(https://si0.twimg.com/images/dev/cms/intents/bird/bird_blue/bird_16_blue.png) 0 50% transparent no-repeat; padding-left:22px;' Sign in with Twitter
 
     .container#main
-      header.jumbotron.subhead
+      // header.jumbotron.subhead
         /* .subnav*/
           ul.nav.nav-pills
             li
-              a href=researchers_url Researchers
+              a href=researchers_path Researchers
             li
-              a href=datasets_url Datasets
+              a href=datasets_path Datasets
 
       == yield
 

@@ -7,5 +7,5 @@ table.table.table-striped.table-bordered
   tbody
     - for curation in curations
       tr
-        td = link_to curation.name, dataset_url(curation)
+        td = link_to curation.name, dataset_path(curation)
         td = curation.created_at.to_s
