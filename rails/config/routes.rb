@@ -2,7 +2,11 @@ WWW140kit::Application.routes.draw do
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
-  resources :researchers, only: [:index, :show]
+  get '/researchers/:user_name' => 'researchers#show', as: :researcher
+  get '/researchers/:user_name/edit' => 'researchers#edit', as: :edit_researcher
+  put'/researchers/:user_name' => 'researchers#update'
+  delete '/researchers/:user_name' => 'researchers#destroy'
+  resources :researchers, only: [:index]
   resources :curations, only: [:index, :show], path: '/datasets', as: :datasets
   match '/auth/:provider/callback' => 'sessions#create'
   match '/signout' => 'sessions#destroy', as: :signout

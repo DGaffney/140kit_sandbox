@@ -1,16 +1,18 @@
 doctype 5
 html
   head
-    title Culture and Community Involvement
+    title
+      | 140kit
+      = ": #{@page_title}" if @page_title
     /[if lt IE 9]
       script src="http://html5shim.googlecode.com/svn/trunk/html5.js"
     = stylesheet_link_tag 'application'
     /* link rel="stylesheet" href="/css/bootstrap-responsive.min.css"*/
-    /* = javascript_include_tag :rails*/
     = csrf_meta_tags
   body
 
-    .navbar.navbar-fixed-top
+    .navbar
+      // .navbar-fixed-top
       .navbar-inner
         .container
           /* a.btn.btn-navbar data-toggle="collapse" data-target=".nav-collapse"*/
@@ -22,27 +24,92 @@ html
           .nav-collapse
             ul.nav
               li class=('active' if current_route?('home#index'))
-                = link_to 'Home', root_url
+                = link_to 'Home', root_path
               li class=('active' if current_route?('researchers#index'))
-                = link_to 'Researchers', researchers_url
+                = link_to 'Researchers', researchers_path
               li class=('active' if current_route?('curations#index'))
-                = link_to 'Datasets', datasets_url
+                = link_to 'Datasets', datasets_path
             ul.nav.pull-right
-              li
-                - if current_user
-                  = link_to "Sign out", signout_url
-                - else
+              - if current_user
+                li.dropdown
+                  // a.btn href="#" Action
+                  a.dropdown-toggle data-toggle="dropdown" href="#"
+                    b.caret
+                  ul.dropdown-menu
+                    li
+                      a href='#' hi hi hi
+                    li
+                      a href='#' hi hi hi
+                    li
+                      a href='#' hi hi hi
+                // li
+                  = link_to "Sign out", signout_path
+              - else
+                li
                   a href="/auth/twitter"
+                    // FIXME: do not hotlink twitterbird
                     span style='background:url(https://si0.twimg.com/images/dev/cms/intents/bird/bird_blue/bird_16_blue.png) 0 50% transparent no-repeat; padding-left:22px;' Sign in with Twitter
 
     .container#main
-      header.jumbotron.subhead
+      // .navbar
+        .navbar-inner
+          .container style='width: auto;'
+            a.btn.btn-navbar data-toggle="collapse" data-target=".nav-collapse"
+              span.icon-bar
+              span.icon-bar
+              span.icon-bar
+            a.brand href="#" Project name
+            .nav-collapse
+              ul.nav
+                li.active
+                  a href="#" Home
+                li
+                  a href='#' Link
+                li
+                  a href='#' Link
+                li
+                  a href='#' Link
+                li.dropdown
+                  a.dropdown-toggle data-toggle='dropdown'
+                    | Dropdown 
+                    b.caret
+                  ul.dropdown-menu
+                    li
+                      a href='#' Action
+                    li
+                      a href='#' Another action
+                    li
+                      a href='#' Yet another action
+                    li.divider
+                    li.nav-header Nav Header
+                    li
+                      a href='#' Separated link
+              ul.nav.pull-right
+                li
+                  a href='#' Link
+                li.divider-vertical
+                li.dropdown
+                  a.dropdown-toggle href="#" data-toggle="dropdown"
+                    | Dropdown 
+                    b.caret
+                  ul.dropdown-menu
+                    li
+                      a href='#' Action
+                    li
+                      a href='#' Another action
+                    li
+                      a href='#' Yet another action
+                    li.divider
+                    li
+                      a href='#' Separated link
+
+      // header.jumbotron.subhead
         /* .subnav*/
           ul.nav.nav-pills
             li
-              a href=researchers_url Researchers
+              a href=researchers_path Researchers
             li
-              a href=datasets_url Datasets
+              a href=datasets_path Datasets
 
       == yield
 
@@ -54,4 +121,4 @@ html
     /* script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"*/
     /* script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"*/
     /* script src="/js/bootstrap.min.js" type="text/javascript"*/
-    /* = javascript_include_tag 'application'*/
+    = javascript_include_tag 'application'

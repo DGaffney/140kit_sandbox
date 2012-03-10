@@ -1,1 +1,0 @@
-../../../slave/models/graph_point.rb

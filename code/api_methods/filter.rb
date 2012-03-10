@@ -4,9 +4,8 @@ class Filter < Instance
   MAX_TRACK_IDS = 10000
   BATCH_SIZE = 100
   STREAM_API_URL = "http://stream.twitter.com"
-  CHECK_FOR_NEW_DATASETS_INTERVAL = 60
-  
-  attr_accessor :user_account, :username, :password, :next_dataset_ends, :queue, :params, :datasets, :start_time, :last_start_time
+  CHECK_FOR_NEW_DATASETS_INTERVAL = 60*5
+  attr_accessor :user_account, :username, :password, :next_dataset_ends, :queue, :params, :datasets, :start_time, :last_start_time, :scrape_type
 
   def initialize
     super
@@ -23,12 +22,13 @@ class Filter < Instance
       config.parser   = :yajl
     end
     @start_time = Time.now
+    @scrape_type = ARGV[0] || "track"
     at_exit { do_at_exit }
   end
   
   def do_at_exit
     puts "Exiting."
-    save_queue
+    save_queue(@queue)
     @user_account.unlock
     @datasets.collect{|dataset| dataset.unlock}
   end
@@ -37,6 +37,12 @@ class Filter < Instance
     puts "Filtering..."
     check_in
     assign_user_account
+    TweetStream.configure do |config|
+      config.username = @screen_name
+      config.password = @password
+      config.auth_method = :basic
+      config.parser = :yajl
+    end
     puts "Entering filter routine."
     loop do
       if !killed?
@@ -55,7 +61,7 @@ class Filter < Instance
       update_next_dataset_ends
       update_params
       collect
-      save_queue
+      save_queue(@queue)
       clean_up_datasets
     end
   end
@@ -104,18 +110,30 @@ class Filter < Instance
   def collect
     puts "Collecting: #{params_for_stream.inspect}"
     client = TweetStream::Client.new
-    client.on_interval(CHECK_FOR_NEW_DATASETS_INTERVAL) { rsync_previous_files; @start_time = Time.now; puts "Switching to new files..."; client.stop if add_datasets }
+    client.on_interval(CHECK_FOR_NEW_DATASETS_INTERVAL) { 
+      time = @start_time
+      datasets = @datasets
+      Thread.new do
+        rsync_previous_files(datasets, time)
+      end
+      @start_time = Time.now
+      puts "Switching to new files..."
+      client.stop if add_datasets 
+    }
     client.on_limit { |skip_count| puts "\nWe are being rate limited! We lost #{skip_count} tweets!\n" }
     client.on_error { |message| puts "\nError: #{message}\n";client.stop }
     client.filter(params_for_stream) do |tweet|
-#      puts "[tweet] #{tweet[:user][:screen_name]}: #{tweet[:text]}"
+      # puts "[tweet] #{tweet[:user][:screen_name]}: #{tweet[:text]}"
+      print "."
       @queue << tweet
-      save_queue if @queue.length >= BATCH_SIZE
-      if @next_dataset_ends
-        client.stop if U.times_up?(@next_dataset_ends)
+      if @queue.length >= BATCH_SIZE
+        tmp_queue = @queue
+        @queue = []
+        Thread.new do
+          save_queue(tmp_queue)
+        end
       end
     end
-    save_queue
   end
   
   def params_for_stream
@@ -124,48 +142,47 @@ class Filter < Instance
     return params
   end
   
-  def save_queue
-    if !@queue.empty?
-      puts "Saving #{@queue.length} tweets."
-      tweets, users, entities, geos, coordinates = data_from_queue
-      @queue = []
-      Thread.new {
-        dataset_ids = tweets.collect{|t| t[:dataset_id]}.uniq
-        dataset_ids.each do |dataset_id|
-          Tweet.store_to_flat_file(tweets.select{|t| t[:dataset_id] == dataset_id}, dir(Tweet, dataset_id))
-          User.store_to_flat_file(users.select{|u| u[:dataset_id] == dataset_id}, dir(User, dataset_id))
-          Entity.store_to_flat_file(entities.select{|e| e[:dataset_id] == dataset_id}, dir(Entity, dataset_id))
-          Geo.store_to_flat_file(geos.select{|g| g[:dataset_id] == dataset_id}, dir(Geo, dataset_id))
-          Coordinate.store_to_flat_file(coordinates.select{|c| c[:dataset_id] == dataset_id}, dir(Coordinate, dataset_id))
-        end
-      }
-    end
-  end
-  
-  def dir(model, dataset_id)
-    return "#{ENV["TMP_PATH"]}/#{model}/#{dataset_id}_#{@start_time.strftime("%Y-%m-%d_%H-%M-%S")}"
-  end
-  
-  def rsync_previous_files
-    rsync_job = fork do
-      [Tweet, User, Entity, Geo, Coordinate].each do |model|
-        @datasets.each do |dataset|
-          Sh::mkdir("#{STORAGE["path"]}/#{model}")
-          store_to_disk("#{dir(model, dataset.id)}.tsv", "#{model}/#{dataset.id}_#{@start_time.strftime("%Y-%m-%d_%H-%M-%S")}.tsv")
-          `rm #{dir(model, dataset.id)}.tsv`
-        end
+  def save_queue(tmp_queue)
+    if !tmp_queue.empty?
+      print "|"
+      tweets, users, entities, geos, coordinates = data_from_queue(tmp_queue)
+      dataset_ids = tweets.collect{|t| t[:dataset_id]}.uniq
+      dataset_ids.each do |dataset_id|
+        dataset = Dataset.first(:id => dataset_id)
+        Tweet.store_to_flat_file(tweets.select{|t| t[:dataset_id] == dataset_id}, dir(Tweet, dataset_id, @start_time))
+        dataset.tweets_count+=tweets.select{|t| t[:dataset_id]==dataset_id}.count
+        User.store_to_flat_file(users.select{|u| u[:dataset_id] == dataset_id}, dir(User, dataset_id, @start_time))
+        dataset.users_count+=users.select{|t| t[:dataset_id]==dataset_id}.count
+        Entity.store_to_flat_file(entities.select{|e| e[:dataset_id] == dataset_id}, dir(Entity, dataset_id, @start_time))
+        dataset.entities_count+=entities.select{|t| t[:dataset_id]==dataset_id}.count
+        Geo.store_to_flat_file(geos.select{|g| g[:dataset_id] == dataset_id}, dir(Geo, dataset_id, @start_time))
+        Coordinate.store_to_flat_file(coordinates.select{|c| c[:dataset_id] == dataset_id}, dir(Coordinate, dataset_id, @start_time))
+        dataset.save
       end
     end
-    Process.detach(rsync_job)
+  end
+  
+  def dir(model, dataset_id, time)
+    return "#{ENV["TMP_PATH"]}/#{model}/#{dataset_id}_#{time.strftime("%Y-%m-%d_%H-%M-%S")}"
+  end
+  
+  def rsync_previous_files(datasets, time)
+    [Tweet, User, Entity, Geo, Coordinate].each do |model|
+      datasets.each do |dataset| 
+        Sh::mkdir("#{STORAGE["path"]}/#{model}")
+        store_to_disk("#{dir(model, dataset.id, time)}.tsv", "#{model}/#{dataset.id}_#{time.strftime("%Y-%m-%d_%H-%M-%S")}.tsv")
+        `rm #{dir(model, dataset.id, time)}.tsv`
+      end
+    end
   end
 
-  def data_from_queue
+  def data_from_queue(tmp_queue)
     tweets = []
     users = []
     entities = []
     geos = []
     coordinates = []
-    @queue.each do |json|
+    tmp_queue.each do |json|
       tweet, user = TweetHelper.prepped_tweet_and_user(json)
       geo = GeoHelper.prepped_geo(json)
       dataset_ids = determine_datasets(json)
@@ -203,14 +220,14 @@ class Filter < Instance
     params.each_pair do |method, values|
       if method == "locations"
         values.each do |value|
-          valid_datasets << value[:dataset_id] if in_location?(value[:params], tweet[:place][:bounding_box][:coordinates].first)
+          valid_datasets << value[:dataset_id] if any_in_location?(value[:params], tweet)
         end
       elsif method == "track"
         values.each do |value|
           if value[:params].include?(" ")
-            valid_datasets << value[:dataset_id] if tweet[:text].include?(value[:params])
+            valid_datasets << value[:dataset_id] if tweet[:text].include?(value[:params]) #add .downcase to set case sensitivity off...
           else
-            valid_datasets << value[:dataset_id] if tweet[:text].split(/\W/).collect(&:downcase).include?(value[:params])
+            valid_datasets << value[:dataset_id] if tweet[:text].split(/[~!$%^&* \[\]\(\)\{\}\-=_+.,\/<>?:;"']/).include?(value[:params])
           end
         end
       elsif method == "follow"
@@ -222,37 +239,25 @@ class Filter < Instance
     return valid_datasets
   end
   
-  def in_location?(location_params, tweet_location)
+  def any_in_location?(location, tweet)
+    coords = CoordinateHelper.prepped_coordinates(tweet)
+    found = false
+    coords.each do |coord|
+      found = true if in_location?(location, coord[:lat], coord[:lon])
+      break if found
+    end
+    return found
+  end
+
+  def in_location?(location_params, lat, lon)
     search_location = location_params.split(",").map {|c| c.to_i }
-    t_longs = tweet_location.collect {|a| a[0] }.uniq.sort
-    t_lats = tweet_location.collect {|a| a[0] }.uniq.sort
-    t_long_range = (t_longs.first..t_longs.last)
-    t_lat_range = (t_lats.first..t_lats.last)
-    l_long_range = (search_location[0]..search_location[2])
+    l_lon_range = (search_location[0]..search_location[2])
     l_lat_range = (search_location[1]..search_location[3])
-    return (l_long_range.include?(t_long_range) && l_lat_range.include?(t_lat_range))
+    return (l_lon_range.include?(lon) && l_lat_range.include?(lat))
   end
   
-  # def in_bounding_box?(location_params)
-  #   t = self[:place][:bounding_box][:coordinates].first
-  #   s = location_params.split(",").map {|c| c.to_f }
-  #   a = { :left => t[0][0],
-  #         :bottom => t[0][1],
-  #         :right => t[2][0],
-  #         :top => t[2][1] }
-  #   b = { :left => s[0],
-  #         :bottom => s[1],
-  #         :right => s[2],
-  #         :top => s[3] }
-  #   abxdif = ((a[:left]+a[:right])-(b[:left]+b[:right])).abs
-  #   abydif = ((a[:top]+a[:bottom])-(b[:top]+b[:bottom])).abs
-  #   xdif = (a[:right]+b[:right])-(a[:left]+b[:left])
-  #   ydif = (a[:top]+b[:top])-(a[:bottom]+b[:bottom])
-  #   return (abxdif <= xdif && abydif <= ydif)
-  # end
-  
   def add_datasets
-    datasets = Dataset.unlocked.all(:scrape_finished => false, :scrape_type => ['track', 'follow', 'locations'])
+    datasets = Dataset.unlocked.all(:scrape_finished => false, :scrape_type => @scrape_type)
     return claim_new_datasets(datasets)
   end
 
@@ -306,7 +311,7 @@ class Filter < Instance
     if !finished_datasets.empty?
       puts "Finished collecting "+finished_datasets.collect {|d| "#{d.scrape_type}:\"#{d.internal_params_label}\"" }.join(", ")
       # Dataset.update_all({:scrape_finished => true}, {:id => finished_datasets.collect {|d| d.id}})
-      Dataset.all(:id => finished_datasets.collect {|d| d.id}).update(:scrape_finished => true)
+      Dataset.all(:id => finished_datasets.collect {|d| d.id}).update(:scrape_finished => true, :status => "tsv_stored")
       @datasets -= finished_datasets
       finished_datasets.collect{|dataset| dataset.unlock}
     end

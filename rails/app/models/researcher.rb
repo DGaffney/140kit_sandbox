@@ -22,4 +22,8 @@ class Researcher < ActiveRecord::Base
     "https://api.twitter.com/1/users/profile_image?screen_name=#{self.user_name}&size=#{size.to_s}"
   end
 
+  def to_param
+    self.user_name
+  end
+
 end

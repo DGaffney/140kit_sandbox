@@ -7,7 +7,8 @@ class Coordinate
   property :user_id, Integer, :min => 0, :max => 2**64-1
   property :lat, String, :unique_index => [:unique_coordinate]
   property :lon, String, :unique_index => [:unique_coordinate]
-  property :dataset_id, String
+  property :dataset_id, Integer
+  property :original_model, String
   belongs_to :dataset, :unique_index => [:unique_coordinate], :index => [:dataset_coordinate], :child_key => :twitter_id
   belongs_to :tweet, :unique_index => [:unique_coordinate], :index => [:dataset_coordinate], :child_key => :twitter_id
 end

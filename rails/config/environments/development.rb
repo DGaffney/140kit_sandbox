@@ -37,4 +37,6 @@ WWW140kit::Application.configure do
 
   # config.less.paths << "#{Rails.root}/lib/less/protractor/stylesheets"
   # config.less.compress = true
+
+  Slim::Engine.set_default_options pretty: true
 end

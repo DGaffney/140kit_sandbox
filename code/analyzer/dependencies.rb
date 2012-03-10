@@ -23,51 +23,54 @@ module Analysis::Dependencies
   end
 
   def self.click_tweet_count_comparison_dependencies
-    ['fastercsv']
+    ['csv']
   end  
 
   def self.centrality_differentials_dependencies
-    ['fastercsv']
+    ['csv']
   end  
 
   def self.jaccard_to_csv_dependencies
-    ['fastercsv']
+    ['csv']
   end
 
   def self.raw_csv_dependencies
-    ['fastercsv']
+    ['csv']
   end
   
   def self.advanced_histogram_dependencies
-    ['fastercsv']
+    ['csv']
   end
 
   def self.advanced_histogram_a_dependencies
-    ['fastercsv']
+    ['csv']
   end
 
   def self.advanced_histogram_b_dependencies
-    ['fastercsv']
+    ['csv']
   end
 
   def self.advanced_histogram_c_dependencies
-    ['fastercsv']
+    ['csv']
   end
 
   def self.basic_histogram_dependencies
-    ['fastercsv']
+    ['csv']
   end
 
   def self.size_counter_dependencies
-    ['fastercsv']
+    ['csv']
   end
   
   def self.time_based_summary_dependencies
-    ['fastercsv']
+    ['csv']
   end
   
   def self.word_frequency_dependencies
-    ['fastercsv']
+    ['csv']
   end
   
+  def self.csv_export_dependencies
+    ['csv']
+  end  
 end

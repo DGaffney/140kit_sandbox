@@ -33,75 +33,74 @@ class CoordinateHelper
   
   def self.prepped_coordinates(json)
     coordinates = []
-    if json[:place] && json[:place][:bounding_box]
-      if json[:place][:bounding_box][:type] == "Polygon"
-        json[:place][:bounding_box][:coordinates].first.each do |coordinate|
-          coordinates << {
-            :twitter_id => json[:id],
-            :geo_id => json[:place][:id],
-            :user_id => json[:user][:id],
-            :geo_type => json[:place][:bounding_box][:type],
-            :lat => coordinate.last,
-            :lon => coordinate.first
-          }
-        end
-      elsif json[:place][:bounding_box][:type] == "Point"
+    if json[:place] && json[:place][:bounding_box] && json[:place][:bounding_box][:type] == "Point"
+      coordinates << {
+        :twitter_id => json[:id],
+        :geo_id => json[:place][:id],
+        :user_id => json[:user][:id],
+        :geo_type => json[:place][:type],
+        :lat => json[:place][:bounding_box][:coordinates].last,
+        :lon => json[:place][:bounding_box][:coordinates].first,
+	:original_model => "place"
+      }
+    end
+    if json[:coordinates] && json[:coordinates][:type] == "Point"
+      coordinates << {
+        :twitter_id => json[:id],
+        :user_id => json[:user][:id],
+        :geo_type => json[:coordinates][:type],
+        :lat => json[:coordinates][:coordinates].last,
+        :lon => json[:coordinates][:coordinates].first,
+        :original_model => "coordinates"
+      }
+    end
+    if json[:geo] && json[:geo][:type] == "Point"
+      coordinates << {
+        :twitter_id => json[:id],
+        :user_id => json[:user][:id],
+        :geo_type => json[:geo][:type],
+        :lat => json[:geo][:coordinates].first,
+        :lon => json[:geo][:coordinates].last,
+        :original_model => "geo"
+      }
+    end
+    if json[:place] && json[:place][:bounding_box] && json[:place][:bounding_box][:type] == "Polygon"
+      json[:place][:bounding_box][:coordinates].first.each do |coordinate|
         coordinates << {
           :twitter_id => json[:id],
           :geo_id => json[:place][:id],
           :user_id => json[:user][:id],
-          :geo_type => json[:place][:type],
-          :lat => json[:place][:bounding_box][:coordinates].last,
-          :lon => json[:place][:bounding_box][:coordinates].first
+          :geo_type => json[:place][:bounding_box][:type],
+          :lat => coordinate.last,
+          :lon => coordinate.first,
+          :original_model => "place"
         }
-      else
       end
-    elsif json[:coordinates]
-      if json[:coordinates][:type] == "Polygon"
-        json[:coordinates][:coordinates].first.each do |coordinate|
-          coordinates << {
-            :twitter_id => json[:id],
-            :user_id => json[:user][:id],
-            :geo_type => json[:coordinates][:type],
-            :lat => coordinate.last,
-            :lon => coordinate.first
-          }
-        end
-      elsif json[:coordinates][:type] == "Point"
+    end
+    if json[:coordinates] && json[:coordinates][:type] == "Polygon"
+      json[:coordinates][:coordinates].first.each do |coordinate|
         coordinates << {
           :twitter_id => json[:id],
           :user_id => json[:user][:id],
           :geo_type => json[:coordinates][:type],
-          :lat => json[:coordinates][:coordinates].last,
-          :lon => json[:coordinates][:coordinates].first
+          :lat => coordinate.last,
+          :lon => coordinate.first,
+          :original_model => "coordinates"
         }
-      else
       end
-    elsif json[:geo]
-      if json[:geo][:type] == "Polygon"
-        json[:geo][:coordinates].first.each do |coordinate|
-          coordinates << {
-            :twitter_id => json[:id],
-            :user_id => json[:user][:id],
-            :geo_type => json[:geo][:type],
-            :lat => coordinate.first,
-            :lon => coordinate.last
-          }
-        end
-      elsif json[:geo][:type] == "Point"
+    end
+    if json[:geo] && json[:geo][:type] == "Polygon"
+      json[:geo][:coordinates].first.each do |coordinate|
         coordinates << {
           :twitter_id => json[:id],
           :user_id => json[:user][:id],
           :geo_type => json[:geo][:type],
-          :lat => json[:geo][:coordinates].first,
-          :lon => json[:geo][:coordinates].last
+          :lat => coordinate.first,
+          :lon => coordinate.last,
+          :original_model => "geo"
         }
-      else
       end
-    else return []
     end
-    debugger if coordinates.last[:lat].to_i.abs > 90
     return coordinates
-  end
-  
+  end  
 end
