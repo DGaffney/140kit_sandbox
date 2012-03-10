@@ -29,7 +29,7 @@
 @import "twitter/bootstrap/tables";
 // Components: common
 @import "twitter/bootstrap/sprites";
-// @import "twitter/bootstrap/dropdowns";
+@import "twitter/bootstrap/dropdowns";
 @import "twitter/bootstrap/wells";
 @import "twitter/bootstrap/component-animations";
 @import "twitter/bootstrap/close";
@@ -101,13 +101,16 @@ body {
   // .box-shadow;
 }
 
-.navbar-fixed-top {
-  position: absolute;
-}
+// .navbar-fixed-top {
+//   position: absolute;
+// }
+
+.navbar { margin-bottom: 0; }
 
 .navbar-inner {
   .box-shadow(none);
-  overflow: hidden;
+  // overflow: hidden;
+  .border-radius: 0;
 }
 
 .navbar .brand {
