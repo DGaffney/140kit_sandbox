@@ -8,4 +8,4 @@ table.table.table-striped.table-bordered
     - for curation in curations
       tr
         td = link_to curation.name, dataset_path(curation)
-        td = curation.created_at.to_s
+        td = curation.datasets.length

@@ -1,0 +1,6 @@
+h1 = @post.title
+p.byline 
+  a href=researcher_path(@post.researcher.user_name) #{@post.researcher.user_name}
+  = " at #{@post.created_at}"
+p.post = @post.text
+p THIS PAGE NEEDS SOMETHING LIKE REDCLOTH OR SOME BLOG ENGINE GOODNESS.

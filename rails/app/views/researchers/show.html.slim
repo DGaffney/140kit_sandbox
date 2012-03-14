@@ -5,16 +5,28 @@
         img.pull-left.twitter-pic src=@researcher.twitter_pic(:bigger)
         h1 = @researcher.name
         h3 = link_to_twitter(@researcher)
-      p
-        | I am a researcher that analyzes Twitter accounts on Twitter.
-        |  Give me a list of your Twitter accounts and I will analyze them.
+      = p @researcher.info if @researcher.info
       ul
-        li
-          | Website: 
-          a href='#' http://www.google.com/
-        li Institution: MIT
-        li Hailing from: Birmingham, AL, USA
-        li Member since: June 30, 2011
+        - if @researcher.website_url
+          li
+            | Website: 
+            a href=@researcher.website_url = @researcher.website_url
+        - if @researcher.affiliation
+          li
+            - if @researcher.affiliation_url
+              | Affiliation: 
+              a href=@researcher.affiliation_url = @researcher.affiliation
+            - else
+              | Affiliation: 
+              = @researcher.affiliation
+        - if @researcher.location
+          li 
+            | Hailing from: 
+            = @researcher.location
+        - if @researcher.join_date
+          li 
+            | Member since: 
+            = @researcher.human_join_date
   .span8
     /* h3 Current Datasets*/
     == render partial: 'curations/table'

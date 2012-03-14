@@ -5,6 +5,7 @@ class Post
   property :slug, String
   property :text, Text
   property :created_at, Time
+  property :status, String
   belongs_to :researcher, Integer, :index => [:dataset_id]
 end
 

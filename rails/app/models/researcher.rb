@@ -1,7 +1,8 @@
 class Researcher < ActiveRecord::Base
 
   has_many :curations
-
+  has_many :posts
+  
   def self.create_with_omniauth(auth)
     create! do |user|
       user.provider = auth["provider"]
@@ -25,5 +26,8 @@ class Researcher < ActiveRecord::Base
   def to_param
     self.user_name
   end
-
+  
+  def human_join_date
+    return self.join_date.strftime("%b %d, %Y")
+  end
 end

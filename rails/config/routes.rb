@@ -1,17 +1,19 @@
 WWW140kit::Application.routes.draw do
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
-
   get '/researchers/:user_name' => 'researchers#show', as: :researcher
   get '/researchers/:user_name/edit' => 'researchers#edit', as: :edit_researcher
   put'/researchers/:user_name' => 'researchers#update'
+  get '/posts/:id/:slug' => 'posts#show', as: :post
   delete '/researchers/:user_name' => 'researchers#destroy'
   resources :researchers, only: [:index]
   resources :curations, only: [:index, :show], path: '/datasets', as: :datasets
+  resources :posts
   match '/auth/:provider/callback' => 'sessions#create'
   match '/signout' => 'sessions#destroy', as: :signout
+  match '/auth/failure' => 'sessions#fail'
   root to: 'home#index'
-
   # Sample of regular route:
   #   match 'products/:id' => 'catalog#view'
   # Keep in mind you can assign values other than :controller and :action

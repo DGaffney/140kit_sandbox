@@ -15,7 +15,7 @@ class ResearchersController < ApplicationController
   end
 
   def show
-    @researcher = Researcher.select([:id, :name, :user_name]).where(user_name: params[:user_name]).first
+    @researcher = Researcher.where(user_name: params[:user_name]).first
     @curations = @researcher.curations.select([:id, :name, :created_at])
   end
 

@@ -4,7 +4,6 @@ class Researcher
   property :name, String
   property :user_name, String, :format => /[A-Za-z0-9_]*/, :length => 3..40
   property :email, Text, :default => "user@localhost.com", :format => :email_address
-  property :reset_code, String
   property :role, String, :default => "Admin"
   property :join_date, Time, :default => Time.now
   property :last_login, Time
@@ -12,14 +11,20 @@ class Researcher
   property :info, Text, :default => "I like to study the internet"
   property :website_url, Text, :default => "http://140kit.com/", :format => :url
   property :location, String, :default => "The Internet"
-  property :salt, String
   property :remember_token, String
   property :remember_token_expires_at, Time
-  property :crypted_password, String
   property :share_email, Boolean, :default => false
   property :private_data, Boolean, :default => false
   property :hidden_account, Boolean, :default => false
   property :rate_limited, Boolean, :default => false
+  property :name, String
+  property :uid, String, :unique_index => 'unique_researchers_uid'
+  property :provider, String
+  property :oauth_token, String
+  property :oauth_token_secret
+  property :first_time, Boolean
+  property :affiliation, String
+  property :affiliation_url, String, :format => :url
   has n, :curations
   has n, :datasets, :through => :curations
   attr_accessor :password
