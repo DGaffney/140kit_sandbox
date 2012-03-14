@@ -90,8 +90,9 @@ body {
 }
 
 #main {
-  padding: 60px 30px 10px;
+  padding: 30px 30px 10px;
   background: #fdfdfd;
+  margin-bottom: 50px;
   // .border-radius(6px);
   // .box-shadow;
 }
@@ -101,16 +102,33 @@ body {
   // .box-shadow;
 }
 
+li.open > a.dropdown-toggle {
+  color: @navbarLinkColorHover !important;
+}
+
+.navbar .nav .dropdown-toggle .caret, .navbar .nav .open.dropdown .caret {
+  border-top-color: @stripeColorDark;
+}
+
+
 // .navbar-fixed-top {
 //   position: absolute;
 // }
 
-.navbar { margin-bottom: 0; }
+// .divider-vertical { margin: 0 !important; }
+
+#main-nav { margin-bottom: 0; }
+
+#main-nav > .navbar-inner {
+  .box-shadow(none);
+  // overflow: hidden;
+  .border-radius(0);
+}
 
 .navbar-inner {
   .box-shadow(none);
   // overflow: hidden;
-  .border-radius: 0;
+  // .border-radius(0);
 }
 
 .navbar .brand {
@@ -137,7 +155,7 @@ body {
   #gradient > .vertical(lighten(@stripeColor, 5%), @stripeColor);
   float: left;
   .skew(-45deg);
-  .box-shadow;
+  // .box-shadow;
 }
 
 .navbar .nav > li > a:hover {

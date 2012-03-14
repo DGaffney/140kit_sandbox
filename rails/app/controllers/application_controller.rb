@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
 
   private
   def current_user
-    @current_user ||= Researcher.select(:id).where(id: session[:researcher_id]).first if session[:researcher_id]
+    @current_user ||= Researcher.select([:id, :name, :user_name]).where(id: session[:researcher_id]).first if session[:researcher_id]
   end
   def login_required
     if current_user.nil?

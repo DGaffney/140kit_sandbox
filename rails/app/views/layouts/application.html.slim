@@ -11,7 +11,7 @@ html
     = csrf_meta_tags
   body
 
-    .navbar
+    .navbar#main-nav
       // .navbar-fixed-top
       .navbar-inner
         .container
@@ -31,17 +31,21 @@ html
                 = link_to 'Datasets', datasets_path
             ul.nav.pull-right
               - if current_user
+                /* li.divider-vertical*/
                 li.dropdown
-                  // a.btn href="#" Action
                   a.dropdown-toggle data-toggle="dropdown" href="#"
+                    span Logged in as 
+                    strong = current_user.name
+                    |  
                     b.caret
                   ul.dropdown-menu
                     li
-                      a href='#' hi hi hi
+                      a href='#' My Datasets
                     li
-                      a href='#' hi hi hi
+                      a href='#' View profile
+                    li.divider
                     li
-                      a href='#' hi hi hi
+                      a href='#' Sign out
                 // li
                   = link_to "Sign out", signout_path
               - else
@@ -51,65 +55,6 @@ html
                     span style='background:url(https://si0.twimg.com/images/dev/cms/intents/bird/bird_blue/bird_16_blue.png) 0 50% transparent no-repeat; padding-left:22px;' Sign in with Twitter
 
     .container#main
-      // .navbar
-        .navbar-inner
-          .container style='width: auto;'
-            a.btn.btn-navbar data-toggle="collapse" data-target=".nav-collapse"
-              span.icon-bar
-              span.icon-bar
-              span.icon-bar
-            a.brand href="#" Project name
-            .nav-collapse
-              ul.nav
-                li.active
-                  a href="#" Home
-                li
-                  a href='#' Link
-                li
-                  a href='#' Link
-                li
-                  a href='#' Link
-                li.dropdown
-                  a.dropdown-toggle data-toggle='dropdown'
-                    | Dropdown 
-                    b.caret
-                  ul.dropdown-menu
-                    li
-                      a href='#' Action
-                    li
-                      a href='#' Another action
-                    li
-                      a href='#' Yet another action
-                    li.divider
-                    li.nav-header Nav Header
-                    li
-                      a href='#' Separated link
-              ul.nav.pull-right
-                li
-                  a href='#' Link
-                li.divider-vertical
-                li.dropdown
-                  a.dropdown-toggle href="#" data-toggle="dropdown"
-                    | Dropdown 
-                    b.caret
-                  ul.dropdown-menu
-                    li
-                      a href='#' Action
-                    li
-                      a href='#' Another action
-                    li
-                      a href='#' Yet another action
-                    li.divider
-                    li
-                      a href='#' Separated link
-
-      // header.jumbotron.subhead
-        /* .subnav*/
-          ul.nav.nav-pills
-            li
-              a href=researchers_path Researchers
-            li
-              a href=datasets_path Datasets
 
       == yield
 
@@ -122,3 +67,5 @@ html
     /* script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"*/
     /* script src="/js/bootstrap.min.js" type="text/javascript"*/
     = javascript_include_tag 'application'
+    javascript:
+      $(function() { $('.dropdown-toggle').dropdown(); });
