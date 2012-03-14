@@ -13,6 +13,8 @@ front-end/public/files/source_data/*
 front-end/vendor/plugins/newrelic_rpm/*
 */config/initializers/secret_token.rb
 */config/initializers/omniauth.rb
+!*/config/initializers/secret_token.rb.example
+!*/config/initializers/omniauth.rb.example
 */public/assets/*
 */public/css/*
 */public/js/*
