@@ -114,7 +114,7 @@ class Filter < Instance
     client.on_error { |message| puts "\nError: #{message}\n";client.stop }
     client.filter(params_for_stream) do |tweet|
       # puts "[tweet] #{tweet[:user][:screen_name]}: #{tweet[:text]}"
-#      print "."
+      print "."
       @queue << tweet
       if @queue.length >= BATCH_SIZE
         tmp_queue = @queue
@@ -134,7 +134,7 @@ class Filter < Instance
   
   def save_queue(tmp_queue)
     if !tmp_queue.empty?
-#      print "|"
+      print "|"
       tweets, users, entities, geos, coordinates = data_from_queue(tmp_queue)
       dataset_ids = tweets.collect{|t| t[:dataset_id]}.uniq
       dataset_ids.each do |dataset_id|
@@ -160,7 +160,7 @@ class Filter < Instance
     files = []
     [Tweet, User, Entity, Geo, Coordinate].each do |model|
       datasets.each do |dataset| 
-        Sh::mkdir("#{STORAGE["path"]}/#{model}")
+        Sh::mkdir("#{STORAGE["path"]}/results/#{model}")
         Sh::compress("#{dir(model, dataset.id, time)}.tsv")
         Sh::store_to_disk("#{dir(model, dataset.id, time)}.tsv.zip", "raw_catalog/#{model}/#{dataset.id}_#{time.strftime("%Y-%m-%d_%H-%M-%S")}.tsv.zip")
 	      files << dir(model, dataset.id, time)+".tsv"
