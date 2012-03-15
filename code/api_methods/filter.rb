@@ -5,7 +5,7 @@ class Filter < Instance
   BATCH_SIZE = 100
   STREAM_API_URL = "http://stream.twitter.com"
   CHECK_FOR_NEW_DATASETS_INTERVAL = 30
-  TOUCH_INTERVAL = 30
+  CHECK_INTERVAL = 30
   attr_accessor :user_account, :username, :password, :next_dataset_ends, :queue, :params, :datasets, :start_time, :last_start_time, :scrape_type
 
   def initialize
