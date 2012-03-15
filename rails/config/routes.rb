@@ -1,28 +1,29 @@
 WWW140kit::Application.routes.draw do
 
-  resources :analytical_offering_variables
-
-  resources :analytical_offering_variable_descriptors
-
-  resources :analytical_offerings
-
-  resources :analysis_metadatas
+  # resources :analytical_offering_variables
+  # 
+  # resources :analytical_offering_variable_descriptors
+  # 
+  # resources :analytical_offerings
+  # 
+  # resources :analysis_metadatas
 
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
   #we should just do single show pages for all these results. Make it atomic, not overwhelming like old site?
   get '/analysis/:curation_id/:analysis_metadata_id' => 'analysis_metadata#results', as: :curation_analysis 
-  
+  get '/new/dataset' => 'curations#new', as: :new_dataset
   get '/researchers/:user_name' => 'researchers#show', as: :researcher
-  get '/curations/:user_name' => 'curations#researcher', as: :researcher_curations
+  get '/datasets/:user_name' => 'datasets#researcher', as: :researcher_datasets
   get '/researchers/:user_name/edit' => 'researchers#edit', as: :edit_researcher
   put'/researchers/:user_name' => 'researchers#update'
   get '/posts/:id/:slug' => 'posts#show', as: :post
   get '/about' => 'posts#about', as: :about
+  post '/datasets/create' => 'curations#create', as: :create_dataset
   delete '/researchers/:user_name' => 'researchers#destroy'
   resources :researchers, only: [:index]
-  resources :curations, only: [:index], path: '/datasets', as: :datasets
+  resources :curations, only: [:index, :new], path: '/datasets', as: :datasets
   resources :posts
   resources :datasets
   match '/auth/:provider/callback' => 'sessions#create'

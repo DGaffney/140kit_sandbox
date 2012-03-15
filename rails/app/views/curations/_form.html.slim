@@ -1,0 +1,12 @@
+= form_tag("/datasets/create", :method => "post") do
+  fieldset
+    .control-group
+      label.control-label Terms To Track (For this field, simply put in all the terms you want to track, separated by commas.
+      .controls
+        = text_field_tag :name, "", :class => "input-xlarge"
+      label.control-label When do you want to stop collecting data? (Range is from one hour to 4 weeks.)
+      .controls
+        = range_field_tag :end_time, Curation.default_time_series, :in => Curation.default_time_series..Curation.max_time, :step => Curation.default_step, :class => 'input-full'
+      span#time_output #{exact_time(Curation.default_time_series)}
+      .form-actions
+        = submit_tag 'Validate', class: 'btn btn-primary'

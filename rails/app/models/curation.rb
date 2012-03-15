@@ -3,6 +3,18 @@ class Curation < ActiveRecord::Base
   has_and_belongs_to_many :datasets, :join_table => "curation_datasets"
   has_many :analysis_metadatas
   
+  def self.max_time
+    return 1.week
+  end
+  
+  def self.default_time_series
+    return 10.minutes
+  end
+  
+  def self.default_step
+    return 10.minutes
+  end
+  
   def current_status
     case self.status
     when "tsv_storing"
