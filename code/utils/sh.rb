@@ -65,7 +65,7 @@ module Sh
     when "local"
       Sh::sh("mkdir -p #{folder_location}")
     when "remote"
-      Sh::sh("ssh #{STORAGE["user"]}@#{STORAGE["hostname"]} 'mkdir -p #{folder_location}'")
+      Sh::sh("ssh #{STORAGE["user"]} 'mkdir -p #{folder_location}'")
     end
   end
   

@@ -155,12 +155,12 @@ class Filter < Instance
   end
   
   def rsync_previous_files(datasets, time)
-    debugger
     [Tweet, User, Entity, Geo, Coordinate].each do |model|
       datasets.each do |dataset| 
         Sh::mkdir("#{STORAGE["path"]}/#{model}")
         Sh::store_to_disk("#{dir(model, dataset.id, time)}.tsv", "#{model}/#{dataset.id}_#{time.strftime("%Y-%m-%d_%H-%M-%S")}.tsv")
         Sh::bt "rm #{dir(model, dataset.id, time)}.tsv"
+        debugger
       end
     end
   end
