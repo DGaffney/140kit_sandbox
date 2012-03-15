@@ -81,7 +81,7 @@ class Filter < Instance
           @screen_name = user.screen_name
           @password = user.password
           TweetStream.configure do |config|
-            config.screen_name = @screen_name
+            config.username = @screen_name
             config.password = @password
             config.auth_method = :basic
             config.parser   = :yajl
