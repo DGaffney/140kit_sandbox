@@ -11,17 +11,6 @@ class Filter < Instance
     super
     @datasets = []
     @queue = []
-    #this oauthing is a little fucked.
-    oauth_settings = YAML.load(File.read(File.dirname(__FILE__)+'/../config/twitter.yml'))
-    account = oauth_settings.keys.shuffle.first
-    TweetStream.configure do |config|
-      config.consumer_key = oauth_settings[account]["oauth_settings"]["consumer_key"]
-      config.consumer_secret = oauth_settings[account]["oauth_settings"]["consumer_secret"]
-      config.oauth_token = oauth_settings[account]["access_token"]["access_token"]
-      config.oauth_token_secret = oauth_settings[account]["access_token"]["access_token_secret"]
-      config.auth_method = :oauth
-      config.parser   = :yajl
-    end
     @start_time = Time.now
     @scrape_type = ARGV[0] || "track"
     at_exit { do_at_exit }
@@ -97,6 +86,12 @@ class Filter < Instance
           @user_account = user
           @screen_name = user.screen_name
           @password = user.password
+          TweetStream.configure do |config|
+            config.screen_name = @screen_name
+            config.password = @password
+            config.auth_method = :basic
+            config.parser   = :yajl
+          end
           puts "Assigned #{@screen_name}."
         else
           puts "Then I can't do anything for you. May god have mercy on your data"
