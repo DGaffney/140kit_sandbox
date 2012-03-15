@@ -8,7 +8,7 @@ class Machine
   property :can_store, Boolean
 
   def self.determine_storage    
-    return self.select_storage || self.fallback_storage_default
+    return self.select_storage_machine || self.fallback_storage_default
   end
   
   def self.fallback_storage_default
