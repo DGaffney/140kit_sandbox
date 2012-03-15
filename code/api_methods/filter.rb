@@ -110,11 +110,8 @@ class Filter < Instance
       end
       @start_time = Time.now
       print "[]"
-      client.stop if add_datasets 
-    }
-    client.on_interval(CHECK_INTERVAL){
       need_to_stop = touch_and_check_for_finished
-      client.stop if need_to_stop
+      client.stop if add_datasets || need_to_stop
     }
     client.on_limit { |skip_count| print "*#{skip_count}*" }
     client.on_error { |message| puts "\nError: #{message}\n";client.stop }
