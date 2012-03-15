@@ -9,7 +9,7 @@ gem 'mysql2'
 gem 'slim'
 gem 'omniauth-twitter'
 gem 'ruby-debug19'
-
+gem 'useful_class_extensions', '~> 0.0.6'
 
 # Gems used only for assets and not required
 # in production environments by default.

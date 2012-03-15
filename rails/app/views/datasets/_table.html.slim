@@ -1,0 +1,21 @@
+- datasets ||= @datasets
+table.table.table-striped.table-bordered
+  thead
+    tr
+      th Type
+      th Parameters
+      th Start Time
+      th End Time
+      th Tweets
+      th Users
+      th Entities
+  tbody
+    - for dataset in datasets
+      tr
+        td = dataset.friendly_type
+        td = dataset.friendly_parameters.html_safe
+        td = dataset.created_at.strftime("%b %d, %Y at %H:%M:%S (%Z)")
+        td = dataset.end_time.strftime("%b %d, %Y at %H:%M:%S (%Z)")
+        td = number_with_delimiter(dataset.tweets_count)
+        td = number_with_delimiter(dataset.users_count)
+        td = number_with_delimiter(dataset.entities_count)

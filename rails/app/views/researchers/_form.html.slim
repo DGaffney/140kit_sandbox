@@ -1,8 +1,37 @@
 = form_for(@researcher, class: 'form-horizontal') do |f|
   fieldset
     .control-group
-      = f.label :name, class: 'control-label'
-      .controls
-        = f.text_field :name, class: 'input-xlarge'
-    .form-actions
-      = f.submit 'Save', class: 'btn btn-primary'
+      .span5
+        = f.label :name, class: 'control-label'
+        .controls
+          = f.text_field :name, class: 'input-xlarge'
+        = f.label "E-mail Address", class: 'control-label'
+        .controls
+          = f.text_field :email, class: 'input-xlarge'
+        = f.label :info, class: 'control-label'
+        .controls
+          = f.text_area :info, class: 'input-xlarge'
+      .span5
+        = f.label "Website URL", class: 'control-label'
+        .controls
+          = f.text_field :website_url, class: 'input-xlarge'
+        = f.label :affiliation, class: 'control-label'
+        .controls
+          = f.text_field :affiliation, class: 'input-xlarge'
+        = f.label "Affiliate URL", class: 'control-label'
+        .controls
+          = f.text_field :affiliation_url, class: 'input-xlarge'
+        = f.label :location, class: 'control-label'
+        .controls
+          = f.text_field :location, class: 'input-xlarge'
+        = f.label "Do you want us to e-mail you about your datasets?", class: 'control-label'
+        .controls
+        = f.check_box :share_email, class: 'input-xlarge'
+        = f.label "Do you want to make your datasets private to only you?", class: 'control-label'
+        .controls
+        = f.check_box :private_data, class: 'input-xlarge'
+        = f.label "Do you want your account to go deep-cover (invisible to all other users)?", class: 'control-label'
+        .controls
+          = f.check_box :hidden_account, class: 'input-xlarge'
+        .form-actions
+          = f.submit 'Save', class: 'btn btn-primary'

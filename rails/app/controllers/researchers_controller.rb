@@ -16,11 +16,11 @@ class ResearchersController < ApplicationController
 
   def show
     @researcher = Researcher.where(user_name: params[:user_name]).first
-    @curations = @researcher.curations.select([:id, :name, :created_at])
+    @curations = @researcher.curations
   end
 
   def edit
-    @researcher = Researcher.find_by_user_name(params[:user_name], select: [:id, :name, :user_name])
+    @researcher = Researcher.find_by_user_name(params[:user_name])
   end
 
   def update

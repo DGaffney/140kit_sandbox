@@ -10,13 +10,13 @@ class PostsController < ApplicationController
 
   def show
     @post = Post.find_by_id_and_slug(params[:id], params[:slug])
-
-    respond_to do |format|
-      format.html
-      format.json { render json: @post }
-    end
   end
-
+  
+  def about
+    @post = Post.find_by_slug("about") || Post.first #remove or when we have the page.
+    render action: "show"
+  end
+  
   def new
     @post = Post.new
 

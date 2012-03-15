@@ -4,8 +4,14 @@ table.table.table-striped.table-bordered
     tr
       th Name
       th Created
+      th Last Updated
+      th Current Status
+      th Options
   tbody
     - for curation in curations
       tr
         td = link_to curation.name, dataset_path(curation)
-        td = curation.datasets.length
+        td = curation.created_at.strftime("%b %d, %Y at %H:%M:%S (%Z)")
+        td = curation.updated_at.strftime("%b %d, %Y at %H:%M:%S (%Z)")
+        td = curation.current_status
+        td = curation.current_options

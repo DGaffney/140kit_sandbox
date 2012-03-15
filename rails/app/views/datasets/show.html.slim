@@ -1,0 +1,12 @@
+h1 
+  | Dataset ##{@curation.id}: 
+  = @curation.name
+h2
+  | Uploaded by: 
+  a href=researcher_path(@curation.researcher.user_name) = @curation.researcher.user_name
+
+h2 Overview:
+== render partial: 'table', locals: {datasets: @curation.datasets}  
+h2 Analytics:
+== render partial: 'analytics', locals: {analysis_metadatas: @curation.analysis_metadatas}
+

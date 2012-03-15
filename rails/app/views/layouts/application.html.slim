@@ -40,9 +40,9 @@ html
                     b.caret
                   ul.dropdown-menu
                     li
-                      a href='#' My Datasets
+                      a href=researcher_curations_path(current_user.user_name) My Curations
                     li
-                      a href='#' View profile
+                      a href=researcher_path(current_user.user_name) View profile
                     li.divider
                     li
                       a href='#' Sign out

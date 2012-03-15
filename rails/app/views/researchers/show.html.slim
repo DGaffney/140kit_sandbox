@@ -8,9 +8,8 @@
       = p @researcher.info if @researcher.info
       ul
         - if @researcher.website_url
-          li
-            | Website: 
-            a href=@researcher.website_url = @researcher.website_url
+          li 
+            a href=@researcher.website_url Website
         - if @researcher.affiliation
           li
             - if @researcher.affiliation_url
@@ -27,6 +26,8 @@
           li 
             | Member since: 
             = @researcher.human_join_date
+      - if @researcher == current_user
+        a href=edit_researcher_path(@researcher) Edit
   .span8
     /* h3 Current Datasets*/
     == render partial: 'curations/table'
