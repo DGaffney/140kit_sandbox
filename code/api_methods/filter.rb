@@ -161,8 +161,10 @@ class Filter < Instance
     [Tweet, User, Entity, Geo, Coordinate].each do |model|
       datasets.each do |dataset| 
         Sh::mkdir("#{STORAGE["path"]}/#{model}")
-        Sh::store_to_disk("#{dir(model, dataset.id, time)}.tsv", "#{model}/#{dataset.id}_#{time.strftime("%Y-%m-%d_%H-%M-%S")}.tsv")
-	files << dir(model, dataset.id, time)+".tsv"
+        Sh::compress("#{dir(model, dataset.id, time)}.tsv")
+        Sh::store_to_disk("#{dir(model, dataset.id, time)}.tsv.zip", "raw_catalog/#{model}/#{dataset.id}_#{time.strftime("%Y-%m-%d_%H-%M-%S")}.tsv.zip")
+	      files << dir(model, dataset.id, time)+".tsv"
+	      files << dir(model, dataset.id, time)+".tsv.zip"
       end
     end
     files.each do |file|

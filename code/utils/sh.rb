@@ -144,6 +144,14 @@ module Sh
       `rsync #{from} #{STORAGE["user"]}@#{STORAGE["hostname"]}:#{STORAGE["path"]}/#{to}`
     end
   end
+  
+  def self.compress(file)
+    if File.file?(file)
+      `zip #{file}.zip #{file} -j`
+    elsif File.directory?(file)
+      `zip #{file}.zip #{file} -j`
+    end
+  end
 end
 
 
