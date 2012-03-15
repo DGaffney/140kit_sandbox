@@ -5,6 +5,7 @@ class Filter < Instance
   BATCH_SIZE = 100
   STREAM_API_URL = "http://stream.twitter.com"
   CHECK_FOR_NEW_DATASETS_INTERVAL = 30
+  TOUCH_INTERVAL = 30
   attr_accessor :user_account, :username, :password, :next_dataset_ends, :queue, :params, :datasets, :start_time, :last_start_time, :scrape_type
 
   def initialize
@@ -110,9 +111,9 @@ class Filter < Instance
       print "[]"
       client.stop if add_datasets 
     }
-    client.on_interval(TOUCH_INTERVAL){
-      touch_and_refresh
-      client.stop if Time.now > @next_dataset_ends
+    client.on_interval(CHECK_INTERVAL){
+      need_to_stop = touch_and_check_for_finished
+      client.stop if need_to_stop
     }
     client.on_limit { |skip_count| print "*#{skip_count}*" }
     client.on_error { |message| puts "\nError: #{message}\n";client.stop }
@@ -127,17 +128,23 @@ class Filter < Instance
           save_queue(tmp_queue)
         end
       end
-      touch_and_refresh
     end
   end
   
-  def touch_and_refresh
+  def touch_and_check_for_finished
     Thread.new do
       @datasets.each do |dataset|
         dataset.touch
       end
     end
-    update_next_dataset_ends
+    need_to_stop = false
+    @datasets.each do |dataset|
+      time = dataset.params.split(",").last.to_i
+      if time != -1 && Time.now > dataset.created_at+time
+        need_to_stop = true
+      end
+    end
+    return need_to_stop
   end
   
   def params_for_stream
@@ -302,7 +309,7 @@ class Filter < Instance
 
   def update_next_dataset_ends
     update_start_times
-    refresh_datasets # this is absolutely necessary even while it's called in update_start_times above. huh!
+    # refresh_datasets # this is absolutely necessary even while it's called in update_start_times above. huh!
     soonest_ending_dataset = @datasets.select{|d| d.params.split(",").last.to_i!=-1}.sort {|x,y| (x.created_at.to_time.gmt + x.params.split(",").last.to_i - DateTime.now.to_time.gmt) <=> (y.created_at.to_time.gmt + y.params.split(",").last.to_i - DateTime.now.to_time.gmt) }.first
     @next_dataset_ends = soonest_ending_dataset.created_at.to_time.gmt + soonest_ending_dataset.params.split(",").last.to_i rescue nil
   end
