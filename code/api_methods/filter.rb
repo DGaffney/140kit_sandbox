@@ -107,10 +107,14 @@ class Filter < Instance
         rsync_previous_files(datasets, time)
       end
       @start_time = Time.now
-      puts "Switching to new files..."
+      print "[]"
       client.stop if add_datasets 
     }
-    client.on_limit { |skip_count| puts "\nWe are being rate limited! We lost #{skip_count} tweets!\n" }
+    client.on_interval(TOUCH_INTERVAL){
+      touch_and_refresh
+      client.stop if Time.now > @next_dataset_ends
+    }
+    client.on_limit { |skip_count| print "*#{skip_count}*" }
     client.on_error { |message| puts "\nError: #{message}\n";client.stop }
     client.filter(params_for_stream) do |tweet|
       # puts "[tweet] #{tweet[:user][:screen_name]}: #{tweet[:text]}"
@@ -123,7 +127,17 @@ class Filter < Instance
           save_queue(tmp_queue)
         end
       end
+      touch_and_refresh
     end
+  end
+  
+  def touch_and_refresh
+    Thread.new do
+      @datasets.each do |dataset|
+        dataset.touch
+      end
+    end
+    update_next_dataset_ends
   end
   
   def params_for_stream
@@ -309,7 +323,7 @@ class Filter < Instance
     started_datasets = @datasets.reject {|d| d.created_at.nil? }
     finished_datasets = started_datasets.select{|d| d.params.split(",").last.to_i!=-1}.select {|d| U.times_up?(d.created_at.gmt+d.params.split(",").last.to_i) }
     if !finished_datasets.empty?
-      puts "Finished collecting "+finished_datasets.collect {|d| "#{d.scrape_type}:\"#{d.internal_params_label}\"" }.join(", ")
+      puts "\nFinished collecting "+finished_datasets.collect {|d| "#{d.scrape_type}:\"#{d.internal_params_label}\"" }.join(", ")
       # Dataset.update_all({:scrape_finished => true}, {:id => finished_datasets.collect {|d| d.id}})
       Dataset.all(:id => finished_datasets.collect {|d| d.id}).update(:scrape_finished => true, :status => "tsv_stored")
       @datasets -= finished_datasets
