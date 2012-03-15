@@ -141,7 +141,6 @@ module Sh
     when "local"
       `cp #{from} #{STORAGE["path"]}/#{to}`
     when "remote"
-      puts "`rsync #{from} #{STORAGE["user"]}@#{STORAGE["hostname"]}:#{STORAGE["path"]}/#{to}`"
       `rsync #{from} #{STORAGE["user"]}@#{STORAGE["hostname"]}:#{STORAGE["path"]}/#{to}`
     end
   end
