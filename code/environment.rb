@@ -20,16 +20,11 @@ require 'tweetstream'
 require 'iconv'
 require 'unicode'
 require 'csv'
+require 'useful_class_extensions'
 #Encoding.default_external = Encoding::ISO_8859_1
 #Encoding.default_internal = Encoding::ISO_8859_1
 DIR = File.dirname(__FILE__)
 
-require DIR+'/extensions/array'
-require DIR+'/extensions/string'
-require DIR+'/extensions/hash'
-require DIR+'/extensions/fixnum'
-require DIR+'/extensions/time'
-require DIR+'/extensions/nil_class'
 require DIR+'/extensions/inflectors'
 
 require DIR+'/utils/git'
@@ -56,41 +51,20 @@ require DIR+'/utils/entity_helper'
 require DIR+'/utils/u'
 # require DIR+'/lib/tweetstream'
 
-env = ARGV.include?("e") ? ARGV[ARGV.index("e")+1]||"development" : "development"
+ENV['E'] = ARGV.include?("e") ? ARGV[ARGV.index("e")+1]||"development" : "development"
 
-puts "Starting #{env} environment..."
+puts "Starting #{ENV['E']} environment..."
 
 database = YAML.load(File.read(File.dirname(__FILE__)+'/config/database.yml'))
-if !database.has_key?(env)
+if !database.has_key?(ENV['E'])
   env = "development"
 end
-database = database[env]
+database = database[ENV['E']]
 database.inspect
 DataMapper.setup(:default, "#{database["adapter"]}://#{database["username"]}:#{database["password"]}@#{database["host"]}:#{database["port"] || 3000}/#{database["database"]}?encoding=UTF8").inspect
 DataMapper.finalize
-
+ENV['STORAGE'] = Machine.determine_storage
 require DIR+'/extensions/dm-extensions'
-
-storage = YAML.load(File.read(File.dirname(__FILE__)+'/config/storage.yml'))
-if !storage.has_key?(env)
-  env = "development"
-end
-STORAGE = storage[env]
-case STORAGE["type"]
-when "local"
-  `mkdir -p #{STORAGE["path"]}`
-when "remote"
-  `ssh #{STORAGE["user"]}@#{STORAGE["host"]} 'mkdir -p #{STORAGE["path"]}'`
-end
-
-def store_to_disk(from, to)
-  case STORAGE["type"]
-  when "local"
-    `cp #{from} #{STORAGE["path"]}/#{to}`
-  when "remote"
-    `rsync #{from} #{STORAGE["user"]}@#{STORAGE["host"]}:#{STORAGE["path"]}/#{to}`
-  end
-end
 
 #require DIR+'/analyzer/analysis'
 

@@ -8,6 +8,7 @@ class Instance
   property :instance_id,    String, :length => 40
   property :hostname,       String, :unique_index => [:unique_instance], :default => ENV['HOSTNAME']
   property :pid,            Integer, :unique_index => [:unique_instance], :default => ENV['PID']
+  property :updated_at,     Time
   property :killed,         Boolean, :default => false
   property :instance_type,  String, :unique_index => [:unique_instance]
   
@@ -41,7 +42,7 @@ class Instance
   
   def check_in
     Sh::mkdir(ENV['TMP_PATH'], "local")
-    @check_in_thread = Thread.new { loop { self.touch; sleep(CHECK_IN_FREQUENCY*60) } }
+    @check_in_thread = Thread.new { loop { self.touch; sleep(60) } }
   end
   
   def whitelisted?

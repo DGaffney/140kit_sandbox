@@ -1,7 +1,7 @@
 module Sh
   require 'open3'
   def self.hostname
-    return sh "hostname"
+    return bt "hostname"
   end
   
   def self.sh(command, chomped=true, silence_errors=true)

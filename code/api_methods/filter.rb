@@ -11,6 +11,7 @@ class Filter < Instance
     super
     @datasets = []
     @queue = []
+    #this oauthing is a little fucked.
     oauth_settings = YAML.load(File.read(File.dirname(__FILE__)+'/../config/twitter.yml'))
     account = oauth_settings.keys.shuffle.first
     TweetStream.configure do |config|
@@ -270,6 +271,9 @@ class Filter < Instance
     if !datasets_to_claim.empty?
      claimed_datasets = Dataset.lock(datasets_to_claim)
      if !claimed_datasets.empty?
+       claimed_datasets.each do |dataset|
+         dataset.storage_machine_id = Machine.first(:hostname => ENV["STORAGE"]["host"]).id rescue 0
+       end
        update_datasets(claimed_datasets)
        return true
      end
