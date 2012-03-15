@@ -159,8 +159,8 @@ class Filter < Instance
       datasets.each do |dataset| 
         Sh::mkdir("#{STORAGE["path"]}/#{model}")
         Sh::store_to_disk("#{dir(model, dataset.id, time)}.tsv", "#{model}/#{dataset.id}_#{time.strftime("%Y-%m-%d_%H-%M-%S")}.tsv")
-        Sh::bt "rm #{dir(model, dataset.id, time)}.tsv"
         debugger
+        Sh::bt "rm #{dir(model, dataset.id, time)}.tsv"
       end
     end
   end
@@ -261,6 +261,7 @@ class Filter < Instance
      if !claimed_datasets.empty?
        claimed_datasets.each do |dataset|
          dataset.storage_machine_id = Machine.first(:hostname => STORAGE["hostname"]).id rescue 0
+         dataset.save!
        end
        update_datasets(claimed_datasets)
        return true
