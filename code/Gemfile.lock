@@ -145,7 +145,7 @@ DEPENDENCIES
   fastercsv
   geokit
   htmlentities
-  jeweler (= 1.5.2)
+  jeweler
   json
   mechanize
   mocha

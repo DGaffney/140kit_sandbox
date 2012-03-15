@@ -67,13 +67,12 @@ module DataMapperExtensions
     csv_header = CSV.generate_line(keys, :col_sep => "\t", :row_sep => "\0", :quote_char => '"')
     f.write(csv_header) if f.size==0
     objs.each do |elem|
-      begin
+#      begin
       row = CSV.generate_line(keys.collect{|k| elem[k.to_sym]}, :col_sep => "\t", :row_sep => "\0", :quote_char => '"')
-      rescue
-        debugger
-        ic = Iconv.new('UTF-8//IGNORE', 'UTF-8')
-        row = CSV.generate_line(keys.collect{|k| elem[k.to_sym].class == String ? elem[k.to_sym].encode("ISO-8859-1") : elem[k.to_sym]}, :col_sep => "\t", :row_sep => "\0", :quote_char => '"')
-      end
+#      rescue
+#        ic = Iconv.new('UTF-8//IGNORE', 'UTF-8')
+#        row = CSV.generate_line(keys.collect{|k| elem[k.to_sym].class == String ? elem[k.to_sym].encode("ISO-8859-1") : elem[k.to_sym]}, :col_sep => "\t", :row_sep => "\0", :quote_char => '"')
+#      end
       f.write(row)
     end
     f.close

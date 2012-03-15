@@ -4,7 +4,7 @@ class Filter < Instance
   MAX_TRACK_IDS = 10000
   BATCH_SIZE = 100
   STREAM_API_URL = "http://stream.twitter.com"
-  CHECK_FOR_NEW_DATASETS_INTERVAL = 60
+  CHECK_FOR_NEW_DATASETS_INTERVAL = 30
   attr_accessor :user_account, :username, :password, :next_dataset_ends, :queue, :params, :datasets, :start_time, :last_start_time, :scrape_type
 
   def initialize
@@ -103,7 +103,9 @@ class Filter < Instance
     client.on_interval(CHECK_FOR_NEW_DATASETS_INTERVAL) { 
       time = @start_time
       datasets = @datasets
-      rsync_previous_files(datasets, time)
+      Thread.new do
+        rsync_previous_files(datasets, time)
+      end
       @start_time = Time.now
       puts "Switching to new files..."
       client.stop if add_datasets 
@@ -112,7 +114,7 @@ class Filter < Instance
     client.on_error { |message| puts "\nError: #{message}\n";client.stop }
     client.filter(params_for_stream) do |tweet|
       # puts "[tweet] #{tweet[:user][:screen_name]}: #{tweet[:text]}"
-      print "."
+#      print "."
       @queue << tweet
       if @queue.length >= BATCH_SIZE
         tmp_queue = @queue
@@ -132,7 +134,7 @@ class Filter < Instance
   
   def save_queue(tmp_queue)
     if !tmp_queue.empty?
-      print "|"
+#      print "|"
       tweets, users, entities, geos, coordinates = data_from_queue(tmp_queue)
       dataset_ids = tweets.collect{|t| t[:dataset_id]}.uniq
       dataset_ids.each do |dataset_id|
@@ -155,13 +157,16 @@ class Filter < Instance
   end
   
   def rsync_previous_files(datasets, time)
+    files = []
     [Tweet, User, Entity, Geo, Coordinate].each do |model|
       datasets.each do |dataset| 
         Sh::mkdir("#{STORAGE["path"]}/#{model}")
         Sh::store_to_disk("#{dir(model, dataset.id, time)}.tsv", "#{model}/#{dataset.id}_#{time.strftime("%Y-%m-%d_%H-%M-%S")}.tsv")
-        debugger
-        Sh::bt "rm #{dir(model, dataset.id, time)}.tsv"
+	files << dir(model, dataset.id, time)+".tsv"
       end
+    end
+    files.each do |file|
+      `rm #{file}`
     end
   end
 
