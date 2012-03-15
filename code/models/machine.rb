@@ -18,6 +18,6 @@ class Machine
   def self.select_storage_machine
     machine = Machine.all(:can_store => true).shuffle.first
     storage_type = machine.hostname == ENV["HOSTNAME"] ? "local" : "remote"
-    return {"type" => storage_type, "path" => machine.working_path, "user" => machine.user, "host" => machine.host}
+    return {"type" => storage_type, "path" => machine.working_path, "user" => machine.user, "hostname" => machine.hostname}
   end
 end

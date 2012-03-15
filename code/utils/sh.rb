@@ -18,7 +18,7 @@ module Sh
     when "local"
       result = self.bt(command).split("\n")
     when "remote"
-      result = self.bt("ssh #{STORAGE["user"]}@#{STORAGE["host"]} '#{command}'").split("\n")
+      result = self.bt("ssh #{STORAGE["user"]}@#{STORAGE["hostname"]} '#{command}'").split("\n")
     end
     return result
   end
@@ -29,7 +29,7 @@ module Sh
     when "local"
       result = self.bt("ls #{STORAGE["path"]}/#{path}").split("\n")
     when "remote"
-      result = self.bt("ssh #{STORAGE["user"]}@#{STORAGE["host"]} 'ls #{STORAGE["path"]}/#{path}'").split("\n")
+      result = self.bt("ssh #{STORAGE["user"]}@#{STORAGE["hostname"]} 'ls #{STORAGE["path"]}/#{path}'").split("\n")
     end
     return result
   end
@@ -65,7 +65,7 @@ module Sh
     when "local"
       Sh::sh("mkdir -p #{folder_location}")
     when "remote"
-      Sh::sh("ssh #{STORAGE["user"]}@#{STORAGE["host"]} 'mkdir -p #{folder_location}'")
+      Sh::sh("ssh #{STORAGE["user"]}@#{STORAGE["hostname"]} 'mkdir -p #{folder_location}'")
     end
   end
   
@@ -111,7 +111,7 @@ module Sh
       location = "#{ENV["TMP_PATH"]}/#{path.split("/").last}"
     when "remote"
       Sh::mkdir("#{ENV["TMP_PATH"]}/#{path.split("/")[0..-2].join("/")}", "local")
-      Sh::sh("rsync #{STORAGE["user"]}@#{STORAGE["host"]}:#{STORAGE["path"]}/#{path} #{ENV["TMP_PATH"]}/#{path}")
+      Sh::sh("rsync #{STORAGE["user"]}@#{STORAGE["hostname"]}:#{STORAGE["path"]}/#{path} #{ENV["TMP_PATH"]}/#{path}")
       location = "#{ENV["TMP_PATH"]}/#{path}"
     end
     return location
@@ -133,6 +133,15 @@ module Sh
       else
         Sh::sh("rm -r #{file}") 
       end
+    end
+  end
+  
+  def store_to_disk(from, to)
+    case STORAGE["type"]
+    when "local"
+      `cp #{from} #{STORAGE["path"]}/#{to}`
+    when "remote"
+      `rsync #{from} #{STORAGE["user"]}@#{STORAGE["hostname"]}:#{STORAGE["path"]}/#{to}`
     end
   end
 end
