@@ -24,6 +24,32 @@ class CurationsController < ApplicationController
       d.status = "tsv_storing"
       d.instance_id = "system"
       d.save!
+      @datasets << d
     end
+    @datasets.collect{|d| d.curations << @curation}
+  end
+  
+  def alter
+    #this could probably be done in a much better way.
+    @curation = Curation.find(params[:id])
+    dataset = @curation.datasets.first
+    params[:name] = @curation.datasets.collect{|x| x.params.split(",").first}.join(",")
+    case dataset.scrape_type
+    when "track"
+      params[:end_time] = dataset.params.split(",").last.to_i
+    end
+    debugger
+    @curation.datasets.collect{|d| d.destroy}
+    @curation.destroy
+  end
+  
+  def verify
+    @researcher = Researcher.find(session[:researcher_id])
+    @curation = Curation.find(params[:id])
+    @curation.datasets.each do |d|
+      d.instance_id = nil
+      d.save!
+    end
+    redirect_to researcher_url(@researcher), :notice => "We're running your streams!"
   end
 end

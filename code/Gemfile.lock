@@ -120,6 +120,7 @@ GEM
       http_parser.rb (~> 0.5.1)
       simple_oauth (~> 0.1.4)
     unicode (0.4.0)
+    useful_class_extensions (0.0.6)
     uuidtools (2.1.2)
     webrobots (0.0.12)
       nokogiri (>= 1.4.4)
@@ -158,4 +159,5 @@ DEPENDENCIES
   tweetstream (= 1.1.2)
   twitter
   unicode
+  useful_class_extensions
   yajl-ruby

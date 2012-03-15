@@ -253,7 +253,7 @@ class Filter < Instance
   end
   
   def add_datasets
-    datasets = Dataset.unlocked.all(:scrape_finished => false, :scrape_type => @scrape_type, :instance_id.not => "system")
+    datasets = Dataset.unlocked.all(:scrape_finished => false, :scrape_type => @scrape_type, :instance_id => nil)
     return claim_new_datasets(datasets)
   end
 
