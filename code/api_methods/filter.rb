@@ -27,6 +27,12 @@ class Filter < Instance
     puts "Filtering..."
     check_in
     assign_user_account
+    TweetStream.configure do |config|
+      config.username = @screen_name
+      config.password = @password
+      config.auth_method = :basic
+      config.parser   = :yajl
+    end
     puts "Entering filter routine."
     loop do
       if !killed?
@@ -80,12 +86,6 @@ class Filter < Instance
           @user_account = user
           @screen_name = user.screen_name
           @password = user.password
-          TweetStream.configure do |config|
-            config.username = @screen_name
-            config.password = @password
-            config.auth_method = :basic
-            config.parser   = :yajl
-          end
           puts "Assigned #{@screen_name}."
         else
           puts "Then I can't do anything for you. May god have mercy on your data"

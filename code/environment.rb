@@ -63,6 +63,7 @@ database = database[ENV['E']]
 database.inspect
 DataMapper.setup(:default, "#{database["adapter"]}://#{database["username"]}:#{database["password"]}@#{database["host"]}:#{database["port"] || 3000}/#{database["database"]}?encoding=UTF8").inspect
 DataMapper.finalize
+debugger
 STORAGE = Machine.determine_storage
 require DIR+'/extensions/dm-extensions'
 
