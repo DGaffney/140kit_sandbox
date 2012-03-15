@@ -18,7 +18,7 @@ WWW140kit::Application.routes.draw do
   get '/analysis/:curation_id/:analysis_metadata_id' => 'analysis_metadata#results', as: :curation_analysis 
   get '/new/dataset' => 'curations#new', as: :new_dataset
   get '/researchers/:user_name' => 'researchers#show', as: :researcher
-  get '/:user_name/datasets' => 'datasets#researcher', as: :researcher_datasets
+  get '/:user_name/datasets' => 'curations#researcher', as: :researcher_datasets
   get '/researchers/:user_name/edit' => 'researchers#edit', as: :edit_researcher
   put'/researchers/:user_name' => 'researchers#update'
   get '/posts/:id/:slug' => 'posts#show', as: :post

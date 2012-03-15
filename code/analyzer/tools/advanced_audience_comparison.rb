@@ -40,7 +40,6 @@ class AdvancedAudienceComparison < AnalysisMetadata
         AdvancedHistogram.generate_sequential_user_graphs(curation, path, {:twitter_id => follower_ids}, AdvancedAudienceComparison, account_names.join("_"))
         AdvancedHistogram.generate_tweet_avg_sum_graphs(curation, path, {:user_id => follower_ids}, AdvancedAudienceComparison, account_names.join("_"))
         AdvancedHistogram.generate_user_avg_sum_graphs(curation, path, {:twitter_id => follower_ids}, AdvancedAudienceComparison, account_names.join("_"))
-        debugger
         self.push_tmp_folder(curation.stored_folder_name+"/#{account_names.join("_")}")
       end
     end

@@ -38,7 +38,6 @@ class CurationsController < ApplicationController
     when "track"
       params[:end_time] = dataset.params.split(",").last.to_i
     end
-    debugger
     @curation.datasets.collect{|d| d.destroy}
     @curation.destroy
   end

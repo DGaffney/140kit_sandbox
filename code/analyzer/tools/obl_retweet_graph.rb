@@ -38,7 +38,6 @@ class OblRetweetGraph < AnalysisMetadata
     end
     Edge.save_all(@edges)
     retweet_graph_versions.each do |graph|
-      debugger
       options = {:dynamic => true, :formats => ["gexf", "graphml"], :node_attributes => [:statuses_count, :followers_count, :friends_count], :edge_attributes => [:style]}
       frequency_set = {:analysis_metadata_id => self.analysis_metadata(curation)&&self.analysis_metadata(curation).id, :style => "network_graph", :title => graph.title}.merge(options)
       RetweetGraph.generate_graph_files(frequency_set, graph)

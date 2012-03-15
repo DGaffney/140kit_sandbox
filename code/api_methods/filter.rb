@@ -104,7 +104,6 @@ class Filter < Instance
     client.on_interval(CHECK_FOR_NEW_DATASETS_INTERVAL) { 
       time = @start_time
       datasets = @datasets
-      debugger
       Thread.new do
         rsync_previous_files(datasets, time)
       end
@@ -138,7 +137,6 @@ class Filter < Instance
     need_to_stop = false
     @datasets.each do |dataset|
       time = dataset.params.split(",").last.to_i
-      debugger
       if time != -1 && Time.now > dataset.created_at+time
         need_to_stop = true
       end
