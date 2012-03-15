@@ -14,7 +14,7 @@ group :core do
   gem 'em-http-request', :require => 'em-http'
   gem 'geokit'
   gem 'htmlentities'
-  gem 'jeweler', '1.5.2'
+  gem 'jeweler'#, '1.5.2'
   gem 'json'
   gem 'mechanize'
   gem 'mocha'
