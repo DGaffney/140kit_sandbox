@@ -136,11 +136,12 @@ module Sh
     end
   end
   
-  def store_to_disk(from, to)
+  def self.store_to_disk(from, to)
     case STORAGE["type"]
     when "local"
       `cp #{from} #{STORAGE["path"]}/#{to}`
     when "remote"
+      puts "`rsync #{from} #{STORAGE["user"]}@#{STORAGE["hostname"]}:#{STORAGE["path"]}/#{to}`"
       `rsync #{from} #{STORAGE["user"]}@#{STORAGE["hostname"]}:#{STORAGE["path"]}/#{to}`
     end
   end
