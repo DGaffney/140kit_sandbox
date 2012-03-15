@@ -50,8 +50,7 @@ class Worker < Instance
     statuses = ["tsv_storing", "tsv_stored", "needs_import", "imported", "needs_drop", "dropped"]
     Curation.all(:status.not => ["imported", "tsv_stored", "dropped"]).each do |curation|
       datasets = curation.datasets
-      debugger
-      if datasets.length == datasets.collect{|x| x.status if x.status == statuses[statuses.index(curation.status)+1]}
+      if datasets.length == datasets.collect{|x| x.status if x.status == statuses[statuses.index(curation.status)+1]}.length
         curation.status = statuses[statuses.index(curation.status)+1] 
         curation.save!
       end
