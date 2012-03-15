@@ -8,7 +8,7 @@ class Curation < ActiveRecord::Base
   end
   
   def self.default_time_series
-    return 10.minutes
+    return 1.minute
   end
   
   def self.default_step

@@ -4,7 +4,7 @@ class Filter < Instance
   MAX_TRACK_IDS = 10000
   BATCH_SIZE = 100
   STREAM_API_URL = "http://stream.twitter.com"
-  CHECK_FOR_NEW_DATASETS_INTERVAL = 60*5
+  CHECK_FOR_NEW_DATASETS_INTERVAL = 60
   attr_accessor :user_account, :username, :password, :next_dataset_ends, :queue, :params, :datasets, :start_time, :last_start_time, :scrape_type
 
   def initialize
@@ -27,12 +27,6 @@ class Filter < Instance
     puts "Filtering..."
     check_in
     assign_user_account
-    TweetStream.configure do |config|
-      config.username = @screen_name
-      config.password = @password
-      config.auth_method = :basic
-      config.parser = :yajl
-    end
     puts "Entering filter routine."
     loop do
       if !killed?
@@ -109,9 +103,7 @@ class Filter < Instance
     client.on_interval(CHECK_FOR_NEW_DATASETS_INTERVAL) { 
       time = @start_time
       datasets = @datasets
-      Thread.new do
-        rsync_previous_files(datasets, time)
-      end
+      rsync_previous_files(datasets, time)
       @start_time = Time.now
       puts "Switching to new files..."
       client.stop if add_datasets 
@@ -163,6 +155,7 @@ class Filter < Instance
   end
   
   def rsync_previous_files(datasets, time)
+    debugger
     [Tweet, User, Entity, Geo, Coordinate].each do |model|
       datasets.each do |dataset| 
         Sh::mkdir("#{STORAGE["path"]}/#{model}")
