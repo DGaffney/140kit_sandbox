@@ -12,13 +12,13 @@ module Sh
     return result
   end
   
-  def self.storage_bt(command)
+  def self.storage_bt(command, credentials=STORAGE)
     result = nil
-    case STORAGE["type"]
+    case credentials["type"]
     when "local"
       result = self.bt(command).split("\n")
     when "remote"
-      result = self.bt("ssh #{STORAGE["user"]}@#{STORAGE["hostname"]} '#{command}'").split("\n")
+      result = self.bt("ssh #{credentials["user"]}@#{credentials["hostname"]} '#{command}'").split("\n")
     end
     return result
   end
@@ -60,12 +60,12 @@ module Sh
     return answer=="y"
   end
 
-  def self.mkdir(folder_location, location=STORAGE["type"])
-    case location
+  def self.mkdir(folder_location, credentials=STORAGE)
+    case credentials["type"]
     when "local"
       Sh::sh("mkdir -p #{folder_location}")
     when "remote"
-      Sh::sh("ssh #{STORAGE["user"]} 'mkdir -p #{folder_location}'")
+      Sh::sh("ssh #{credentials["user"]} 'mkdir -p #{folder_location}'")
     end
   end
   
@@ -102,16 +102,16 @@ module Sh
     return [".zip", ".tar.gz", ".gz"]
   end
   
-  def self.pull_file_from_storage(path)
+  def self.pull_file_from_storage(path, credentials=STORAGE)
     location = ""
     case STORAGE["type"]
     when "local"
-      Sh::mkdir("#{ENV["TMP_PATH"]}/#{path.split("/")[0..-2].join("/")}", "local")
+      Sh::mkdir("#{ENV["TMP_PATH"]}/#{path.split("/")[0..-2].join("/")}", {"type"=>"local"})
       Sh::sh("cp #{path} #{ENV["TMP_PATH"]}/#{path.split("/").last}")
       location = "#{ENV["TMP_PATH"]}/#{path.split("/").last}"
     when "remote"
-      Sh::mkdir("#{ENV["TMP_PATH"]}/#{path.split("/")[0..-2].join("/")}", "local")
-      Sh::sh("rsync #{STORAGE["user"]}@#{STORAGE["hostname"]}:#{STORAGE["path"]}/#{path} #{ENV["TMP_PATH"]}/#{path}")
+      Sh::mkdir("#{ENV["TMP_PATH"]}/#{path.split("/")[0..-2].join("/")}", {"type"=>"local"})
+      Sh::sh("rsync #{credentials["user"]}@#{credentials["hostname"]}:#{credentials["path"]}/#{path} #{ENV["TMP_PATH"]}/#{path}")
       location = "#{ENV["TMP_PATH"]}/#{path}"
     end
     return location
@@ -136,12 +136,12 @@ module Sh
     end
   end
   
-  def self.store_to_disk(from, to)
-    case STORAGE["type"]
+  def self.store_to_disk(from, to, credentials=STORAGE)
+    case credentials["type"]
     when "local"
-      `cp #{from} #{STORAGE["path"]}/#{to}`
+      `cp #{from} #{credentials["path"]}/#{to}`
     when "remote"
-      `rsync #{from} #{STORAGE["user"]}@#{STORAGE["hostname"]}:#{STORAGE["path"]}/#{to}`
+      `rsync #{from} #{credentials["user"]}@#{credentials["hostname"]}:#{credentials["path"]}/#{to}`
     end
   end
   

@@ -59,7 +59,7 @@ module DataMapperExtensions
   end
 
   def store_to_flat_file(objs, file=File.dirname(__FILE__)+"/../../data/raw/file")
-    Sh::mkdir(file.split("/")[0..file.split("/").length-2].join("/"), "local")
+    Sh::mkdir(file.split("/")[0..file.split("/").length-2].join("/"), {"type"=>"local"})
     return false if objs.empty?
     objs = objs.sth if objs.first.class != self && objs.first.class != Hash
     keys = self.attributes.collect(&:to_s).sort

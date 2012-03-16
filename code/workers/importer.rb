@@ -58,6 +58,15 @@ class Importer < Instance
     debugger
     @curation.datasets.each do |dataset|
       storage = Machine.first(:id => dataset.storage_machine_id).machine_storage_details
+      models = [Tweet, User, Entity, Geo, Coordinate]
+      models.each do |model|
+        files = Sh::storage_ls("raw_catalog/#{model}", storage).select{|x| dataset.id == x.split("_").first.to_i}
+        files.each do |file|
+          mysql_filename = "mysql_tmp_#{Time.now.to_i}_#{rand(10000)}.sql"
+          mysql_file = File.open("#{ENV['TMP_PATH']}/#{mysql_filename}", "w+")
+          file_location = Sh::pull_file_from_storage("#{model.to_s}/#{file}", storage)
+        end
+      end
     end
     # @curation = Curation.first
     # Sh::mkdir(ENV["TMP_PATH"], "local")

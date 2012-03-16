@@ -41,7 +41,7 @@ class Instance
   end
   
   def check_in
-    Sh::mkdir(ENV['TMP_PATH'], "local")
+    Sh::mkdir(ENV['TMP_PATH'], {"type"=>"local"})
     @check_in_thread = Thread.new { loop { self.touch; sleep(60) } }
   end
   
