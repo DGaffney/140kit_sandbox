@@ -23,13 +23,13 @@ module Sh
     return result
   end
   
-  def self.storage_ls(path="")
+  def self.storage_ls(path="", credentials=STORAGE)
     result = nil
-    case STORAGE["type"]
+    case credentials["type"]
     when "local"
-      result = self.bt("ls #{STORAGE["path"]}/#{path}").split("\n")
+      result = self.bt("ls #{credentials["path"]}/#{path}").split("\n")
     when "remote"
-      result = self.bt("ssh #{STORAGE["user"]}@#{STORAGE["hostname"]} 'ls #{STORAGE["path"]}/#{path}'").split("\n")
+      result = self.bt("ssh #{credentials["user"]}@#{credentials["hostname"]} 'ls #{credentials["path"]}/#{path}'").split("\n")
     end
     return result
   end
