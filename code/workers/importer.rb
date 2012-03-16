@@ -40,7 +40,6 @@ class Importer < Instance
     @curation = select_curation
     if @curation
       import_datasets_to_database
-      flag_curation
     end
   end
   
@@ -55,32 +54,37 @@ class Importer < Instance
   end
 
   def import_datasets_to_database
-    # @curation = Curation.first
-    # Sh::mkdir(ENV["TMP_PATH"], "local")
-    dataset_ids = @curation.datasets.collect{|x| x.id}
-    models = [Tweet, User, Entity, Geo, Coordinate]
-    models.each do |model|
-      files = Sh::storage_ls(model.to_s).select{|x| dataset_ids.include?(x[0].to_i)}
-      files.each do |file|
-        mysql_filename = "mysql_tmp_#{Time.now.to_i}_#{rand(10000)}.sql"
-        mysql_file = File.open("#{ENV['TMP_PATH']}/#{mysql_filename}", "w+")
-        file_location = Sh::pull_file_from_storage("#{model.to_s}/#{file}")#ENV["TMP_PATH"]+"/"+file
-        header = CSV.open(file_location, "r", :col_sep => "\t", :row_sep => "\0", :quote_char => '"').first
-        header_row = header.index("id")
-        header[header_row] = "@id" if header_row
-        mysql_file.write("load data local infile '#{file_location}' ignore into table #{model.storage_name} fields terminated by '\\t' optionally enclosed by '\"' lines terminated by '\\0' ignore 1 lines (#{header.join(", ")});\n")
-        mysql_file.close
-        puts "Executing mysql block..."
-        config = DataMapper.repository.adapter.options
-        puts "mysql -u #{config["user"]} --password='#{config["password"]}' -P #{config["port"]} -h #{config["host"]} #{config["path"].gsub("/", "")} < #{ENV["TMP_PATH"]}/#{mysql_filename} --local-infile=1"
-        Sh::sh("sudo mysql -u #{config["user"]} --password='#{config["password"]}' -P #{config["port"]} -h #{config["host"] || "localhost"} #{config["path"].gsub("/", "")} < #{ENV["TMP_PATH"]}/#{mysql_filename} --local-infile=1")
-        Sh::remove("#{ENV["TMP_PATH"]}/#{mysql_filename}")
-        Sh::remove("#{file_location}")
+    dataset = @curation.datasets.first
+    @curation.datasets.each do |dataset|
+      storage = Machine.first(:id => dataset.storage_machine_id).machine_storage_details
+      models = [Tweet, User, Entity, Geo, Coordinate]
+      models.each do |model|
+        files = Sh::storage_ls("raw_catalog/#{model}", storage).select{|x| dataset.id == x.split("_").first.to_i}
+        files.each do |file|
+          mysql_filename = "mysql_tmp_#{Time.now.to_i}_#{rand(10000)}.sql"
+          mysql_file = File.open("#{ENV['TMP_PATH']}/#{mysql_filename}", "w+")
+          file_location = Sh::pull_file_from_storage("raw_catalog/#{model.to_s}/#{file}", storage)
+          decompressed_files = Sh::decompress(file_location, File.dirname(file_location))
+          decompressed_files.each do |decompressed_file|
+            header = CSV.open(decompressed_file, "r", :col_sep => "\t", :row_sep => "\0", :quote_char => '"').first
+            header_row = header.index("id")
+            header[header_row] = "@id" if header_row
+            mysql_file.write("load data local infile '#{decompressed_file}' ignore into table #{model.storage_name} fields terminated by '\\t' optionally enclosed by '\"' lines terminated by '\\0' ignore 1 lines (#{header.join(", ")});\n")
+            mysql_file.close
+            puts "Executing mysql block..."
+            config = DataMapper.repository.adapter.options
+            puts "mysql -u #{config["user"]} --password='#{config["password"]}' -P #{config["port"]} -h #{config["host"]} #{config["path"].gsub("/", "")} < #{ENV["TMP_PATH"]}/#{mysql_filename} --local-infile=1"
+            Sh::sh("mysql -u #{config["user"]} --password='#{config["password"]}' -P #{config["port"]} -h #{config["host"] || "localhost"} #{config["path"].gsub("/", "")} < #{ENV["TMP_PATH"]}/#{mysql_filename} --local-infile=1")
+            Sh::remove("#{ENV["TMP_PATH"]}/#{mysql_filename}")
+            Sh::remove("#{decompressed_file}")
+            Sh::remove("#{file_location}")
+          end
+        end
       end
+      dataset.status = "imported"
+      dataset.save!
     end
-    self.finished = true
-    self.save!
-    @curation.status = "live"
+    @curation.status = "imported"
     @curation.save!
     @curation.unlock
   end

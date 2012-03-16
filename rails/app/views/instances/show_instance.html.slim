@@ -1,0 +1,25 @@
+h2 = "Instance ##{@instance.id} running on #{@instance.hostname}"
+table.table.table-striped.table-bordered
+  thead
+    tr
+      th Instance ID
+      th PID
+      th Type
+      th Killed?
+  tbody
+    tr
+      td = @instance.instance_id
+      td = @instance.pid
+      td = @instance.instance_type
+      td = @instance.killed
+
+table.table.table-striped.table-bordered
+  thead
+    tr
+      th Class
+      th ID
+  tbody
+    - for lock in @locks
+      tr
+        td = lock.classname
+        td = lock.with_id

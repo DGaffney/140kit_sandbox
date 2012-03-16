@@ -59,7 +59,7 @@ module DataMapperExtensions
   end
 
   def store_to_flat_file(objs, file=File.dirname(__FILE__)+"/../../data/raw/file")
-    Sh::mkdir(file.split("/")[0..file.split("/").length-2].join("/"), "local")
+    Sh::mkdir(file.split("/")[0..file.split("/").length-2].join("/"), {"type"=>"local"})
     return false if objs.empty?
     objs = objs.sth if objs.first.class != self && objs.first.class != Hash
     keys = self.attributes.collect(&:to_s).sort
@@ -67,13 +67,12 @@ module DataMapperExtensions
     csv_header = CSV.generate_line(keys, :col_sep => "\t", :row_sep => "\0", :quote_char => '"')
     f.write(csv_header) if f.size==0
     objs.each do |elem|
-      begin
+#      begin
       row = CSV.generate_line(keys.collect{|k| elem[k.to_sym]}, :col_sep => "\t", :row_sep => "\0", :quote_char => '"')
-      rescue
-        debugger
-        ic = Iconv.new('UTF-8//IGNORE', 'UTF-8')
-        row = CSV.generate_line(keys.collect{|k| elem[k.to_sym].class == String ? elem[k.to_sym].encode("ISO-8859-1") : elem[k.to_sym]}, :col_sep => "\t", :row_sep => "\0", :quote_char => '"')
-      end
+#      rescue
+#        ic = Iconv.new('UTF-8//IGNORE', 'UTF-8')
+#        row = CSV.generate_line(keys.collect{|k| elem[k.to_sym].class == String ? elem[k.to_sym].encode("ISO-8859-1") : elem[k.to_sym]}, :col_sep => "\t", :row_sep => "\0", :quote_char => '"')
+#      end
       f.write(row)
     end
     f.close

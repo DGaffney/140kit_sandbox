@@ -20,22 +20,17 @@ require 'tweetstream'
 require 'iconv'
 require 'unicode'
 require 'csv'
+require 'useful_class_extensions'
 #Encoding.default_external = Encoding::ISO_8859_1
 #Encoding.default_internal = Encoding::ISO_8859_1
 DIR = File.dirname(__FILE__)
 
-require DIR+'/extensions/array'
-require DIR+'/extensions/string'
-require DIR+'/extensions/hash'
-require DIR+'/extensions/fixnum'
-require DIR+'/extensions/time'
-require DIR+'/extensions/nil_class'
 require DIR+'/extensions/inflectors'
 
 require DIR+'/utils/git'
 require DIR+'/utils/sh'
 
-ENV['HOSTNAME'] = Sh::hostname
+ENV['HOSTNAME'] = Sh::hostname.strip
 ENV['PID'] = Process.pid.to_s #because ENV only allows strings.
 ENV['INSTANCE_ID'] = Digest::SHA1.hexdigest("#{ENV['HOSTNAME']}#{ENV['PID']}")
 ENV['TMP_PATH'] = DIR+"/tmp_files/#{ENV['INSTANCE_ID']}/scratch_processes"
@@ -43,7 +38,7 @@ ENV['TMP_PATH'] = DIR+"/tmp_files/#{ENV['INSTANCE_ID']}/scratch_processes"
 require DIR+'/model'
 models = [
   "analysis_metadata", "analytical_offering", "analytical_offering_variable", "analytical_offering_variable_descriptor", "auth_user", "coordinate", "curation",
-  "dataset", "edge", "friendship", "entity", "geo", "graph", "graph_point", "importer_task", "instance", "location", "lock", "mail", "parameter", "post", 
+  "dataset", "edge", "friendship", "entity", "geo", "graph", "graph_point", "importer_task", "instance", "location", "lock", "machine", "mail", "parameter", "post", 
   "researcher", "ticket", "trending_topic", "tweet", "user", "whitelisting", "worker_description"
 ]
 models.collect{|model| require DIR+'/models/'+model}
@@ -56,41 +51,20 @@ require DIR+'/utils/entity_helper'
 require DIR+'/utils/u'
 # require DIR+'/lib/tweetstream'
 
-env = ARGV.include?("e") ? ARGV[ARGV.index("e")+1]||"development" : "development"
+ENV['E'] = ARGV.include?("e") ? ARGV[ARGV.index("e")+1]||"development" : "development"
 
-puts "Starting #{env} environment..."
+puts "Starting #{ENV['E']} environment..."
 
 database = YAML.load(File.read(File.dirname(__FILE__)+'/config/database.yml'))
-if !database.has_key?(env)
+if !database.has_key?(ENV['E'])
   env = "development"
 end
-database = database[env]
+database = database[ENV['E']]
 database.inspect
 DataMapper.setup(:default, "#{database["adapter"]}://#{database["username"]}:#{database["password"]}@#{database["host"]}:#{database["port"] || 3000}/#{database["database"]}?encoding=UTF8").inspect
 DataMapper.finalize
-
+STORAGE = Machine.determine_storage
 require DIR+'/extensions/dm-extensions'
-
-storage = YAML.load(File.read(File.dirname(__FILE__)+'/config/storage.yml'))
-if !storage.has_key?(env)
-  env = "development"
-end
-STORAGE = storage[env]
-case STORAGE["type"]
-when "local"
-  `mkdir -p #{STORAGE["path"]}`
-when "remote"
-  `ssh #{STORAGE["user"]}@#{STORAGE["host"]} 'mkdir -p #{STORAGE["path"]}'`
-end
-
-def store_to_disk(from, to)
-  case STORAGE["type"]
-  when "local"
-    `cp #{from} #{STORAGE["path"]}/#{to}`
-  when "remote"
-    `rsync #{from} #{STORAGE["user"]}@#{STORAGE["host"]}:#{STORAGE["path"]}/#{to}`
-  end
-end
 
 #require DIR+'/analyzer/analysis'
 

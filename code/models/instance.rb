@@ -8,6 +8,7 @@ class Instance
   property :instance_id,    String, :length => 40
   property :hostname,       String, :unique_index => [:unique_instance], :default => ENV['HOSTNAME']
   property :pid,            Integer, :unique_index => [:unique_instance], :default => ENV['PID']
+  property :updated_at,     Time
   property :killed,         Boolean, :default => false
   property :instance_type,  String, :unique_index => [:unique_instance]
   
@@ -16,6 +17,8 @@ class Instance
   # validates_uniqueness_of :instance_id
   
   attr_accessor :metadata, :rest_allowed, :last_count_check, :tmp_path, :tmp_data, :check_in_thread
+  
+  SLEEP_CONSTANT = 20
   
   def initialize
     super
@@ -40,8 +43,8 @@ class Instance
   end
   
   def check_in
-    Sh::mkdir(ENV['TMP_PATH'], "local")
-    @check_in_thread = Thread.new { loop { self.touch; sleep(CHECK_IN_FREQUENCY*60) } }
+    Sh::mkdir(ENV['TMP_PATH'], {"type"=>"local"})
+    @check_in_thread = Thread.new { loop { self.touch; sleep(60) } }
   end
   
   def whitelisted?
@@ -52,6 +55,7 @@ class Instance
   end
   
   def killed?
+    self.reload
     self.killed
   end
   

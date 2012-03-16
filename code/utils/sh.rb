@@ -1,7 +1,7 @@
 module Sh
   require 'open3'
   def self.hostname
-    return sh "hostname"
+    return bt "hostname"
   end
   
   def self.sh(command, chomped=true, silence_errors=true)
@@ -12,24 +12,24 @@ module Sh
     return result
   end
   
-  def self.storage_bt(command)
+  def self.storage_bt(command, credentials=STORAGE)
     result = nil
-    case STORAGE["type"]
+    case credentials["type"]
     when "local"
       result = self.bt(command).split("\n")
     when "remote"
-      result = self.bt("ssh #{STORAGE["user"]}@#{STORAGE["host"]} '#{command}'").split("\n")
+      result = self.bt("ssh #{credentials["user"]}@#{credentials["hostname"]} '#{command}'").split("\n")
     end
     return result
   end
   
-  def self.storage_ls(path="")
+  def self.storage_ls(path="", credentials=STORAGE)
     result = nil
-    case STORAGE["type"]
+    case credentials["type"]
     when "local"
-      result = self.bt("ls #{STORAGE["path"]}/#{path}").split("\n")
+      result = self.bt("ls #{credentials["path"]}/#{path}").split("\n")
     when "remote"
-      result = self.bt("ssh #{STORAGE["user"]}@#{STORAGE["host"]} 'ls #{STORAGE["path"]}/#{path}'").split("\n")
+      result = self.bt("ssh #{credentials["user"]}@#{credentials["hostname"]} 'ls #{credentials["path"]}/#{path}'").split("\n")
     end
     return result
   end
@@ -60,12 +60,12 @@ module Sh
     return answer=="y"
   end
 
-  def self.mkdir(folder_location, location=STORAGE["type"])
-    case location
+  def self.mkdir(folder_location, credentials=STORAGE)
+    case credentials["type"]
     when "local"
       Sh::sh("mkdir -p #{folder_location}")
     when "remote"
-      Sh::sh("ssh #{STORAGE["user"]}@#{STORAGE["host"]} 'mkdir -p #{folder_location}'")
+      Sh::sh("ssh #{credentials["user"]} 'mkdir -p #{folder_location}'")
     end
   end
   
@@ -85,15 +85,15 @@ module Sh
       end
     when ".zip"
       if to_location == "."
-        Sh::sh("unzip -c #{file}")
+        Sh::sh("unzip #{file}")
       else
-        Sh::sh("unzip -c #{file} -d #{to_location}+#{file.gsub(File.dirname(file), "")}")
+        Sh::sh("unzip -o #{file} -d #{to_location}")
       end
     when ".tar.gz"
     else
       return [file]
     end
-    current_files = self.resolve_all_files(File.dirname(file))
+    current_files = Sh::resolve_all_files(File.dirname(file))
     file_additions = current_files-existing_files
     return file_additions
   end
@@ -102,16 +102,16 @@ module Sh
     return [".zip", ".tar.gz", ".gz"]
   end
   
-  def self.pull_file_from_storage(path)
+  def self.pull_file_from_storage(path, credentials=STORAGE)
     location = ""
-    case STORAGE["type"]
+    case credentials["type"]
     when "local"
-      Sh::mkdir("#{ENV["TMP_PATH"]}/#{path.split("/")[0..-2].join("/")}", "local")
+      Sh::mkdir("#{ENV["TMP_PATH"]}/#{path.split("/")[0..-2].join("/")}", {"type"=>"local"})
       Sh::sh("cp #{path} #{ENV["TMP_PATH"]}/#{path.split("/").last}")
       location = "#{ENV["TMP_PATH"]}/#{path.split("/").last}"
     when "remote"
-      Sh::mkdir("#{ENV["TMP_PATH"]}/#{path.split("/")[0..-2].join("/")}", "local")
-      Sh::sh("rsync #{STORAGE["user"]}@#{STORAGE["host"]}:#{STORAGE["path"]}/#{path} #{ENV["TMP_PATH"]}/#{path}")
+      Sh::mkdir("#{ENV["TMP_PATH"]}/#{path.split("/")[0..-2].join("/")}", {"type"=>"local"})
+      Sh::sh("rsync #{credentials["user"]}@#{credentials["hostname"]}:#{credentials["path"]}/#{path} #{ENV["TMP_PATH"]}/#{path}")
       location = "#{ENV["TMP_PATH"]}/#{path}"
     end
     return location
@@ -121,7 +121,7 @@ module Sh
     files = []
     folders = [folders].flatten
     folders.each do |folder|
-      files << Sh::sh("find #{folder} -type f").split("\n").select{|file| File.file?(file) && !File.extname(file).empty? && !File.zero?(file)}
+      files << Sh::bt("find #{folder} -type f").split("\n").select{|file| File.file?(file) && !File.extname(file).empty? && !File.zero?(file)}
     end
     return files.flatten.uniq
   end
@@ -133,6 +133,23 @@ module Sh
       else
         Sh::sh("rm -r #{file}") 
       end
+    end
+  end
+  
+  def self.store_to_disk(from, to, credentials=STORAGE)
+    case credentials["type"]
+    when "local"
+      `cp #{from} #{credentials["path"]}/#{to}`
+    when "remote"
+      `rsync #{from} #{credentials["user"]}@#{credentials["hostname"]}:#{credentials["path"]}/#{to}`
+    end
+  end
+  
+  def self.compress(file)
+    if File.file?(file)
+      `zip #{file}.zip #{file} -j`
+    elsif File.directory?(file)
+      `zip #{file}.zip #{file} -j`
     end
   end
 end

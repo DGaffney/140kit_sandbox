@@ -40,17 +40,17 @@ class Worker < Instance
   
   def work_routine
     @curation = select_curation
-    #clean_orphans
+    clean_orphans
     do_analysis_jobs
     switch_curation_statuses
     @curation.unlock if @curation
   end
   
   def switch_curation_statuses
-    statuses = ["tsv_storing", "tsv_stored", "needs_import", "imported", "needs_drop", "dropped"]
+    statuses = ["tsv_storing", "tsv_stored", "needs_import", "imported", "live", "needs_drop", "dropped"]
     Curation.all(:status.not => ["imported", "tsv_stored", "dropped"]).each do |curation|
       datasets = curation.datasets
-      if datasets.length == datasets.collect{|x| x.status if x.status == statuses[statuses.index(curation.status)+1]}
+      if datasets.length == datasets.collect{|x| x.status if x.status == statuses[statuses.index(curation.status)+1]}.compact.length
         curation.status = statuses[statuses.index(curation.status)+1] 
         curation.save!
       end
@@ -59,7 +59,7 @@ class Worker < Instance
   
   def select_curation
     puts "select_curation..."
-    curations = Curation.unlocked.all(:analyzed => false).reject {|c| c.datasets.collect {|d| d.scrape_finished }.include?(false) }.shuffle
+    curations = Curation.unlocked.all(:analyzed => false, :status.not => ["tsv_storing"]).reject {|c| c.datasets.collect {|d| d.scrape_finished }.include?(false) }.shuffle
     for curation in curations
       curation.lock
       return curation if curation.owned_by_me?
@@ -69,15 +69,13 @@ class Worker < Instance
   
   def clean_orphans
     puts "clean_orphans..."
-    begin
-      Instance.all(:hostname => ENV['HOSTNAME']).each do |instance|
-        if Sh::sh("kill -0 #{instance.pid}", false, false).select{|response| !response.empty?}.length == 1
-          Lock.all(:instance_id => instance.instance_id).destroy
-          instance.destroy
-        end
+    Instance.all.each do |instance|
+      process_report = Sh::bt("ssh #{instance.hostname} 'ps -p #{instance.pid}'").split("\n")
+      if process_report.length == 1 || process_report.last.scan(/(.*#{instance.pid}.*pts\/.*\d\d:\d\d:\d\d (ruby|rdebug))/).flatten.first != process_report.last
+        Sh::bt("ssh #{instance.hostname} 'rm -r 140kit_sandbox/code/tmp_files/#{instance.instance_id}'")
+        Lock.all(:instance_id => instance.instance_id).destroy
+        instance.destroy
       end
-    rescue
-      retry
     end
     Lock.all(:instance_id.not => Instance.all.collect{|instance| instance.instance_id}).destroy
   end
@@ -106,6 +104,7 @@ class Worker < Instance
       raise "Language #{metadata.language} is not currently supported for analytical routing!"
     end
   end
+
 end
 
 worker = Worker.new

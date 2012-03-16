@@ -18,10 +18,10 @@ class Researcher
   property :hidden_account, Boolean, :default => false
   property :rate_limited, Boolean, :default => false
   property :name, String
-  property :uid, String, :unique_index => 'unique_researchers_uid'
+  property :uid, String
   property :provider, String
   property :oauth_token, String
-  property :oauth_token_secret
+  property :oauth_token_secret, String
   property :first_time, Boolean
   property :affiliation, String
   property :affiliation_url, String, :format => :url

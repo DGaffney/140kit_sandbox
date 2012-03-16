@@ -197,7 +197,7 @@ class CentralityDifferentials < AnalysisMetadata
     env = ENV["e"] || "development"
     database = YAML.load(File.open(DIR+'/config/database.yml').read)
     Sh::mkdir(ENV['TMP_PATH'])
-    `python #{DIR}/analyzer/resources/python/pagerank.py #{graph.id} #{ENV['TMP_PATH']}/results.csv #{database[env]["host"]} #{database[env]["username"]} #{database[env]["password"]} #{database[env]["database"]} #{database[env]["port"]}`
+    `python #{DIR}/analyzer/resources/python/pagerank.py #{graph.id} #{ENV['TMP_PATH']}/results.csv #{database[env]["hostname"]} #{database[env]["username"]} #{database[env]["password"]} #{database[env]["database"]} #{database[env]["port"]}`
     edges = []
     FasterCSV.open("#{ENV['TMP_PATH']}/results.csv", "r").each do |row|
       edges << {:id => row[0], :start_node => Iconv.iconv('utf-8', 'ISO_8859-1', row[1]), :end_node => Iconv.iconv('utf-8', 'ISO_8859-1', row[2]), :time => Time.parse(row[3]), :edge_id => row[4], :flagged => row[5], :style => row[6], :start_node_kind => row[7], :end_node_kind => row[8], :analysis_metadata_id => row[9], :curation_id => row[10], :graph_id => row[11], :start_centrality => row[12], :end_centrality => row[13], :start_degree => row[14], :end_degree => row[15]}    	

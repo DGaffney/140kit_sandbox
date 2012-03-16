@@ -4,25 +4,18 @@ class Filter < Instance
   MAX_TRACK_IDS = 10000
   BATCH_SIZE = 100
   STREAM_API_URL = "http://stream.twitter.com"
-  CHECK_FOR_NEW_DATASETS_INTERVAL = 60*5
+  CHECK_FOR_NEW_DATASETS_INTERVAL = 30
+  CHECK_INTERVAL = 30
   attr_accessor :user_account, :username, :password, :next_dataset_ends, :queue, :params, :datasets, :start_time, :last_start_time, :scrape_type
 
   def initialize
     super
     @datasets = []
     @queue = []
-    oauth_settings = YAML.load(File.read(File.dirname(__FILE__)+'/../config/twitter.yml'))
-    account = oauth_settings.keys.shuffle.first
-    TweetStream.configure do |config|
-      config.consumer_key = oauth_settings[account]["oauth_settings"]["consumer_key"]
-      config.consumer_secret = oauth_settings[account]["oauth_settings"]["consumer_secret"]
-      config.oauth_token = oauth_settings[account]["access_token"]["access_token"]
-      config.oauth_token_secret = oauth_settings[account]["access_token"]["access_token_secret"]
-      config.auth_method = :oauth
-      config.parser   = :yajl
-    end
     @start_time = Time.now
     @scrape_type = ARGV[0] || "track"
+    self.instance_type = "filter"
+    self.save
     at_exit { do_at_exit }
   end
   
@@ -41,7 +34,7 @@ class Filter < Instance
       config.username = @screen_name
       config.password = @password
       config.auth_method = :basic
-      config.parser = :yajl
+      config.parser   = :yajl
     end
     puts "Entering filter routine."
     loop do
@@ -117,10 +110,11 @@ class Filter < Instance
         rsync_previous_files(datasets, time)
       end
       @start_time = Time.now
-      puts "Switching to new files..."
-      client.stop if add_datasets 
+      print "[]"
+      need_to_stop = touch_and_check_for_finished
+      client.stop if add_datasets || need_to_stop
     }
-    client.on_limit { |skip_count| puts "\nWe are being rate limited! We lost #{skip_count} tweets!\n" }
+    client.on_limit { |skip_count| print "*#{skip_count}*" }
     client.on_error { |message| puts "\nError: #{message}\n";client.stop }
     client.filter(params_for_stream) do |tweet|
       # puts "[tweet] #{tweet[:user][:screen_name]}: #{tweet[:text]}"
@@ -134,6 +128,22 @@ class Filter < Instance
         end
       end
     end
+  end
+  
+  def touch_and_check_for_finished
+    Thread.new do
+      @datasets.each do |dataset|
+        dataset.touch
+      end
+    end
+    need_to_stop = false
+    @datasets.each do |dataset|
+      time = dataset.params.split(",").last.to_i
+      if time != -1 && Time.now > dataset.created_at+time
+        need_to_stop = true
+      end
+    end
+    return need_to_stop
   end
   
   def params_for_stream
@@ -167,12 +177,18 @@ class Filter < Instance
   end
   
   def rsync_previous_files(datasets, time)
+    files = []
     [Tweet, User, Entity, Geo, Coordinate].each do |model|
       datasets.each do |dataset| 
-        Sh::mkdir("#{STORAGE["path"]}/#{model}")
-        store_to_disk("#{dir(model, dataset.id, time)}.tsv", "#{model}/#{dataset.id}_#{time.strftime("%Y-%m-%d_%H-%M-%S")}.tsv")
-        `rm #{dir(model, dataset.id, time)}.tsv`
+        Sh::mkdir("#{STORAGE["path"]}/raw_catalog/#{model}")
+        Sh::compress("#{dir(model, dataset.id, time)}.tsv")
+        Sh::store_to_disk("#{dir(model, dataset.id, time)}.tsv.zip", "raw_catalog/#{model}/#{dataset.id}_#{time.strftime("%Y-%m-%d_%H-%M-%S")}.tsv.zip")
+	      files << dir(model, dataset.id, time)+".tsv"
+	      files << dir(model, dataset.id, time)+".tsv.zip"
       end
+    end
+    files.each do |file|
+      `rm #{file}`
     end
   end
 
@@ -257,7 +273,7 @@ class Filter < Instance
   end
   
   def add_datasets
-    datasets = Dataset.unlocked.all(:scrape_finished => false, :scrape_type => @scrape_type)
+    datasets = Dataset.unlocked.all(:scrape_finished => false, :scrape_type => @scrape_type, :instance_id => nil)
     return claim_new_datasets(datasets)
   end
 
@@ -270,6 +286,10 @@ class Filter < Instance
     if !datasets_to_claim.empty?
      claimed_datasets = Dataset.lock(datasets_to_claim)
      if !claimed_datasets.empty?
+       claimed_datasets.each do |dataset|
+         dataset.storage_machine_id = Machine.first(:hostname => STORAGE["hostname"]).id rescue 0
+         dataset.save!
+       end
        update_datasets(claimed_datasets)
        return true
      end
@@ -288,7 +308,7 @@ class Filter < Instance
 
   def update_next_dataset_ends
     update_start_times
-    refresh_datasets # this is absolutely necessary even while it's called in update_start_times above. huh!
+    # refresh_datasets # this is absolutely necessary even while it's called in update_start_times above. huh!
     soonest_ending_dataset = @datasets.select{|d| d.params.split(",").last.to_i!=-1}.sort {|x,y| (x.created_at.to_time.gmt + x.params.split(",").last.to_i - DateTime.now.to_time.gmt) <=> (y.created_at.to_time.gmt + y.params.split(",").last.to_i - DateTime.now.to_time.gmt) }.first
     @next_dataset_ends = soonest_ending_dataset.created_at.to_time.gmt + soonest_ending_dataset.params.split(",").last.to_i rescue nil
   end
@@ -309,7 +329,7 @@ class Filter < Instance
     started_datasets = @datasets.reject {|d| d.created_at.nil? }
     finished_datasets = started_datasets.select{|d| d.params.split(",").last.to_i!=-1}.select {|d| U.times_up?(d.created_at.gmt+d.params.split(",").last.to_i) }
     if !finished_datasets.empty?
-      puts "Finished collecting "+finished_datasets.collect {|d| "#{d.scrape_type}:\"#{d.internal_params_label}\"" }.join(", ")
+      puts "\nFinished collecting "+finished_datasets.collect {|d| "#{d.scrape_type}:\"#{d.internal_params_label}\"" }.join(", ")
       # Dataset.update_all({:scrape_finished => true}, {:id => finished_datasets.collect {|d| d.id}})
       Dataset.all(:id => finished_datasets.collect {|d| d.id}).update(:scrape_finished => true, :status => "tsv_stored")
       @datasets -= finished_datasets

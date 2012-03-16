@@ -1,0 +1,13 @@
+h1 Adding Curation
+p These are the current settings for your dataset. Please check all of these values very carefully. If you're satisfied, please click verify below; otherwise, click alter to return to the form.
+h2 Settings
+== render partial: 'table', locals: {curations: [@curation], show_options: false}
+h2 Streams
+== render partial: '/datasets/table'
+.row
+
+  .span2.offset1
+    a.btn.btn-primary.btn-large href=alter_dataset_path(@curation.id) &laquo; Alter 
+
+  .span2.offset7
+    a.btn.btn-primary.btn-large href=verify_dataset_path(@curation.id) Verify &raquo;

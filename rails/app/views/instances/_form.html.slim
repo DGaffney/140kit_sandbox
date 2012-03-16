@@ -1,0 +1,25 @@
+.row
+  = form_tag(update_machine_path(@machine), :method => "post") do
+    .span10.offset1
+      fieldset
+        .control-group
+          label.control-label IP
+          .controls
+            = text_field_tag :ip, @machine.ip, class: 'input-xlarge'
+          label.control-label Storage Path
+          .controls
+            = text_field_tag :storage_path, @machine.storage_path, class: 'input-xlarge'
+          label.control-label Working Path
+          .controls
+            = text_field_tag :working_path, @machine.working_path, class: 'input-xlarge'
+          label.control-label User
+          .controls
+            = text_field_tag :user, @machine.user, class: 'input-xlarge'
+          label.control-label Image URL
+          .controls
+            = text_field_tag :image_url, @machine.image_url, class: 'input-xlarge'
+          label.control-label Can it Store?
+          .controls
+            = check_box_tag :can_store, @machine.can_store, class: 'input-xlarge'
+          .form-actions
+            = submit_tag 'Save', class: 'btn btn-primary'

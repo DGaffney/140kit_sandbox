@@ -24,7 +24,6 @@ class Pretty
   
   def self.location(graph_points)
     graph_points.select{|graph_point| graph_point[:label] = "Not Reported" if graph_point[:label].nil?}
-    debugger
     iphone_graph_points = graph_points.select{|graph_point| graph_point[:label].include?("UT:") || graph_point[:label].include?("iPhone:")}
     iphone_graph_point = iphone_graph_points.empty?  ? nil : {:label => "iPhone Location", :curation_id => graph_points.first[:curation_id], :graph_id => graph_points.first[:graph_id], :value => iphone_graph_points.length}
     pre_graph_points = graph_points.select{|graph_point| graph_point[:label].include?("Pre:")}

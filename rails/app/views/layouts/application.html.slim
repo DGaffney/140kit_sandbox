@@ -6,7 +6,8 @@ html
       = ": #{@page_title}" if @page_title
     /[if lt IE 9]
       script src="http://html5shim.googlecode.com/svn/trunk/html5.js"
-    = stylesheet_link_tag 'application'
+    = javascript_include_tag "http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js", "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/jquery-ui.min.js", "application"
+    = stylesheet_link_tag "http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/redmond/jquery-ui.css", "application"
     /* link rel="stylesheet" href="/css/bootstrap-responsive.min.css"*/
     = csrf_meta_tags
   body
@@ -40,7 +41,9 @@ html
                     b.caret
                   ul.dropdown-menu
                     li
-                      a href=researcher_curations_path(current_user.user_name) My Curations
+                      a href=researcher_datasets_path(current_user.user_name) My Datasets
+                    li
+                      a href=new_dataset_path Add A Dataset
                     li
                       a href=researcher_path(current_user.user_name) View profile
                     li.divider

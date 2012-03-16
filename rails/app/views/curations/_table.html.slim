@@ -1,4 +1,5 @@
 - curations ||= @curations
+- show_options ||= true
 table.table.table-striped.table-bordered
   thead
     tr
@@ -6,7 +7,8 @@ table.table.table-striped.table-bordered
       th Created
       th Last Updated
       th Current Status
-      th Options
+      - if show_options
+        th Options
   tbody
     - for curation in curations
       tr
@@ -14,4 +16,5 @@ table.table.table-striped.table-bordered
         td = curation.created_at.strftime("%b %d, %Y at %H:%M:%S (%Z)")
         td = curation.updated_at.strftime("%b %d, %Y at %H:%M:%S (%Z)")
         td = curation.current_status
-        td = curation.current_options
+        - if show_options
+          td = curation.current_options.html_safe
