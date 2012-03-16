@@ -85,15 +85,15 @@ module Sh
       end
     when ".zip"
       if to_location == "."
-        Sh::sh("unzip -c #{file}")
+        Sh::sh("unzip #{file}")
       else
-        Sh::sh("unzip -c #{file} -d #{to_location}+#{file.gsub(File.dirname(file), "")}")
+        Sh::sh("unzip -o #{file} -d #{to_location}")
       end
     when ".tar.gz"
     else
       return [file]
     end
-    current_files = self.resolve_all_files(File.dirname(file))
+    current_files = Sh::resolve_all_files(File.dirname(file))
     file_additions = current_files-existing_files
     return file_additions
   end
@@ -104,7 +104,7 @@ module Sh
   
   def self.pull_file_from_storage(path, credentials=STORAGE)
     location = ""
-    case STORAGE["type"]
+    case credentials["type"]
     when "local"
       Sh::mkdir("#{ENV["TMP_PATH"]}/#{path.split("/")[0..-2].join("/")}", {"type"=>"local"})
       Sh::sh("cp #{path} #{ENV["TMP_PATH"]}/#{path.split("/").last}")
@@ -121,7 +121,7 @@ module Sh
     files = []
     folders = [folders].flatten
     folders.each do |folder|
-      files << Sh::sh("find #{folder} -type f").split("\n").select{|file| File.file?(file) && !File.extname(file).empty? && !File.zero?(file)}
+      files << Sh::bt("find #{folder} -type f").split("\n").select{|file| File.file?(file) && !File.extname(file).empty? && !File.zero?(file)}
     end
     return files.flatten.uniq
   end
