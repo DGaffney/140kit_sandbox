@@ -1,0 +1,15 @@
+- analysis_metadatas ||= @analysis_metadatas
+table.table.table-striped.table-bordered
+  thead
+    tr
+      th Type
+      th Status
+      th Options
+  tbody
+    - for analysis_metadata in analysis_metadatas
+      tr
+        td
+          | 
+          a href=analytical_offering_path(analysis_metadata.analytical_offering.id) #{analysis_metadata.analytical_offering.title}
+        td = analysis_metadata.status
+        td ????Remove | Restart????

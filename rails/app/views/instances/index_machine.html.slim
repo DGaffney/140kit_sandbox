@@ -1,0 +1,17 @@
+/*got realrealllllll lazy. also doesn't matter.*/
+h1 Machines | <a href="/instances">Instances</a>
+p
+- @machines.each_slice(4) do |slice|
+  .row
+    - for machine in slice
+      .span3
+        .well
+          img.pull-left.twitter-pic src=machine.image_url
+          br
+          a href=edit_machine_path(machine) Edit Machine
+          br
+          a href=kill_machine_path(machine) Kill Machine
+          br
+          a href=machine_path(machine) Machine Stats
+          br
+

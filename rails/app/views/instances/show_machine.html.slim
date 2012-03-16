@@ -1,0 +1,15 @@
+h1 = @machine.user
+table.table.table-striped.table-bordered
+  thead
+    tr
+      th Instance ID
+      th PID
+      th Type
+      th Killed?
+  tbody
+    - for instance in @instances
+      tr
+        td = instance.instance_id
+        td = instance.pid
+        td = instance.instance_type
+        td = instance.killed
