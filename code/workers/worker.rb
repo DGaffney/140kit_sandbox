@@ -40,7 +40,7 @@ class Worker < Instance
   
   def work_routine
     @curation = select_curation
-    #clean_orphans
+    clean_orphans
     do_analysis_jobs
     switch_curation_statuses
     @curation.unlock if @curation
