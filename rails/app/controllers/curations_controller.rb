@@ -8,25 +8,42 @@ class CurationsController < ApplicationController
     @curations = @researcher.curations
   end
   
+  def show
+    @curation = Curation.find_by_id(params[:id])
+  end
+
   def validate
-    @curation = Curation.new
-    @datasets = []
-    @curation.created_at = Time.now
-    @curation.status = "tsv_storing"
-    @curation.single_dataset = false
-    @curation.name = params[:name]
-    @curation.researcher_id = session[:researcher_id]
-    @curation.save!
-    params[:name].split(",").each do |term|
-      d = Dataset.new
-      d.scrape_type = "track"
-      d.params = "#{term},#{params[:end_time]}"
-      d.status = "tsv_storing"
-      d.instance_id = "system"
-      d.save!
-      @datasets << d
+    if !curation_is_same?
+      @curation = Curation.new
+      @datasets = []
+      @curation.created_at = Time.now
+      @curation.updated_at = @curation.created_at
+      @curation.status = "tsv_storing"
+      @curation.single_dataset = false
+      @curation.name = params[:name]
+      @curation.researcher_id = session[:researcher_id]
+      @curation.save!
+      params[:name].split(",").each do |term|
+        d = Dataset.new
+        d.scrape_type = "track"
+        d.params = "#{term},#{params[:end_time]}"
+        d.status = "tsv_storing"
+        d.instance_id = "system"
+        d.save!
+        @datasets << d
+      end
+      @datasets.collect{|d| d.curations << @curation}
+    else
+      @datasets = @curation.datasets
     end
-    @datasets.collect{|d| d.curations << @curation}
+  end
+  
+  def curation_is_same?
+    @curation = Curation.find_by_name_and_researcher_id(params[:name], session[:researcher_id])
+    result = @curation && 
+             @curation.datasets.collect{|d| d.params.split(",").first}.sort == params[:name].split(",").sort && 
+             @curation.datasets.first.params.split(",").last.to_i == params[:end_time].to_i
+    return result
   end
   
   def alter
@@ -50,5 +67,9 @@ class CurationsController < ApplicationController
       d.save!
     end
     redirect_to researcher_url(@researcher), :notice => "We're running your streams!"
+  end
+  
+  def import
+    @curation.status = "needs_import"
   end
 end

@@ -55,34 +55,35 @@ class Importer < Instance
   end
 
   def import_datasets_to_database
+    debugger
     # @curation = Curation.first
     # Sh::mkdir(ENV["TMP_PATH"], "local")
-    dataset_ids = @curation.datasets.collect{|x| x.id}
-    models = [Tweet, User, Entity, Geo, Coordinate]
-    models.each do |model|
-      files = Sh::storage_ls(model.to_s).select{|x| dataset_ids.include?(x[0].to_i)}
-      files.each do |file|
-        mysql_filename = "mysql_tmp_#{Time.now.to_i}_#{rand(10000)}.sql"
-        mysql_file = File.open("#{ENV['TMP_PATH']}/#{mysql_filename}", "w+")
-        file_location = Sh::pull_file_from_storage("#{model.to_s}/#{file}")#ENV["TMP_PATH"]+"/"+file
-        header = CSV.open(file_location, "r", :col_sep => "\t", :row_sep => "\0", :quote_char => '"').first
-        header_row = header.index("id")
-        header[header_row] = "@id" if header_row
-        mysql_file.write("load data local infile '#{file_location}' ignore into table #{model.storage_name} fields terminated by '\\t' optionally enclosed by '\"' lines terminated by '\\0' ignore 1 lines (#{header.join(", ")});\n")
-        mysql_file.close
-        puts "Executing mysql block..."
-        config = DataMapper.repository.adapter.options
-        puts "mysql -u #{config["user"]} --password='#{config["password"]}' -P #{config["port"]} -h #{config["host"]} #{config["path"].gsub("/", "")} < #{ENV["TMP_PATH"]}/#{mysql_filename} --local-infile=1"
-        Sh::sh("sudo mysql -u #{config["user"]} --password='#{config["password"]}' -P #{config["port"]} -h #{config["host"] || "localhost"} #{config["path"].gsub("/", "")} < #{ENV["TMP_PATH"]}/#{mysql_filename} --local-infile=1")
-        Sh::remove("#{ENV["TMP_PATH"]}/#{mysql_filename}")
-        Sh::remove("#{file_location}")
-      end
-    end
-    self.finished = true
-    self.save!
-    @curation.status = "live"
-    @curation.save!
-    @curation.unlock
+    # dataset_ids = @curation.datasets.collect{|x| x.id}
+    # models = [Tweet, User, Entity, Geo, Coordinate]
+    # models.each do |model|
+    #   files = Sh::storage_ls(model.to_s).select{|x| dataset_ids.include?(x[0].to_i)}
+    #   files.each do |file|
+    #     mysql_filename = "mysql_tmp_#{Time.now.to_i}_#{rand(10000)}.sql"
+    #     mysql_file = File.open("#{ENV['TMP_PATH']}/#{mysql_filename}", "w+")
+    #     file_location = Sh::pull_file_from_storage("#{model.to_s}/#{file}")#ENV["TMP_PATH"]+"/"+file
+    #     header = CSV.open(file_location, "r", :col_sep => "\t", :row_sep => "\0", :quote_char => '"').first
+    #     header_row = header.index("id")
+    #     header[header_row] = "@id" if header_row
+    #     mysql_file.write("load data local infile '#{file_location}' ignore into table #{model.storage_name} fields terminated by '\\t' optionally enclosed by '\"' lines terminated by '\\0' ignore 1 lines (#{header.join(", ")});\n")
+    #     mysql_file.close
+    #     puts "Executing mysql block..."
+    #     config = DataMapper.repository.adapter.options
+    #     puts "mysql -u #{config["user"]} --password='#{config["password"]}' -P #{config["port"]} -h #{config["host"]} #{config["path"].gsub("/", "")} < #{ENV["TMP_PATH"]}/#{mysql_filename} --local-infile=1"
+    #     Sh::sh("sudo mysql -u #{config["user"]} --password='#{config["password"]}' -P #{config["port"]} -h #{config["host"] || "localhost"} #{config["path"].gsub("/", "")} < #{ENV["TMP_PATH"]}/#{mysql_filename} --local-infile=1")
+    #     Sh::remove("#{ENV["TMP_PATH"]}/#{mysql_filename}")
+    #     Sh::remove("#{file_location}")
+    #   end
+    # end
+    # self.finished = true
+    # self.save!
+    # @curation.status = "live"
+    # @curation.save!
+    # @curation.unlock
   end
   
 end

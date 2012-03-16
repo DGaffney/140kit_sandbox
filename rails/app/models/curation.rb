@@ -35,19 +35,20 @@ class Curation < ActiveRecord::Base
   end
   
   def current_options
+    #this is bad design, I know. It's just the first thing I thought of that could do this - problem is I'm not sure you can access a specific object from within model?
     case self.status
     when "tsv_storing"
-      return "<a href='/curations/#{self.id}/analyze>Set Analytics</a> | <a href='/curations/#{self.id}/destroy>Destroy</a>"
+      return "<a href='/datasets/#{self.id}/analyze'>Set Analytics</a> | <a href='/datasets/#{self.id}/destroy'>Destroy</a>"
     when "tsv_stored"
-      return "<a href='/curations/#{self.id}/analyze>Set Analytics</a> | <a href='/curations/#{self.id}/import'>Bring it live</a>"
+      return "<a href='/datasets/#{self.id}/analyze'>Set Analytics</a> | <a href='/datasets/#{self.id}/import'>Bring it live</a>"
     when "needs_import"
       return "Sit tight..."
     when "imported"
-      return "<a href='/curations/#{self.id}/analyze>Set Analytics</a> | <a href='/curations/#{self.id}/archive'>Archive</a>"
+      return "<a href='/datasets/#{self.id}/analyze'>Set Analytics</a> | <a href='/datasets/#{self.id}/archive'>Archive</a>"
     when "needs_drop"
       return "Sit tight..."
     when "dropped"
-      return "<a href='/curations/#{self.id}/analyze>Set Analytics</a> | <a href='/curations/#{self.id}/restore'>restore</a>"
+      return "<a href='/datasets/#{self.id}/analyze'>Set Analytics</a> | <a href='/datasets/#{self.id}/restore'>restore</a>"
     else
       return "Sit tight..."
     end

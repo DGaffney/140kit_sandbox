@@ -13,8 +13,10 @@ WWW140kit::Application.routes.draw do
   # first created -> highest priority.
   #we should just do single show pages for all these results. Make it atomic, not overwhelming like old site?
   post '/datasets/validate' => 'curations#validate', as: :validate_dataset
-  get '/datasets/verify/:id' => 'curations#verify', as: :verify_dataset
-  get '/datasets/alter/:id' => 'curations#alter', as: :alter_dataset
+  get '/datasets/:id/verify' => 'curations#verify', as: :verify_dataset
+  get '/datasets/:id/alter' => 'curations#alter', as: :alter_dataset
+  get '/datasets/:id/analyze' => 'curations#analyze', as: :analyze_dataset
+  get '/datasets/:id/import' => 'curations#import', as: :import_dataset
   get '/analysis/:curation_id/:analysis_metadata_id' => 'analysis_metadata#results', as: :curation_analysis 
   get '/new/dataset' => 'curations#new', as: :new_dataset
   get '/researchers/:user_name' => 'researchers#show', as: :researcher
@@ -25,6 +27,7 @@ WWW140kit::Application.routes.draw do
   get '/about' => 'posts#about', as: :about
   delete '/researchers/:user_name' => 'researchers#destroy'
   resources :researchers, only: [:index]
+  get '/datasets/:id' => 'curations#show', as: :dataset
   resources :curations, only: [:index, :new], path: '/datasets', as: :datasets
   resources :posts
   resources :datasets
