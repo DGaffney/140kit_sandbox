@@ -53,6 +53,7 @@ class Instance
   end
   
   def killed?
+    self.reload
     self.killed
   end
   
