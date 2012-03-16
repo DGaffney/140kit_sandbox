@@ -1,5 +1,7 @@
 WWW140kit::Application.routes.draw do
 
+  # resources :instances
+
   # resources :analytical_offering_variables
   # 
   # resources :analytical_offering_variable_descriptors
@@ -12,6 +14,14 @@ WWW140kit::Application.routes.draw do
   # The priority is based upon order of creation:
   # first created -> highest priority.
   #we should just do single show pages for all these results. Make it atomic, not overwhelming like old site?
+  get '/instances/' => 'instances#index_instance', as: :instances
+  get '/machines/' => 'instances#index_machine', as: :instances
+  get '/machines/:id/edit' => 'instances#edit', as: :edit_machine
+  get '/machines/:id/kill' => 'instances#kill_machine', as: :kill_machine
+  get '/instances/:id/kill' => 'instances#kill_instance', as: :kill_instance
+  get '/instances/:id' => 'instances#show_instance', as: :instance
+  get '/machines/:id' => 'instances#show_machine', as: :machine
+  post '/machines/:id/update' => 'instances#update', as: :update_machine
   post '/datasets/validate' => 'curations#validate', as: :validate_dataset
   get '/datasets/:id/verify' => 'curations#verify', as: :verify_dataset
   get '/datasets/:id/alter' => 'curations#alter', as: :alter_dataset

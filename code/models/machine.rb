@@ -2,10 +2,11 @@ class Machine
   include DataMapper::Resource
   property :id, Serial
   property :user, String
-  property :hostname, String
+  property :ip, String
   property :storage_path, String
   property :working_path, String
   property :can_store, Boolean
+  property :image_url, String
 
   def self.determine_storage    
     return self.select_storage_machine || self.fallback_storage_default
