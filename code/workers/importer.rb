@@ -40,7 +40,6 @@ class Importer < Instance
     @curation = select_curation
     if @curation
       import_datasets_to_database
-      flag_curation
     end
   end
   
@@ -82,6 +81,8 @@ class Importer < Instance
           end
         end
       end
+      dataset.status = "imported"
+      dataset.save!
     end
     @curation.status = "live"
     @curation.save!
