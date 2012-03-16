@@ -5,15 +5,20 @@ p
   .row
     - for instance in slice
       .span3
-        .well
-          img.pull-left.twitter-pic src=instance.machine_image
-              a href=edit_machine_path(instance.machine) Edit Machine
-              br 
-              a href=kill_machine_path(instance.machine) Kill Machine
-              br 
-              a href=kill_instance_path(instance) Kill Instance
-              br 
-              a href=machine_path(instance.machine) Machine Stats
-              br 
-              a href=instance_path(instance) Instance Stats
+          span.over_image = instance.id
+          .well
+            img.pull-left.twitter-pic src=instance.machine_image
+                a href=edit_machine_path(instance.machine) Edit Machine
+                br 
+                a href=kill_machine_path(instance.machine) Kill Machine
+                - if !instance.killed
+                  br 
+                  a href=kill_instance_path(instance) Kill Instance
+                - else
+                  br 
+                  a href=kill_instance_path(instance) Start Instance
+                br 
+                a href=machine_path(instance.machine) Machine Stats
+                br 
+                a href=instance_path(instance) Instance Stats
 

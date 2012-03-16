@@ -15,7 +15,7 @@ WWW140kit::Application.routes.draw do
   # first created -> highest priority.
   #we should just do single show pages for all these results. Make it atomic, not overwhelming like old site?
   get '/instances/' => 'instances#index_instance', as: :instances
-  get '/machines/' => 'instances#index_machine', as: :instances
+  get '/machines/' => 'instances#index_machine', as: :machines
   get '/machines/:id/edit' => 'instances#edit', as: :edit_machine
   get '/machines/:id/kill' => 'instances#kill_machine', as: :kill_machine
   get '/instances/:id/kill' => 'instances#kill_instance', as: :kill_instance

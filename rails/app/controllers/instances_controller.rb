@@ -26,7 +26,7 @@ class InstancesController < ApplicationController
   
   def kill_instance
     @instance = Instance.find(params[:id])
-    @instance.killed = true
+    @instance.killed = !@instance.killed
     @instance.save!
     redirect_to instances_url, :notice => "Changes saved."
   end
@@ -35,10 +35,10 @@ class InstancesController < ApplicationController
     @machine = Machine.find(params[:id])
     @instances = Instance.find_all_by_hostname(@machine.user)
     @instances.each do |instance|
-      instance.killed = true
+      instance.killed = instance.killed
       instance.save!
     end
-    redirect_to instances_url, :notice => "Changes saved."
+    redirect_to machines_url, :notice => "Changes saved."
   end
   
   def show_instance
