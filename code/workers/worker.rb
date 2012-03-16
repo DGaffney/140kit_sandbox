@@ -69,15 +69,13 @@ class Worker < Instance
   
   def clean_orphans
     puts "clean_orphans..."
-    begin
-      Instance.all(:hostname => ENV['HOSTNAME']).each do |instance|
-        if Sh::sh("kill -0 #{instance.pid}", false, false).select{|response| !response.empty?}.length == 1
-          Lock.all(:instance_id => instance.instance_id).destroy
-          instance.destroy
-        end
+    Instance.all.each do |instance|
+      process_report = Sh::bt("ssh #{instance.hostname} 'ps -p #{instance.pid}'").split("\n")
+      if process_report.length == 1 || process_report.last.scan(/#{instance.instance_id} pts\/.    \d\d:\d\d:\d\d ruby/).first != process_report.last
+        Sh::bt("ssh #{instance.hostname} 'rm -r 140kit_sandbox/code/tmp_files/#{instance.instance_id}'")
+        Lock.all(:instance_id => instance.instance_id).destroy
+        instance.destroy
       end
-    rescue
-      retry
     end
     Lock.all(:instance_id.not => Instance.all.collect{|instance| instance.instance_id}).destroy
   end
@@ -106,6 +104,7 @@ class Worker < Instance
       raise "Language #{metadata.language} is not currently supported for analytical routing!"
     end
   end
+
 end
 
 worker = Worker.new

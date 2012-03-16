@@ -14,6 +14,8 @@ class Filter < Instance
     @queue = []
     @start_time = Time.now
     @scrape_type = ARGV[0] || "track"
+    self.instance_type = "filter"
+    self.save
     at_exit { do_at_exit }
   end
   
