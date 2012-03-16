@@ -84,7 +84,7 @@ class Importer < Instance
       dataset.status = "imported"
       dataset.save!
     end
-    @curation.status = "live"
+    @curation.status = "imported"
     @curation.save!
     @curation.unlock
   end
