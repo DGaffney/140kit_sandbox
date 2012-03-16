@@ -83,8 +83,6 @@ class Importer < Instance
         end
       end
     end
-    self.finished = true
-    self.save!
     @curation.status = "live"
     @curation.save!
     @curation.unlock

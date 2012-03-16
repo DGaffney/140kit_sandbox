@@ -22,7 +22,6 @@ class CurationsController < ApplicationController
       @curation.single_dataset = false
       @curation.name = params[:name]
       @curation.researcher_id = session[:researcher_id]
-      @curation.save!
       params[:name].split(",").each do |term|
         d = Dataset.new
         d.scrape_type = "track"
@@ -32,6 +31,7 @@ class CurationsController < ApplicationController
         d.save!
         @datasets << d
       end
+      @curation.save!
       @datasets.collect{|d| d.curations << @curation}
     else
       @datasets = @curation.datasets
@@ -62,7 +62,12 @@ class CurationsController < ApplicationController
   def verify
     @researcher = Researcher.find(session[:researcher_id])
     @curation = Curation.find(params[:id])
+    @curation.created_at = Time.now
+    @curation.updated_at = @curation.created_at
+    @curation.save!
     @curation.datasets.each do |d|
+      d.created_at = Time.now
+      d.updated_at = d.created_at
       d.instance_id = nil
       d.save!
     end
@@ -73,5 +78,6 @@ class CurationsController < ApplicationController
     @curation = Curation.find(params[:id])
     @curation.status = "needs_import"
     @curation.save!
+    redirect_to researcher_url(@researcher), :notice => "We're Importing the data now!"
   end
 end
