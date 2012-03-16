@@ -30,7 +30,7 @@ require DIR+'/extensions/inflectors'
 require DIR+'/utils/git'
 require DIR+'/utils/sh'
 
-ENV['HOSTNAME'] = Sh::hostname
+ENV['HOSTNAME'] = Sh::hostname.strip
 ENV['PID'] = Process.pid.to_s #because ENV only allows strings.
 ENV['INSTANCE_ID'] = Digest::SHA1.hexdigest("#{ENV['HOSTNAME']}#{ENV['PID']}")
 ENV['TMP_PATH'] = DIR+"/tmp_files/#{ENV['INSTANCE_ID']}/scratch_processes"

@@ -15,8 +15,13 @@ class Machine
     return {"type" => "local", "path" => "#{Git.root_dir}/results"}
   end
   
-  def self.select_storage_machine
+  def self.select_storage_machine(id=nil)
     machine = Machine.all(:can_store => true).shuffle.first
+    storage_type = machine.hostname == ENV["HOSTNAME"] ? "local" : "remote"
+    return {"type" => storage_type, "path" => machine.storage_path, "user" => machine.user, "hostname" => machine.hostname}
+  end
+  
+  def machine_storage_details
     storage_type = machine.hostname == ENV["HOSTNAME"] ? "local" : "remote"
     return {"type" => storage_type, "path" => machine.storage_path, "user" => machine.user, "hostname" => machine.hostname}
   end

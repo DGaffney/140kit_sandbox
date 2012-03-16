@@ -70,6 +70,8 @@ class CurationsController < ApplicationController
   end
   
   def import
+    @curation = Curation.find(params[:id])
     @curation.status = "needs_import"
+    @curation.save!
   end
 end
