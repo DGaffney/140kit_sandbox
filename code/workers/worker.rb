@@ -71,7 +71,7 @@ class Worker < Instance
     puts "clean_orphans..."
     Instance.all.each do |instance|
       process_report = Sh::bt("ssh #{instance.hostname} 'ps -p #{instance.pid}'").split("\n")
-      if process_report.length == 1 || process_report.last.scan(/( #{instance.pid} pts\/.    \d\d:\d\d:\d\d (ruby|rdebug))/).flatten.first != process_report.last
+      if process_report.length == 1 || process_report.last.scan(/(.*#{instance.pid}.*pts\/.*\d\d:\d\d:\d\d (ruby|rdebug))/).flatten.first != process_report.last
         Sh::bt("ssh #{instance.hostname} 'rm -r 140kit_sandbox/code/tmp_files/#{instance.instance_id}'")
         Lock.all(:instance_id => instance.instance_id).destroy
         instance.destroy
