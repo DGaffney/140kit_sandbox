@@ -18,6 +18,8 @@ class Instance
   
   attr_accessor :metadata, :rest_allowed, :last_count_check, :tmp_path, :tmp_data, :check_in_thread
   
+  SLEEP_CONSTANT = 20
+  
   def initialize
     super
     connect_to_db
