@@ -57,7 +57,7 @@ class Importer < Instance
   def import_datasets_to_database
     debugger
     @curation.datasets.each do |dataset|
-      
+      STORAGE = Machine.first(:id => dataset.storage_machine_id)
     end
     # @curation = Curation.first
     # Sh::mkdir(ENV["TMP_PATH"], "local")

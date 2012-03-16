@@ -22,7 +22,7 @@ class Machine
   end
   
   def machine_storage_details
-    storage_type = machine.hostname == ENV["HOSTNAME"] ? "local" : "remote"
+    storage_type = self.hostname == ENV["HOSTNAME"] ? "local" : "remote"
     return {"type" => storage_type, "path" => machine.storage_path, "user" => machine.user, "hostname" => machine.hostname}
   end
 end
