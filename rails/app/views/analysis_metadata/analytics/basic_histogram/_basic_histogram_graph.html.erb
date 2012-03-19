@@ -2,7 +2,8 @@
 <%
   @dataset = @graph.graph_points.collect{|gp| {:label => gp.label, :value => gp.value}}
   if ["tweets_created_at", "users_created_at"].include?(@graph.title)
-    @dataset.collect{|x| x[:label] = x[:label]}
+    debugger
+    @dataset.collect{|x| x[:label] = Time.parse(x[:label])}
   elsif ["users_statuses_count", "users_followers_count", "users_friends_count", "users_favourites_count"].include?(@graph.title)
     @dataset.sort!{|x,y| x[:label].to_i<=>y[:label].to_i}
     @dataset = @dataset.collect{|x| x.values.collect(&:to_i)}

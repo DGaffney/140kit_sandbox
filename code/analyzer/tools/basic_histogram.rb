@@ -4,7 +4,6 @@ class BasicHistogram < AnalysisMetadata
   
   #Results: Frequency Charts of basic data on Tweets and Users per data set
   def self.run(curation_id)
-    debugger
     curation = Curation.first(:id => curation_id)
     FilePathing.tmp_folder(curation, self.underscore)
     self.generate_graphs([
@@ -20,6 +19,7 @@ class BasicHistogram < AnalysisMetadata
       {:model => User,  :attribute => :time_zone},
       {:model => User,  :attribute => :created_at}
     ], curation)
+    debugger
     self.push_tmp_folder(curation.stored_folder_name)
     self.finalize_work(curation)
   end
@@ -76,7 +76,6 @@ class BasicHistogram < AnalysisMetadata
         return data
       }
       csv << ["label", "value"]
-      debugger
       results = records.call(limit, offset)
       while !results.empty?
         graph_points = results.collect{|record| {:label => record.first, :value => record.last, :graph_id => graph.id, :curation_id => graph.curation_id}}

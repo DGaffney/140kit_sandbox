@@ -10,14 +10,10 @@ class Pretty
       graph_points = Pretty.location(graph_points)
     when "tweets_language"
       graph_points.collect{|graph_point| graph_point[:label] = Pretty.language(graph_point[:label])}
-    # when "tweets_created_at"
-    #   graph_points = Pretty.time_generalize(graph_points)
     when "tweets_source"
       graph_points.collect{|graph_point| graph_point[:label] = Pretty.source(graph_point[:label])}
     when "users_lang"
       graph_points.collect{|graph_point| graph_point[:label] = Pretty.language(graph_point[:label])}
-    # when "users_created_at"
-    #   graph_points = Pretty.time_generalize(graph_points)
     end
     return graph_points
   end
@@ -41,38 +37,5 @@ class Pretty
       source = source.scan(/>(.*)</)[0][0]
     end
     return source.gsub("\"", "\\\"")
-  end
-
-  def self.time_generalize(graph_points)
-    sorted_times = graph_points.collect{|g| Time.parse(g[:label].to_s).to_i}.sort
-    length = sorted_times.last-sorted_times.first
-    if length < 60
-      return Pretty.time_rounder(graph_points, "%b %d, %Y, %H:%M:%S")
-    elsif length < 3600
-      return Pretty.time_rounder(graph_points, "%b %d, %Y, %H:%M")
-    elsif length < 86400
-      return Pretty.time_rounder(graph_points, "%b %d, %Y, %H")
-    elsif length < 11536000 #31536000
-      return Pretty.time_rounder(graph_points, "%b %d, %Y")
-    else 
-      return Pretty.time_rounder(graph_points, "%b %Y")
-    end
-  end
-  
-  def self.time_rounder(graph_points, time_format)
-    graph_point_counts = {}
-    graph_points.each do |graph_point|
-      time = graph_point[:label]
-      if graph_point_counts[time.strftime(time_format)].nil?
-        graph_point_counts[time.strftime(time_format)] = {:label => time.strftime(time_format), :value => graph_point[:value].to_i, :curation_id => graph_point[:curation_id], :graph_id => graph_point[:graph_id]}
-      else
-        graph_point_counts[time.strftime(time_format)][:value] += graph_point[:value].to_i
-      end
-    end
-    final_graphs = []
-    graph_point_counts.keys.sort.each do |graph_key|
-      final_graphs << graph_point_counts[graph_key]
-    end
-    return final_graphs
   end
 end
