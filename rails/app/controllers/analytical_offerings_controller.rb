@@ -1,4 +1,7 @@
 class AnalyticalOfferingsController < ApplicationController
+  def show
+    @analytical_offering = AnalyticalOffering.find(params[:id])
+  end
   
   def add
     @curation = Curation.find(params[:curation_id])

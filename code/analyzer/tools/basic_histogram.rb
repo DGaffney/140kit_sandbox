@@ -1,9 +1,10 @@
 class BasicHistogram < AnalysisMetadata
-
+  # include ActsAsReloadable
   DEFAULT_CHUNK_SIZE = 1000
   
   #Results: Frequency Charts of basic data on Tweets and Users per data set
   def self.run(curation_id)
+    debugger
     curation = Curation.first(:id => curation_id)
     FilePathing.tmp_folder(curation, self.underscore)
     self.generate_graphs([
@@ -75,31 +76,17 @@ class BasicHistogram < AnalysisMetadata
         return data
       }
       csv << ["label", "value"]
-      if fs[:attribute].to_s == "created_at"
-        results = DataMapper.repository.adapter.select("select count(distinct(twitter_id)) as value,date_format(#{fs[:attribute].to_s}, '%b %d, %Y, %H:%M') as #{fs[:attribute]} from #{fs[:model].storage_name} #{Analysis.conditions_to_mysql_query(conditional)} group by date_format(#{fs[:attribute].to_s}, '%b %d, %Y, %H:%M') order by count(distinct(twitter_id)) asc limit #{limit} offset #{offset}")
-        while !results.empty?
-          graph_points = results.collect{|record| {:label => record.send(fs[:attribute].to_s), :value => record.value, :graph_id => graph.id, :curation_id => graph.curation_id}}
-          debugger
-          GraphPoint.save_all(graph_points) if fs[:generate_graph_points]
-          graph_points.each do |graph_point|
-            csv << [graph_point[:label],graph_point[:value]]
-          end
-          offset+=limit
-          results = DataMapper.repository.adapter.select("select count(distinct(twitter_id)) as value,date_format(#{fs[:attribute].to_s}, '%b %d, %Y, %H:%M') from #{fs[:model].storage_name} #{Analysis.conditions_to_mysql_query(conditional)} group by date_format(#{fs[:attribute].to_s}, '%b %d, %Y, %H:%M') order by count(distinct(twitter_id)) asc limit #{limit} offset #{offset}")            
+      debugger
+      results = records.call(limit, offset)
+      while !results.empty?
+        graph_points = results.collect{|record| {:label => record.first, :value => record.last, :graph_id => graph.id, :curation_id => graph.curation_id}}
+        graph_points = graph.sanitize_points(graph_points)
+        GraphPoint.save_all(graph_points) if fs[:generate_graph_points]
+        graph_points.each do |graph_point|
+          csv << [graph_point[:label],graph_point[:value]]
         end
-      else
+        offset+=limit
         results = records.call(limit, offset)
-        while !results.empty?
-          graph_points = results.collect{|record| {:label => record.first, :value => record.last, :graph_id => graph.id, :curation_id => graph.curation_id}}
-          graph_points = graph.sanitize_points(graph_points)
-          GraphPoint.save_all(graph_points) if fs[:generate_graph_points]
-          graph_points.each do |graph_point|
-            csv << [graph_point[:label],graph_point[:value]]
-          end
-          offset+=limit
-          results = records.call(limit, offset)
-        end
-        
       end
     end
     graph.written = true
@@ -113,10 +100,4 @@ class BasicHistogram < AnalysisMetadata
     response[:message_content] = "Your CSV files are ready for download. You can grab them by visiting the collection's page: <a href=\"http://140kit.com/#{curation.researcher.user_name}/collections/#{curation.id}\">http://140kit.com/#{curation.researcher.user_name}/collections/#{curation.id}</a>."
     return response
   end
-  
-  def self.view(curation)
-    return "<div>HEY</div>"
-  end
 end
-
-

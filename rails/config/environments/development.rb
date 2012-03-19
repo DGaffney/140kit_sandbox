@@ -40,3 +40,5 @@ WWW140kit::Application.configure do
 
   Slim::Engine.set_default_options pretty: true
 end
+
+ActiveSupport::Dependencies.explicitly_unloadable_constants << "AnalysisMetadata::BasicHistogram"

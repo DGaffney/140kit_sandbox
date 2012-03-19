@@ -14,10 +14,12 @@ WWW140kit::Application.routes.draw do
   # The priority is based upon order of creation:
   # first created -> highest priority.
   #we should just do single show pages for all these results. Make it atomic, not overwhelming like old site?
-  get '/analytics/:id' => 'analytical_offerings#show', as: :analytical_offering
+  get '/analytics/:id/details' => 'analytical_offerings#show', as: :analytical_offering
   get '/analytics/:id/:curation_id' => 'analytical_offerings#add', as: :add_analytical_offering
   post '/analytics/:id/:curation_id/validate' => 'analytical_offerings#validate', as: :validate_analysis_metadata
-  get '/analysis/:id' => 'analysis_metadata#show', as: :analysis_metadata
+  get '/analytics/:id' => 'analysis_metadata#show', as: :analysis_metadata
+  get '/analytics/:id/:graph_id/graph' => 'analysis_metadata#graph', as: :analysis_metadata_graph
+  get '/analytics/:id/destroy' => 'analysis_metadata#show', as: :destroy_analysis_metadata
   get '/analytics/:id/:curation_id/verify' => 'analytical_offerings#verify', as: :verify_analysis_metadata
   get '/instances/' => 'instances#index_instance', as: :instances
   get '/machines/' => 'instances#index_machine', as: :machines
@@ -35,7 +37,7 @@ WWW140kit::Application.routes.draw do
   get '/analysis/:curation_id/:analysis_metadata_id' => 'analysis_metadata#results', as: :curation_analysis 
   get '/new/dataset' => 'curations#new', as: :new_dataset
   get '/researchers/:user_name' => 'researchers#show', as: :researcher
-  get '/:user_name/datasets' => 'curations#researcher', as: :researcher_datasets
+
   get '/researchers/:user_name/edit' => 'researchers#edit', as: :edit_researcher
   put'/researchers/:user_name' => 'researchers#update'
   get '/posts/:id/:slug' => 'posts#show', as: :post
@@ -50,6 +52,10 @@ WWW140kit::Application.routes.draw do
   match '/signout' => 'sessions#destroy', as: :signout
   match '/auth/failure' => 'sessions#fail'
   root to: 'home#index'
+  
+  get '/highchart/graph/:id' => 'high_chart#graph', as: :high_chart_graph
+  
+  get '/:user_name/datasets' => 'curations#researcher', as: :researcher_datasets  
   # Sample of regular route:
   #   match 'products/:id' => 'catalog#view'
   # Keep in mind you can assign values other than :controller and :action

@@ -4,7 +4,7 @@ gem 'rails', '3.2.1'
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
-
+gem 'RedCloth'
 gem 'require_all'
 gem 'mysql2'
 gem 'slim'

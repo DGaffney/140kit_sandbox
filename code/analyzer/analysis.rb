@@ -70,3 +70,5 @@ class Analysis
   end
 
 end
+
+module ActsAsReloadable;end

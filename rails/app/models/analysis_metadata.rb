@@ -3,15 +3,30 @@ class AnalysisMetadata < ActiveRecord::Base
   belongs_to :curation
   belongs_to :analytical_offering
   has_many :analytical_offering_variables
+  has_many :graphs
   def status
     if self.finished
-      return "<a href='/analysis/#{self.curation.id}/#{self.id}'>Results</a>"
-    elsif self.curation.status == "imported"
+      return "Finished"
+    elsif !self.ready && self.curation.status == "imported"
+      return "Verifying"
+    elsif self.ready && self.curation.status == "imported"
       return "Processing"
-    else return "Waiting for Dataset to Complete"
+    else return "Unknown"
     end
   end
   
+  def links
+    links = []
+    if self.finished
+      links << "<a href='/analysis/#{self.id}'>Results</a>"
+    elsif !self.ready && self.curation.status == "imported"
+      links << "<a href='/analysis/#{self.id}'>Results</a>"
+    elsif self.ready && self.curation.status == "imported"
+      links << "<a href='/analysis/#{self.id}'>Results</a>"
+    end
+    links << "<a href='/analysis/#{self.id}/destroy'>Remove</a>"
+  end
+
   def verify_absolute_uniqueness
     duplicate_analysis_metadatas = AnalysisMetadata.where(:curation_id => self.curation_id, :analytical_offering_id => self.analytical_offering.id, :finished => false).select{|analysis_metadata| analysis_metadata.run_vars==self.run_vars}-[self]
     results = {:success => true}
@@ -124,14 +139,18 @@ class AnalysisMetadata < ActiveRecord::Base
     end
   end
   
+  def function_path
+    File.dirname(__FILE__) + "/../../../code/analyzer/tools/#{function}#{AnalyticalOffering.language_extensions(self.analytical_offering.language)}"
+  end
+  
   def clear
     function_class.clear(self)
   end
   
-  def self.view(curation)
-    return "<h1>Sorry!</h1><p>It looks like this developer has not created a viewable result for this analytic yet</p>"
+  def self.view(curation, params)
+    return {:response => "<h1>Sorry!</h1><p>It looks like this developer has not created a viewable result for this analytic yet</p>", :found => false}
   end
-  
+
 end
 
 require_all File.dirname(__FILE__) + '/../../../code/analyzer/tools'

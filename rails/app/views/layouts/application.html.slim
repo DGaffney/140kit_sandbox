@@ -6,10 +6,11 @@ html
       = ": #{@page_title}" if @page_title
     /[if lt IE 9]
       script src="http://html5shim.googlecode.com/svn/trunk/html5.js"
-    = javascript_include_tag "http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js", "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/jquery-ui.min.js", "application"
+    = javascript_include_tag "http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js", "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/jquery-ui.min.js", "http://code.highcharts.com/highcharts.js", "http://code.highcharts.com/modules/exporting.js", "https://www.google.com/jsapi", "application"
     = stylesheet_link_tag "http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/redmond/jquery-ui.css", "application"
     /* link rel="stylesheet" href="/css/bootstrap-responsive.min.css"*/
     = csrf_meta_tags
+    script type='text/javascript' google.load('visualization', '1', {packages:['table']});
   body
 
     .navbar#main-nav

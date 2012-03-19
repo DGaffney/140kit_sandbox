@@ -58,5 +58,21 @@ module WWW140kit
 
     # Version of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'
+    # config.autoload_paths += %W(#{config.root}/lib)
+    puts config.root
+    config.autoload_paths << 'lib'
+    path = File.dirname(__FILE__) + '/../../code/analyzer/tools/'
+    file_set = `ls #{path}`.split("\n").collect{|f| config.autoload_paths << path+f}
+
+    # config.autoload_paths += %W(#{File.dirname(__FILE__) + '/../../../code/analyzer/tools/'})
+    # config.autoload_paths += Dir["#{File.dirname(__FILE__) + '/../../../code/analyzer/tools/**/'}"]
   end
 end
+path = File.dirname(__FILE__) + '/../../code/analyzer/tools/'
+file_set = `ls #{path}`.split("\n").collect{|f| path+f}
+RELOAD_LIBS = file_set if Rails.env.development?
+# module ActsAsReloadable
+#   def self.included(base)
+#     ActiveSupport::Dependencies.explicitly_unloadable_constants << base.name if Rails.env == 'development'
+#   end
+# end

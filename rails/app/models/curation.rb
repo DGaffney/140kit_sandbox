@@ -2,6 +2,7 @@ class Curation < ActiveRecord::Base
   belongs_to :researcher
   has_and_belongs_to_many :datasets, :join_table => "curation_datasets"
   has_many :analysis_metadatas
+  has_many :graphs
   
   def self.max_time
     return 1.week
