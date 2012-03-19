@@ -78,7 +78,7 @@ class CurationsController < ApplicationController
     @curation = Curation.find(params[:id])
     @curation.status = "needs_import"
     @curation.save!
-    redirect_to researcher_url(@researcher), :notice => "We're Importing the data now!"
+    redirect_to dataset_path(@curation), :notice => "We're Importing the data now!"
   end
   
   def analyze

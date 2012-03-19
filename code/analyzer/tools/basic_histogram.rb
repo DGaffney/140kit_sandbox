@@ -57,7 +57,7 @@ class BasicHistogram < AnalysisMetadata
     offset = 0
     sub_directory = "/"+[fs[:year],fs[:month],fs[:date],fs[:hour]].compact.join("/")
     full_path_with_file = sub_directory == "/" ? path+"/"+fs[:title]+".csv" : path+sub_directory+"/"+fs[:title]+".csv"    
-    Sh::mkdir(path+sub_directory) if sub_directory != "/"
+    Sh::mkdir(path+sub_directory)
     csv = CSV.open(full_path_with_file, "w")
     if block_given?
       yield fs, graph, conditional, csv, limit, offset
