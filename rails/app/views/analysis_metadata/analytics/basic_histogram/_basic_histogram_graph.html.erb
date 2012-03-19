@@ -1,0 +1,179 @@
+
+<%
+  @dataset = @graph.graph_points.collect{|gp| {:label => gp.label, :value => gp.value}}
+  if ["tweets_created_at", "users_created_at"].include?(@graph.title)
+    @dataset.collect{|x| x[:label] = x[:label]}
+  elsif ["users_statuses_count", "users_followers_count", "users_friends_count", "users_favourites_count"].include?(@graph.title)
+    @dataset.sort!{|x,y| x[:label].to_i<=>y[:label].to_i}
+    @dataset = @dataset.collect{|x| x.values.collect(&:to_i)}
+    @dataset = @dataset.collect{|set| [(set[0] == 0 ? 0 : Math.log(set[0],10).round(2)), (set[1] == 0 ? 0 : Math.log(set[1],10).round(2))] }
+  elsif ["users_geo_enabled"].include?(@graph.title)
+    @dataset.sort!{|x,y| x[:value].to_i<=>y[:value].to_i}
+    @dataset = @dataset.collect{|x| [x[:label], x[:value].to_f]}
+    @dataset = @dataset.inspect.html_safe
+  elsif ["tweets_language", "tweets_location", "tweets_source", "users_time_zone"].include?(@graph.title)
+    @dataset.sort!{|x,y| x[:value].to_i<=>y[:value].to_i}
+    @dataset = @dataset.reverse
+    @dataset.collect{|d| d[:label] = "Not Set" if d[:label].empty?}
+  end
+  def yAxis(title)
+    {"tweets_language" => nil,
+    "tweets_created_at" => nil,
+    "tweets_source" => nil,
+    "tweets_location" => nil,
+    "users_followers_count" => "{title: {text: 'Number of Users that have X Followers (log(10))'}},",
+    "users_friends_count" => "{title: {text: 'Number of Users that have X Friends (log(10))'}},",
+    "users_favourites_count" => "{title: {text: 'Number of Users that have X Favourites (log(10))'}},",
+    "users_geo_enabled" => nil,
+    "users_statuses_count" => "{title: {text: 'Number of Users that have X Statuses (log(10))'}},",
+    "users_time_zone" => "{title: {text: 'Number of Users'}}",
+    "users_created_at" =>""}[title] || "{title: {text: 'Total'},plotLines: [{value: 0,width: 1,color: '#808080'}]},"
+  end
+  def xAxis(title)
+    {"tweets_language" => nil,
+    "tweets_created_at" => nil,
+    "tweets_source" => nil,
+    "tweets_location" => nil,
+    "users_followers_count" => "{title: {text: 'Number of Followers (log(10))'}, startOnTick: true, endOnTick: true, showLastLabel: true},",
+    "users_friends_count" => "{title: {text: 'Number of Friends (log(10))'}, startOnTick: true, endOnTick: true, showLastLabel: true},",
+    "users_favourites_count" => "{title: {text: 'Number of Favourites (log(10))'}, startOnTick: true, endOnTick: true, showLastLabel: true},",
+    "users_geo_enabled" => nil,
+    "users_statuses_count" => "{title: {text: 'Number of Statuses Posted (log(10))'}, startOnTick: true, endOnTick: true, showLastLabel: true},",
+    "users_time_zone" => nil,
+    "users_created_at" =>""}[title] || "{title: {text: 'Total'},plotLines: [{value: 0,width: 1,color: '#808080'}]},"
+  end
+  def chart(title)
+    {"tweets_language" => "{renderTo: 'container',plotBackgroundColor: null,plotBorderWidth: null,plotShadow: false},",
+    "tweets_created_at" => nil,
+    "tweets_source" => nil,
+    "tweets_location" => nil,
+    "users_followers_count" => "{renderTo: 'container',type: 'scatter',marginRight: 130,marginBottom: 50},",
+    "users_friends_count" => "{renderTo: 'container',type: 'scatter',marginRight: 130,marginBottom: 50},",
+    "users_favourites_count" => "{renderTo: 'container',type: 'scatter',marginRight: 130,marginBottom: 50},",
+    "users_geo_enabled" => "{renderTo: 'container',plotBackgroundColor: null,plotBorderWidth: null,plotShadow: false},",
+    "users_statuses_count" => "{renderTo: 'container',type: 'scatter',marginRight: 130,marginBottom: 50},",
+    "users_time_zone" => "{renderTo: 'container',plotBackgroundColor: null,plotBorderWidth: null,plotShadow: false},",
+    "users_created_at" =>""}[title] || "{renderTo: 'container',type: 'scatter',marginRight: 130,marginBottom: 50},"
+  end
+  def series(title)
+    {"tweets_language" => "type: 'pie',",
+    "tweets_created_at" => nil,
+    "tweets_source" => nil,
+    "tweets_location" => nil,
+    "users_followers_count" => nil,
+    "users_friends_count" => nil,
+    "users_favourites_count" => nil,
+    "users_geo_enabled" => "type: 'pie',",
+    "users_statuses_count" => nil,
+    "users_time_zone" => "type: 'pie',",
+    "users_created_at" =>""}[title] || ""
+  end
+  def plotOptions(title)
+    {"tweets_language" => "{pie: {allowPointSelect: true,cursor: 'pointer',dataLabels: {enabled: false},showInLegend: true}},",
+    "tweets_created_at" => nil,
+    "tweets_source" => nil,
+    "tweets_location" => nil,
+    "users_followers_count" => nil,
+    "users_friends_count" => nil,
+    "users_favourites_count" => nil,
+    "users_geo_enabled" => "{pie: {allowPointSelect: true,cursor: 'pointer',dataLabels: {enabled: false},showInLegend: true}},",
+    "users_statuses_count" => nil,
+    "users_time_zone" => "{pie: {allowPointSelect: true,cursor: 'pointer',dataLabels: {enabled: false},showInLegend: true}},",
+    "users_created_at" =>""}[title] || "{},"
+  end
+  def tooltip(title)
+    {"tweets_language" => "{formatter: function() {return this.point.name +': '+ Math.round(this.percentage) +' % ('+ this.point.y + ')';}},",
+    "tweets_created_at" => nil,
+    "tweets_source" => nil,
+    "tweets_location" => nil,
+    "users_followers_count" => nil,
+    "users_friends_count" => nil,
+    "users_favourites_count" => nil,
+    "users_geo_enabled" => "{formatter: function() {return this.point.name +': '+ Math.round(this.percentage) +' % ('+ this.point.y + ')';}},",
+    "users_statuses_count" => nil,
+    "users_time_zone" => "{formatter: function() {return this.point.name +': '+ Math.round(this.percentage) +' % ('+ this.point.y + ')';}},",
+    "users_created_at" =>""}[title] || "{},"
+  end
+  def google_number(title)
+    {"tweets_language" => 'Number of Users',
+    "tweets_created_at" => nil,
+    "tweets_source" => 'Number of Users',
+    "tweets_location" => nil,
+    "users_followers_count" => nil,
+    "users_friends_count" => nil,
+    "users_favourites_count" => nil,
+    "users_geo_enabled" => "{formatter: function() {return this.point.name +': '+ Math.round(this.percentage) +' % ('+ this.point.y + ')';}},",
+    "users_statuses_count" => nil,
+    "users_time_zone" => 'Number of Users',
+    "users_created_at" =>""}[title] || "Number"
+  end
+  def google_string(title)
+    {"tweets_language" => 'Language',
+    "tweets_created_at" => nil,
+    "tweets_source" => 'Source Application',
+    "tweets_location" => 'Location',
+    "users_followers_count" => nil,
+    "users_friends_count" => nil,
+    "users_favourites_count" => nil,
+    "users_geo_enabled" => "{formatter: function() {return this.point.name +': '+ Math.round(this.percentage) +' % ('+ this.point.y + ')';}},",
+    "users_statuses_count" => nil,
+    "users_time_zone" => 'Time Zone',
+    "users_created_at" =>""}[title] || "Number"
+  end
+%>
+<% if ["tweets_created_at", "tweets_source", "users_followers_count", "users_friends_count", "users_favourites_count", "users_geo_enabled", "users_statuses_count", "users_created_at"].include?(@graph.title) %>
+<script type="text/javascript">
+  $(function () {
+      var chart;
+      $(document).ready(function() {
+          chart = new Highcharts.Chart({
+              // chart: <%= chart(@graph.title) %>
+              // title: {
+              //     text: '<%= @graph.pretty_title %>',
+              //     x: -20 //center
+              // },
+              // subtitle: {
+              //     text: 'Source: WorldClimate.com',
+              //     x: -20
+              // },
+              // plotOptions: <%= plotOptions(@graph.title) %>
+              // series: [{
+              //     <%= series(@graph.title) %>
+              //     data: <%= @dataset.inspect %>
+              // }]
+              
+              chart: <%= chart(@graph.title) %>
+              yAxis: <%= yAxis(@graph.title) %>
+              xAxis: <%= xAxis(@graph.title) %>
+              title: {text: '<%= @graph.pretty_title %>',x: -20},
+              tooltip: <%= tooltip(@graph.title) %>
+          		plotOptions: <%= plotOptions(@graph.title) %>
+          		series: [{
+          			<%= series(@graph.title) %>
+          			data: <%= @dataset %>
+          		}]
+          });
+      });
+    
+  });
+</script>
+<% elsif ["tweets_language", "tweets_source", "tweets_location", "users_time_zone"].include?(@graph.title) %>
+<script type='text/javascript'>
+  var data = new google.visualization.DataTable();
+  data.addColumn('string', '<%= google_string(@graph.title) %>');
+  data.addColumn('number', '<%= google_number(@graph.title) %>');
+  data.addRows(<%= @dataset.length %>);
+  <% count = 0 %>
+  <% @dataset.each do |row| %>
+    data.setCell(<%= count %>, 0, '<%= escape_javascript(row[:label]) %>');
+    data.setCell(<%= count %>, 1, <%= row[:value].to_i %>);
+    <% count+=1 %>
+  <% end %>
+  var table = new google.visualization.Table(document.getElementById('container'));
+  table.draw(data, {showRowNumber: true, page: 'enable', width: 680, height: 800, pageSize: 100});
+</script>
+<h1><%= @graph.pretty_title %></h1>
+<% end %>
+<div id="container" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+
+<!-- {startOnTick: true, endOnTick: true, showLastLabel: true}, -->
