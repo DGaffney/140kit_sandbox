@@ -1,0 +1,38 @@
+h1 = "Adding #{@analytical_offering.title} to #{@curation.name}"
+br
+br
+.row
+  .span6
+    p Below are the current settings for your proposed analysis. Some values may not be modifiable, and are just shown for transparency's sake. Please review your settings carefully, then click verify to validate the settings and kick off the analysis.
+    = form_tag(validate_analysis_metadata_path, :method => "post") do
+      fieldset
+        .control_group
+          - for aovd in @analytical_offering.analytical_offering_variable_descriptors
+            == render partial: '/analytical_offering_variable_descriptors/form', locals: {aovd: aovd}
+          .form-actions
+            = submit_tag 'Validate', class: 'btn btn-primary'
+  .span5.well
+    b Info
+    ul
+      li 
+        | Access Level: 
+        = @analytical_offering.access_level
+      li
+        | Language: 
+        = @analytical_offering.language
+      li 
+        | Developer: 
+        = link_to @analytical_offering.created_by, @analytical_offering.created_by_link
+      li 
+        | Source Code: 
+        = link_to "Github", @analytical_offering.source_code_link
+      li 
+        | Requires REST API:
+        = @analytical_offering.rest ? "Yes" : "No"
+      li 
+        | Status: 
+        = @analytical_offering.enabled ? "Online" : "Offline"
+    p 
+      b Description
+      br
+      = @analytical_offering.description

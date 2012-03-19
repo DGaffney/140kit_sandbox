@@ -1,0 +1,30 @@
+h1 = @analytical_offering.title
+br
+br
+br
+.row
+  .span3
+    .well
+      ul
+        li 
+          | Access Level: 
+          = @analytical_offering.access_level
+        li
+          | Language: 
+          = @analytical_offering.language
+        li 
+          | Developer: 
+          = link_to @analytical_offering.created_by, @analytical_offering.created_by_link
+        li 
+          | Source Code: 
+          = link_to "Github", @analytical_offering.source_code_link
+        li 
+          | Requires REST API:
+          = @analytical_offering.rest ? "Yes" : "No"
+        li 
+          | Status: 
+          = @analytical_offering.enabled ? "Online" : "Offline"
+
+
+  .span9
+    p = @analytical_offering.description

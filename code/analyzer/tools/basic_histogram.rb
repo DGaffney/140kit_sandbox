@@ -112,6 +112,10 @@ class BasicHistogram < AnalysisMetadata
     response[:message_content] = "Your CSV files are ready for download. You can grab them by visiting the collection's page: <a href=\"http://140kit.com/#{curation.researcher.user_name}/collections/#{curation.id}\">http://140kit.com/#{curation.researcher.user_name}/collections/#{curation.id}</a>."
     return response
   end
+  
+  def self.view(curation)
+    return "<div>HEY</div>"
+  end
 end
 
 

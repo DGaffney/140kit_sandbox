@@ -80,4 +80,13 @@ class CurationsController < ApplicationController
     @curation.save!
     redirect_to researcher_url(@researcher), :notice => "We're Importing the data now!"
   end
+  
+  def analyze
+    @curation = Curation.find(params[:id])
+    @researcher = Researcher.find(session[:researcher_id])
+    @applied_analytical_offerings = AnalyticalOffering.already_applied(@curation)
+    @analysis_metadatas = @curation.analysis_metadatas
+    @analytical_offerings = AnalyticalOffering.available_to_researcher(@researcher)-@applied_analytical_offerings
+  end
+    
 end

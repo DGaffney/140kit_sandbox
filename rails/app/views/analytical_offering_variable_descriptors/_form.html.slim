@@ -1,0 +1,12 @@
+- field_options = {:class => "input-xlarge"}
+- if !aovd.user_modifiable
+  - field_options[:readonly] = true
+- if params["aov_#{aovd.name}_error"]
+  .control-group.error
+    label <b>#{aovd.description}</b>
+  .control-group.warning
+    label #{params["aov_#{aovd.name}_error"]}
+- else
+  label.control-label <b>#{aovd.description}</b>
+.controls
+  = text_field_tag "aov_#{aovd.name}", params["aov_"+aovd.name] || @analysis_metadata.set_variable(aovd), field_options

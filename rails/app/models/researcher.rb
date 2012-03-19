@@ -30,4 +30,8 @@ class Researcher < ActiveRecord::Base
   def human_join_date
     return self.join_date.strftime("%b %d, %Y")
   end
+  
+  def self.roles
+    return ["Inactive", "Suspended", "User", "Academic", "Admin"]
+  end
 end

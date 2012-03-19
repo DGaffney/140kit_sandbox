@@ -6,6 +6,7 @@ class AnalysisMetadata
   property :rest, Boolean, :default => false
   property :curation_id, Integer
   property :analytical_offering_id, Integer
+  property :ready, Boolean
   belongs_to :curation, :child_key => :curation_id
   belongs_to :analytical_offering, :child_key => :analytical_offering_id
   has n, :analytical_offering_variables
@@ -111,7 +112,7 @@ class AnalysisMetadata
     when "curation_id"
       answer = answer.empty? ? self.curation_id : answer.to_i
       response = {}
-      response[:reason] = "The curation id you specified (#{answer}) does now correspond to an existing curation. Please try again."
+      response[:reason] = "The curation id you specified (#{answer}) does not correspond to an existing curation. Please try again."
       response[:variable] = answer
       return response if Curation.first(:id => answer).nil?
     else
@@ -142,7 +143,6 @@ class AnalysisMetadata
     begin
       return function.to_class
     rescue
-      puts "HEY"
       require "#{File.dirname(__FILE__)}/../analyzer/tools/#{function}.rb"
       retry
     end

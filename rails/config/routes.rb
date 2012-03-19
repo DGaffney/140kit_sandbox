@@ -14,6 +14,11 @@ WWW140kit::Application.routes.draw do
   # The priority is based upon order of creation:
   # first created -> highest priority.
   #we should just do single show pages for all these results. Make it atomic, not overwhelming like old site?
+  get '/analytics/:id' => 'analytical_offerings#show', as: :analytical_offering
+  get '/analytics/:id/:curation_id' => 'analytical_offerings#add', as: :add_analytical_offering
+  post '/analytics/:id/:curation_id/validate' => 'analytical_offerings#validate', as: :validate_analysis_metadata
+  get '/analysis/:id' => 'analysis_metadata#show', as: :analysis_metadata
+  get '/analytics/:id/:curation_id/verify' => 'analytical_offerings#verify', as: :verify_analysis_metadata
   get '/instances/' => 'instances#index_instance', as: :instances
   get '/machines/' => 'instances#index_machine', as: :machines
   get '/machines/:id/edit' => 'instances#edit', as: :edit_machine

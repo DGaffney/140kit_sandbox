@@ -1,3 +1,4 @@
+# encoding: utf-8
 class CentralityDifferentials < AnalysisMetadata
   
   def self.run(curation_id, step_size=3600, include_phrases=true)

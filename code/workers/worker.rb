@@ -83,8 +83,8 @@ class Worker < Instance
   def do_analysis_jobs
     puts "do_analysis_jobs..."
     # WARNING: TODO: rest_allowed not implemented yet
-    while AnalysisMetadata.unlocked.count(:finished => false)!=0
-      metadata = AnalysisMetadata.unlocked.first(:finished => false)
+    while AnalysisMetadata.unlocked.all(:finished => false, :ready => true).select{|am| ["imported", "live"].include?(am.curation.status)}.length!=0
+      metadata = AnalysisMetadata.unlocked.all(:finished => false, :ready => true).select{|am| ["imported", "live"].include?(am.curation.status)}.first
       metadata.lock
       if !metadata.nil? && metadata.owned_by_me?
         $instance.metadata = metadata

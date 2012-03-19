@@ -1,0 +1,16 @@
+table.table.table-striped.table-bordered
+  thead
+    tr
+      th Name
+      th Language
+      th Developer
+      th Source Code
+      th Options
+  tbody
+    - for analysis_metadata in analysis_metadatas
+      tr
+        td = link_to analysis_metadata.title, analytical_offering_path(analysis_metadata.analytical_offering)
+        td = analysis_metadata.language
+        td = link_to analysis_metadata.created_by, analysis_metadata.created_by_link
+        td = link_to "Github", analysis_metadata.source_code_link
+        td = link_to "View Analysis", analysis_metadata_path(analysis_metadata)
