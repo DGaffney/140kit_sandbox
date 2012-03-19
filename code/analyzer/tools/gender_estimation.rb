@@ -7,7 +7,7 @@ class GenderEstimation < AnalysisMetadata
     FilePathing.tmp_folder(curation, self.underscore)
     tk_environment = load_config_file("api_keys")["trueknowledge"]
     path=ENV['TMP_PATH']
-    Sh::mkdir(path)
+    Sh::mkdir(path, {"type"=>"local"})
     analysis_metadata = self.analysis_metadata(curation)
     graphs = []
     BasicHistogram.generate_graphs([

@@ -19,7 +19,7 @@ class CsvExport < AnalysisMetadata
     keys = nil
     limit = 1000
     offset = 0
-    Sh::mkdir(path)
+    Sh::mkdir(path, {"type"=>"local"})
     csv = CSV.open(path+filename, "w")
     records = model.all({:limit => limit, :offset => offset}.merge(conditional))
     while !records.empty?

@@ -25,7 +25,7 @@ class WordFrequency < AnalysisMetadata
     offset = 0
     sub_directory = "/"+[fs[:year],fs[:month],fs[:date],fs[:hour]].compact.join("/")    
     full_path_with_file = sub_directory == "/" ? path+"/"+graph.title+".csv" : path+sub_directory+"/"+graph.title+".csv"
-    Sh::mkdir(path+sub_directory) if sub_directory != "/"
+    Sh::mkdir(path+sub_directory, {"type"=>"local"}) if sub_directory != "/"
     csv = CSV.open(full_path_with_file, "w")
       records = Entity.aggregate(:value, :all.count, {:limit => limit, :offset => offset}.merge(conditional).merge(self.conditional_from_frequency_type(fs[:frequency_type])))
       while !records.empty?

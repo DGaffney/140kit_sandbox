@@ -17,7 +17,7 @@ class GisExport < AnalysisMetadata
     keys = ["twitter_id", "text", "created_at", "lat", "lon", "full_name", "geo_id", "country", "street_address", "locality", "iso3", "postal_code", "language", "source", "geo_type"]
     limit = 1000
     offset = 0
-    Sh::mkdir(path)
+    Sh::mkdir(path, {"type"=>"local"})
     csv = CSV.open(path+filename, "w")
     records = DataMapper.repository.adapter.select("select tweets.twitter_id as twitter_id ,tweets.text as text,tweets.created_at as created_at,tweets.lat as lat,tweets.lon as lon,geos.full_name as full_name,geos.geo_id as geo_id,geos.country as country,geos.street_address as street_address,geos.locality as locality,geos.iso3 as iso3,geos.postal_code as postal_code,tweets.language as language,tweets.source as source,coordinates.geo_type as geo_type from tweets join geos on geos.twitter_id = tweets.twitter_id join coordinates on coordinates.twitter_id = geos.twitter_id #{Analysis.conditions_to_mysql_query(Analysis.curation_conditional(curation)).gsub("dataset_id", "tweets.dataset_id")} and tweets.lat is not null group by tweets.twitter_id limit #{limit} offset #{offset}")
     while !records.empty?

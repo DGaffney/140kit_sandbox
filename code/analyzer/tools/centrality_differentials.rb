@@ -197,7 +197,7 @@ class CentralityDifferentials < AnalysisMetadata
   def self.generate_centralities_from_python_script(time, step_size, graph, limit=1000)
     env = ENV["e"] || "development"
     database = YAML.load(File.open(DIR+'/config/database.yml').read)
-    Sh::mkdir(ENV['TMP_PATH'])
+    Sh::mkdir(ENV['TMP_PATH'], {"type"=>"local"})
     `python #{DIR}/analyzer/resources/python/pagerank.py #{graph.id} #{ENV['TMP_PATH']}/results.csv #{database[env]["hostname"]} #{database[env]["username"]} #{database[env]["password"]} #{database[env]["database"]} #{database[env]["port"]}`
     edges = []
     FasterCSV.open("#{ENV['TMP_PATH']}/results.csv", "r").each do |row|

@@ -16,7 +16,7 @@ class ClickCounter < AnalysisMetadata
     sub_directory = "/"+[graph.year,graph.month,graph.date,graph.hour].compact.join("/")
     path = ENV['TMP_PATH']
     full_path_with_file = sub_directory == "/" ? path+"/"+graph.title+".csv" : path+sub_directory+"/"+graph.title+".csv"
-    Sh::mkdir(path+sub_directory) if sub_directory != "/"
+    Sh::mkdir(path+sub_directory, {"type"=>"local"}) if sub_directory != "/"
     FasterCSV.open(full_path_with_file, "w") do |csv|
       records = DataMapper.repository.adapter.select(full_select_without_limit_offset+" limit #{limit} offset #{offset}")
       csv << ["label", "value"]

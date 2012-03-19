@@ -19,7 +19,7 @@ class RawCsv < AnalysisMetadata
   def self.query_to_csv(model, conditional, filename="/"+model.storage_name+".csv", path=ENV['TMP_PATH'])
     first = true
     keys = nil
-    Sh::mkdir(path)
+    Sh::mkdir(path, {"type"=>"local"})
     FasterCSV.open(path+filename, "w") do |csv|
       model.all(conditional).chunks(DEFAULT_CHUNK_SIZE).each do |chunk|
         chunk.each do |row|

@@ -57,7 +57,7 @@ class BasicHistogram < AnalysisMetadata
     offset = 0
     sub_directory = "/"+[fs[:year],fs[:month],fs[:date],fs[:hour]].compact.join("/")
     full_path_with_file = sub_directory == "/" ? path+"/"+fs[:title]+".csv" : path+sub_directory+"/"+fs[:title]+".csv"    
-    Sh::mkdir(path+sub_directory)
+    Sh::mkdir(path+sub_directory, {"type"=>"local"})
     csv = CSV.open(full_path_with_file, "w")
     if block_given?
       yield fs, graph, conditional, csv, limit, offset
@@ -79,6 +79,7 @@ class BasicHistogram < AnalysisMetadata
         results = DataMapper.repository.adapter.select("select count(distinct(twitter_id)) as value,date_format(#{fs[:attribute].to_s}, '%b %d, %Y, %H:%M') as #{fs[:attribute]} from #{fs[:model].storage_name} #{Analysis.conditions_to_mysql_query(conditional)} group by date_format(#{fs[:attribute].to_s}, '%b %d, %Y, %H:%M') order by count(distinct(twitter_id)) asc limit #{limit} offset #{offset}")
         while !results.empty?
           graph_points = results.collect{|record| {:label => record.send(fs[:attribute].to_s), :value => record.value, :graph_id => graph.id, :curation_id => graph.curation_id}}
+          debugger
           GraphPoint.save_all(graph_points) if fs[:generate_graph_points]
           graph_points.each do |graph_point|
             csv << [graph_point[:label],graph_point[:value]]
