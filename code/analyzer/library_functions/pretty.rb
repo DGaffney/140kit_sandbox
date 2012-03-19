@@ -10,14 +10,14 @@ class Pretty
       graph_points = Pretty.location(graph_points)
     when "tweets_language"
       graph_points.collect{|graph_point| graph_point[:label] = Pretty.language(graph_point[:label])}
-    when "tweets_created_at"
-      graph_points = Pretty.time_generalize(graph_points)
+    # when "tweets_created_at"
+    #   graph_points = Pretty.time_generalize(graph_points)
     when "tweets_source"
       graph_points.collect{|graph_point| graph_point[:label] = Pretty.source(graph_point[:label])}
     when "users_lang"
       graph_points.collect{|graph_point| graph_point[:label] = Pretty.language(graph_point[:label])}
-    when "users_created_at"
-      graph_points = Pretty.time_generalize(graph_points)
+    # when "users_created_at"
+    #   graph_points = Pretty.time_generalize(graph_points)
     end
     return graph_points
   end
