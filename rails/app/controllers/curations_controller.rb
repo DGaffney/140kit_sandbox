@@ -66,12 +66,7 @@ class CurationsController < ApplicationController
     @curation.created_at = Time.now
     @curation.updated_at = @curation.created_at
     @curation.save!
-    @curation.datasets.each do |d|
-      d.created_at = Time.now
-      d.updated_at = d.created_at
-      d.instance_id = nil
-      d.save!
-    end
+    @curation.datasets.update_all(:created_at => Time.now, :updated_at => Time.now, :instance_id => nil)
     redirect_to researcher_url(@researcher), :notice => "We're running your streams!"
   end
   
@@ -90,4 +85,10 @@ class CurationsController < ApplicationController
     @analytical_offerings = AnalyticalOffering.available_to_researcher(@researcher)-@applied_analytical_offerings
   end
     
+  def archive
+    @curation = Curation.find(params[:id])
+    @curation.status = "needs_import"
+    @curation.datasets.update_all(:status => "needs_import")
+    redirect_to dataset_path(@curation), :notice => "Data has been sent off for a deep freeze."
+  end
 end
