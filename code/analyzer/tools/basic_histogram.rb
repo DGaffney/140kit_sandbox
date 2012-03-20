@@ -78,6 +78,7 @@ class BasicHistogram < AnalysisMetadata
         while !results.empty?
           puts fs[:attribute]
           puts fs[:model]
+          debugger if fs[:attribute] == "created_at" && fs[:model] == User
           graph_points = results.collect{|record| {:label => record.send(fs[:attribute].to_s), :value => record.value, :graph_id => graph.id, :curation_id => graph.curation_id}}
           GraphPoint.save_all(graph_points) if fs[:generate_graph_points]
           offset+=limit
