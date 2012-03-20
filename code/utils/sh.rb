@@ -137,7 +137,7 @@ module Sh
     return files.flatten.uniq
   end
   
-  def self.remove(file)
+  def self.rm(file)
     if File.exists?(file)
       if File.file?(file)
         Sh::sh("rm #{file}") 

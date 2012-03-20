@@ -80,10 +80,10 @@ class Importer < Instance
             config = DataMapper.repository.adapter.options
             puts "mysql -u #{config["user"]} --password='#{config["password"]}' -P #{config["port"]} -h #{config["host"]} #{config["path"].gsub("/", "")} < #{ENV["TMP_PATH"]}/#{mysql_filename} --local-infile=1"
             Sh::sh("mysql -u #{config["user"]} --password='#{config["password"]}' -P #{config["port"]} -h #{config["host"] || "localhost"} #{config["path"].gsub("/", "")} < #{ENV["TMP_PATH"]}/#{mysql_filename} --local-infile=1")
-            Sh::storage_remove("raw_catalog/#{model.to_s}/#{file}", storage)
-            Sh::remove("#{ENV["TMP_PATH"]}/#{mysql_filename}")
-            Sh::remove("#{decompressed_file}")
-            Sh::remove("#{file_location}")
+            Sh::storage_rm("raw_catalog/#{model.to_s}/#{file}", storage)
+            Sh::rm("#{ENV["TMP_PATH"]}/#{mysql_filename}")
+            Sh::rm("#{decompressed_file}")
+            Sh::rm("#{file_location}")
           end
         end
       end

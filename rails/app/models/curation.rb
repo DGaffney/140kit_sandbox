@@ -54,4 +54,5 @@ class Curation < ActiveRecord::Base
       return "Sit tight..."
     end
   end
+  
 end
