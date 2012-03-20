@@ -1,4 +1,4 @@
-class BasicUserStatistics < AnalysisMetadata
+class BasicUserStatistic < AnalysisMetadata
   # include ActsAsReloadable
   DEFAULT_CHUNK_SIZE = 1000
   
