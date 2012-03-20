@@ -3,8 +3,9 @@ class AdvancedHistogram < AnalysisMetadata
   DEFAULT_CHUNK_SIZE = 10000
   
   #Results: Frequency Charts of basic data on Tweets and Users per data set
-  def self.run(curation_id)
-    curation = Curation.first(:id => curation_id)
+  def self.run(analysis_metadata_id)
+    analysis_metadata = AnalysisMedata.first(:id => analysis_metadata_id)
+    curation = analysis_metadata.curation
     FilePathing.tmp_folder(curation, self.underscore)
     self.generate_sequential_tweet_graphs(curation)
     self.generate_sequential_user_graphs(curation)
