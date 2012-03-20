@@ -12,6 +12,6 @@ h2 Overview:
 == render partial: '/datasets/table', locals: {datasets: @curation.datasets}  
 h2 Analytics:
 - if @curation.analysis_metadatas.empty?
-  p No datasets added yet. #{link_to "Add one?", analyze_dataset_path(@curation)}
+  p No analytics added yet. #{link_to "Add one?", analyze_dataset_path(@curation)}
 - else
   == render partial: 'analytics', locals: {analysis_metadatas: @curation.analysis_metadatas}

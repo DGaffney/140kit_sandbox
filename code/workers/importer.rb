@@ -87,6 +87,9 @@ class Importer < Instance
           end
         end
       end
+      dataset.tweets_count = Tweet.count(:dataset_id => dataset.id)
+      dataset.users_count = User.count(:dataset_id => dataset.id)
+      dataset.entities_count = Entity.count(:dataset_id => dataset.id)
       dataset.status = "imported"
       dataset.save!
     end

@@ -46,7 +46,7 @@ module CurationsHelper
   def next_step_badge_text(curation)
     case curation.status 
     when "tsv_storing"
-      return "Hold on"
+      return "Select Analytics"
     when "tsv_stored"
       return "Bring it live"
     when "needs_import"
@@ -65,11 +65,11 @@ module CurationsHelper
   def next_step_badge_link(curation)
     case curation.status
     when "tsv_storing"
-      return "#"
+      return analyze_dataset_url(curation)
     when "tsv_stored"
       return import_dataset_url(curation)
     when "needs_import"
-      return "#"
+      return analyze_dataset_url(curation)
     when "imported"
       return "#"
     when "live"

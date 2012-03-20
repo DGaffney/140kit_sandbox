@@ -101,7 +101,7 @@ class Worker < Instance
       vars = [metadata.id]+metadata.run_vars
       puts "#{metadata.function.classify}.run(#{vars.join(", ")})"
       metadata.function.classify.constantize.run(*vars)
-      metadata.function.classify.constantize.finalize_work
+      # metadata.function.classify.constantize.finalize_work
       metadata.unlock
     else 
       raise "Language #{metadata.language} is not currently supported for analytical routing!"
