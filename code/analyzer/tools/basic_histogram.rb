@@ -75,10 +75,8 @@ class BasicHistogram < AnalysisMetadata
         length = (first-last).abs
         date_format = Pretty.time_interval(length, DataMapper.repository.adapter.options["adapter"])
         results = DataMapper.repository.adapter.select("select count(distinct(twitter_id)) as value,date_format(#{fs[:attribute].to_s}, '#{date_format}') as #{fs[:attribute]} from #{fs[:model].storage_name} #{Analysis.conditions_to_mysql_query(conditional)} group by date_format(#{fs[:attribute].to_s}, '#{date_format}') order by count(distinct(twitter_id)) asc limit #{limit} offset #{offset}")
+        debugger
         while !results.empty?
-          puts fs[:attribute]
-          puts fs[:model]
-          debugger if fs[:attribute] == "created_at" && fs[:model] == User
           graph_points = results.collect{|record| {:label => record.send(fs[:attribute].to_s), :value => record.value, :graph_id => graph.id, :curation_id => graph.curation_id}}
           GraphPoint.save_all(graph_points) if fs[:generate_graph_points]
           offset+=limit
