@@ -10,13 +10,18 @@ class Pretty
       graph_points = Pretty.location(graph_points)
     when "tweets_language"
       graph_points.collect{|graph_point| graph_point[:label] = Pretty.language(graph_point[:label])}
+    when "tweets_created_at"
+      graph_points = Pretty.time_generalize(graph_points)
     when "tweets_source"
       graph_points.collect{|graph_point| graph_point[:label] = Pretty.source(graph_point[:label])}
     when "users_lang"
       graph_points.collect{|graph_point| graph_point[:label] = Pretty.language(graph_point[:label])}
+    when "users_created_at"
+      graph_points = Pretty.time_generalize(graph_points)
     end
     return graph_points
   end
+
   
   def self.location(graph_points)
     graph_points.select{|graph_point| graph_point[:label] = "Not Reported" if graph_point[:label].nil?}
@@ -38,4 +43,42 @@ class Pretty
     end
     return source.gsub("\"", "\\\"")
   end
+  
+  def self.time_generalize(graph_points)
+    sorted_times = graph_points.collect{|g| Time.parse(g[:label].to_s).to_i}.sort
+    length = sorted_times.last-sorted_times.first
+    Pretty.time_rounder(graph_points, self.time_interval(length))
+  end
+  
+  def self.time_interval(length, platform="ruby")
+    if length < 60
+      return {"ruby" => "%Y-%m-%d %H:%M:%S", "mysql" => "%Y-%m-%d %H:%i:%S"}[platform]
+    elsif length < 3600
+      return {"ruby" => "%Y-%m-%d %H:%M:00", "mysql" => "%Y-%m-%d %H:%i:%S"}[platform]
+    elsif length < 86400
+      return {"ruby" => "%Y-%m-%d %H:00:00", "mysql" => "%Y-%m-%d %H:%i:%S"}[platform]
+    elsif length < 11536000 #31536000
+      return {"ruby" => "%Y-%m-%d 00:00:00", "mysql" => "%Y-%m-%d %H:%i:%S"}[platform]
+    else
+      return {"ruby" => "%Y-%m-00 00:00:00", "mysql" => "%Y-%m-%d %H:%i:%S"}[platform]
+    end
+  end
+  
+  def self.time_rounder(graph_points, time_format)
+    graph_point_counts = {}
+    graph_points.each do |graph_point|
+      time = graph_point[:label]
+      if graph_point_counts[time.strftime(time_format)].nil?
+        graph_point_counts[time.strftime(time_format)] = {:label => time.strftime(time_format), :value => graph_point[:value].to_i, :curation_id => graph_point[:curation_id], :graph_id => graph_point[:graph_id]}
+      else
+        graph_point_counts[time.strftime(time_format)][:value] += graph_point[:value].to_i
+      end
+    end
+    final_graphs = []
+    graph_point_counts.keys.sort.each do |graph_key|
+      final_graphs << graph_point_counts[graph_key]
+    end
+    return final_graphs
+  end
+  
 end

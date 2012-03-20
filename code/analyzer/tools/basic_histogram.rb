@@ -19,7 +19,6 @@ class BasicHistogram < AnalysisMetadata
       {:model => User,  :attribute => :time_zone},
       {:model => User,  :attribute => :created_at}
     ], curation)
-    debugger
     self.push_tmp_folder(curation.stored_folder_name)
     self.finalize_work(curation)
   end
@@ -76,16 +75,34 @@ class BasicHistogram < AnalysisMetadata
         return data
       }
       csv << ["label", "value"]
-      results = records.call(limit, offset)
-      while !results.empty?
-        graph_points = results.collect{|record| {:label => record.first, :value => record.last, :graph_id => graph.id, :curation_id => graph.curation_id}}
-        graph_points = graph.sanitize_points(graph_points)
-        GraphPoint.save_all(graph_points) if fs[:generate_graph_points]
-        graph_points.each do |graph_point|
-          csv << [graph_point[:label],graph_point[:value]]
+      if fs[:attribute].to_s == "created_at"
+        first = DataMapper.repository.adapter.select("select #{fs[:attribute]} from #{fs[:model].storage_name} #{Analysis.conditions_to_mysql_query(conditional)} order by #{fs[:attribute]} asc limit 1")
+        last = DataMapper.repository.adapter.select("select #{fs[:attribute]} from #{fs[:model].storage_name} #{Analysis.conditions_to_mysql_query(conditional)} order by #{fs[:attribute]} desc limit 1")
+        length = (first-last).abs
+        date_format = Pretty.time_interval(length, DataMapper.repository.adapter.options["adapter"])
+        results = DataMapper.repository.adapter.select("select count(distinct(twitter_id)) as value,date_format(#{fs[:attribute].to_s}, '#{date_format}') as #{fs[:attribute]} from #{fs[:model].storage_name} #{Analysis.conditions_to_mysql_query(conditional)} group by date_format(#{fs[:attribute].to_s}, '%b %d, %Y, %H:%M') order by count(distinct(twitter_id)) asc limit #{limit} offset #{offset}")
+        while !results.empty?
+          graph_points = results.collect{|record| {:label => record.send(fs[:attribute].to_s), :value => record.value, :graph_id => graph.id, :curation_id => graph.curation_id}}
+          GraphPoint.save_all(graph_points) if fs[:generate_graph_points]
+          graph_points.each do |graph_point|
+            csv << [graph_point[:label],graph_point[:value]]
+          end
+          offset+=limit
+          results = DataMapper.repository.adapter.select("select count(distinct(twitter_id)) as value,date_format(#{fs[:attribute].to_s}, '#{date_format}') from #{fs[:model].storage_name} #{Analysis.conditions_to_mysql_query(conditional)} group by date_format(#{fs[:attribute].to_s}, '%b %d, %Y, %H:%M') order by count(distinct(twitter_id)) asc limit #{limit} offset #{offset}")            
         end
-        offset+=limit
+      else
         results = records.call(limit, offset)
+        while !results.empty?
+          graph_points = results.collect{|record| {:label => record.first, :value => record.last, :graph_id => graph.id, :curation_id => graph.curation_id}}
+          graph_points = graph.sanitize_points(graph_points)
+          GraphPoint.save_all(graph_points) if fs[:generate_graph_points]
+          graph_points.each do |graph_point|
+            csv << [graph_point[:label],graph_point[:value]]
+          end
+          offset+=limit
+          results = records.call(limit, offset)
+        end
+        
       end
     end
     graph.written = true

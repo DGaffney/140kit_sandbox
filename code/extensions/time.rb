@@ -1,9 +1,12 @@
 class Time
-  def self.ntp
-    return self.at(self.now.to_f)
-  end
-
-  def gmt
-    return to_time.gmtime
+  def super_parse(value)
+    answer = nil
+    begin 
+      self.parse
+    rescue
+      year,month,day,hour,minute,second = value.split(" ")
+      answer = Time.parse("#{year}-#{month}-#{day} #{hour}:#{minute}:#{second}")
+    end
+    return answer
   end
 end
