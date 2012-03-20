@@ -287,8 +287,7 @@ class Filter < Instance
      claimed_datasets = Dataset.lock(datasets_to_claim)
      if !claimed_datasets.empty?
        claimed_datasets.each do |dataset|
-         debugger
-         dataset.storage_machine_id = Machine.first(:hostname => STORAGE["hostname"]).id rescue 0
+         dataset.storage_machine_id = Machine.first(:user => STORAGE["hostname"]).id
          dataset.save!
        end
        update_datasets(claimed_datasets)
