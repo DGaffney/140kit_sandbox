@@ -60,7 +60,7 @@ class Pretty
     elsif length < 11536000 #31536000
       return {"ruby" => "%Y-%m-%d 00:00:00", "mysql" => "%Y-%m-%d 00:00:00"}[platform]
     else
-      return {"ruby" => "%Y-%m-00 00:00:00", "mysql" => "%Y-%m-00 00:00:00"}[platform]
+      return {"ruby" => "%Y-%m-01 00:00:00", "mysql" => "%Y-%m-01 00:00:00"}[platform]
     end
   end
   

@@ -18,11 +18,10 @@
   # end
   if ["tweets_created_at", "users_created_at"].include?(@graph.title)
     @dataset.collect{|x| x[:label] = Time.parse(x[:label])}
-    @dataset.sort!{|x,y| x[:label].to_i<=>y[:label].to_i}
     start_time = @dataset.first[:label]
     end_time = @dataset.last[:label]
     @end_time_string = start_time.strftime("Date.UTC(%Y,%m,%d,%H,%M,%S)")
-    @length = time_generalize(start_time,end_time)
+    @dataset.sort!{|x,y| x[:label].to_i<=>y[:label].to_i}
     @dataset.collect{|x| x[:label] = x[:label].strftime("Date.UTC(%Y,%m,%d,%H,%M,%S)")}
     @dataset.collect{|x| x[:value] = x[:value].to_i}
     @dataset = @dataset.collect{|x| [x[:label], x[:value]]}
