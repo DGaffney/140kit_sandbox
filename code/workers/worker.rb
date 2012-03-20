@@ -59,7 +59,7 @@ class Worker < Instance
   
   def select_curation
     puts "select_curation..."
-    curations = Curation.unlocked.all(:analyzed => false, :status.not => ["tsv_storing"]).reject {|c| c.datasets.collect {|d| d.scrape_finished }.include?(false) }.shuffle
+    curations = Curation.unlocked.all(:status.not => ["tsv_storing"]).reject {|c| c.datasets.collect {|d| d.scrape_finished }.include?(false) }.shuffle
     for curation in curations
       curation.lock
       return curation if curation.owned_by_me?
