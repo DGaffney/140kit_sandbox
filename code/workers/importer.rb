@@ -56,6 +56,7 @@ class Importer < Instance
   def import_datasets_to_database
     dataset = @curation.datasets.first
     @curation.datasets.each do |dataset|
+      debugger
       storage = Machine.first(:id => dataset.storage_machine_id).machine_storage_details
       models = [Tweet, User, Entity, Geo, Coordinate]
       models.each do |model|

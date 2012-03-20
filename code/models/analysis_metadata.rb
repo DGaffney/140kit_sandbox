@@ -230,22 +230,22 @@ class AnalysisMetadata
     FilePathing.remove_permanent_folder(folder_name, folder)
   end
   
-  def self.finalize_work(curation)
-    response = self.finalize_analysis(curation)
-    response[:researcher_id] = curation.researcher.id
-    Mail.queue(response)
-    self.analysis_metadata(curation).update(:finished => true)
-    self.analysis_metadata(curation).unlock!
-    return response
-  end
-  
-  def self.finalize_analysis(curation)
-    response = {}
-    response[:recipient] = curation.researcher.email
-    response[:subject] = "#{curation.researcher.user_name}, an analytical process on your '#{curation.name}' data has finished."
-    response[:message_content] = "An analytical process, #{self}, has finished running on your dataset. You can view results by visiting the collection's page: <a href=\"http://140kit.com/#{curation.researcher.user_name}/collections/#{curation.id}\">http://140kit.com/#{curation.researcher.user_name}/collections/#{curation.id}</a>."
-    return response
-  end
+  # def self.finalize_work(curation)
+  #   response = self.finalize_analysis(curation)
+  #   response[:researcher_id] = curation.researcher.id
+  #   Mail.queue(response)
+  #   self.analysis_metadata(curation).update(:finished => true)
+  #   self.analysis_metadata(curation).unlock!
+  #   return response
+  # end
+  # 
+  # def self.finalize_analysis(curation)
+  #   response = {}
+  #   response[:recipient] = curation.researcher.email
+  #   response[:subject] = "#{curation.researcher.user_name}, an analytical process on your '#{curation.name}' data has finished."
+  #   response[:message_content] = "An analytical process, #{self}, has finished running on your dataset. You can view results by visiting the collection's page: <a href=\"http://140kit.com/#{curation.researcher.user_name}/collections/#{curation.id}\">http://140kit.com/#{curation.researcher.user_name}/collections/#{curation.id}</a>."
+  #   return response
+  # end
   
   def zip_download_url
     "http://"+STORAGE["path"]+"/"+self.curation.stored_folder_name

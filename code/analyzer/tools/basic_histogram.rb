@@ -20,7 +20,6 @@ class BasicHistogram < AnalysisMetadata
       {:model => User,  :attribute => :time_zone},
       {:model => User,  :attribute => :created_at}
     ], curation)
-    self.finalize_work(curation)
   end
 
   def self.generate_graphs(frequency_set, curation, analytic=self)
