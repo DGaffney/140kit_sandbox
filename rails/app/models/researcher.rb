@@ -34,4 +34,8 @@ class Researcher < ActiveRecord::Base
   def self.roles
     return ["Inactive", "Suspended", "User", "Academic", "Admin"]
   end
+  
+  def admin?
+    return Researcher.find(self.id).role == "Admin"
+  end
 end

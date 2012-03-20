@@ -12,4 +12,11 @@ class ApplicationController < ActionController::Base
       redirect_to root_path, alert: "You must be logged in to view this page."
     end
   end
+
+  def admin_required
+    if current_user.nil? || !Researcher.find(current_user.id).admin?
+      flash[:notice] = "You must be logged in to view this page."
+      redirect_to root_path, alert: "You must be logged in to view this page."
+    end
+  end
 end

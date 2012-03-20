@@ -13,9 +13,13 @@ class AnalysisMetadataController < ApplicationController
       format.js { render :template => analysis_metadata_partial_path(@analysis_metadata), :layout => false }
     end
   end
-  
+
   def analysis_metadata_partial_path(analysis_metadata)
-    "/analysis_metadata/analytics/#{analysis_metadata.function}/#{analysis_metadata.function}_graph"
+    if File.exists?(Rails.root.join("app", "views", "analysis_metadata", "analytics", analysis_metadata.function, "_#{analysis_metadata.function}.js.erb"))
+      return "/analysis_metadata/analytics/#{analysis_metadata.function}/graph"
+    else
+      return "/analysis_metadata/analytics/graph"
+    end
   end
   
 end

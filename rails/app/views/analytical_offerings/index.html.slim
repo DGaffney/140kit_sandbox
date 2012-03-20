@@ -1,0 +1,21 @@
+h1 Hey
+table.table.table-striped.table-bordered
+  thead
+    tr
+      th Name
+      th Language
+      th Developer
+      th Source Code
+      th Options
+  tbody
+    - for analytical_offering in @analytical_offerings
+      tr
+        td = link_to analytical_offering.title, analytical_offering_path(analytical_offering)
+        td = analytical_offering.language
+        td = link_to analytical_offering.created_by, analytical_offering.created_by_link
+        td = link_to "Github", analytical_offering.source_code_link
+        td 
+          = link_to "See Datasets", search_dataset_path
+          = " | "
+          - if current_user.admin?
+            = link_to "Edit", edit_analytical_offering_path(analytical_offering)

@@ -1,0 +1,18 @@
+h2 Analytical Process: #{link_to @analysis_metadata.title, analytical_offering_path(@analysis_metadata.analytical_offering)}
+- groupings = {"counts_by_app" => ["source_retweet_counts", "source_link_count", "source_mention_count", "source_entity_count"]}
+.row#graph_view
+  .span11.well
+      .span4
+        h3 Counts By Application
+        ul
+          - for graph_title in groupings["counts_by_app"]
+            - graph = @analysis_metadata.graphs.select{|g| g.title == graph_title}.first
+            li = link_to graph.pretty_title, analysis_metadata_partial_graph_path(graph), :remote => true
+      .span4
+        h3 Counts By Application
+        ul
+          - for graph_title in groupings["counts_by_app"]
+            - graph = @analysis_metadata.graphs.select{|g| g.title == graph_title}.first
+            li = link_to graph.pretty_title, analysis_metadata_partial_graph_path(graph), :remote => true
+  .span12
+    div#graph

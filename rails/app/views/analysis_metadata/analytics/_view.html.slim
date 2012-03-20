@@ -1,0 +1,22 @@
+h1 Whoops!
+
+p It looks like this analytic has no view developed just yet. Please check later. In the meantime, this is what we can tell you about it:
+h3 Task details
+ul
+  li Ready to Analyze? #{@analysis_metadata.ready}
+  li Finished Analyzing? #{@analysis_metadata.finished}
+
+h3 Graphs
+- if @analysis_metadata.graphs.length == 0
+  b No graphs generated yet.
+- else
+  - if @analysis_metadata.graphs.select{|g| g.written}.length != 0
+    b Written Graphs
+    - for graph in @analysis_metadata.graphs.select{|g| g.written}
+      ul
+        li #{graph.title} (#{graph.style} type of graph)
+  - if @analysis_metadata.graphs.select{|g| !g.written}.length != 0
+    b Processing Graphs
+    - for graph in @analysis_metadata.graphs.select{|g| !g.written}
+      ul
+        li #{graph.title} (#{graph.style} type of graph)

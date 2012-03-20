@@ -1,83 +1,34 @@
 class Array
   def sum
-    self.compact.inject(0) { |s,v| s += v }
+    return self.inject(0){|acc,i|acc +i}
+  end
+
+  def average
+    return self.sum/self.length.to_f
+  end
+
+  def sample_variance
+    avg=self.average
+    sum=self.inject(0){|acc,i|acc +(i-avg)**2}
+    return(1/self.length.to_f*sum)
+  end
+
+  def standard_deviation
+    return Math.sqrt(self.sample_variance)
   end
   
-  def to_i
-    self.collect{|x| x.to_i}
-  end
-  
-  def to_f
-    self.collect{|x| x.to_i}
-  end
-  
-  def frequencies
-    new_val = {}
-    self.each do |s|
-      elem = s.to_s
-      new_val[elem].nil? ? new_val[elem]=1 : new_val[elem]+=1
-    end
-    return new_val
-  end
-  
-  def chunk(pieces=2)
-    len = self.length
-    return [] if len == 0
-    mid = (len/pieces)
-    chunks = []
-    start = 0
-    1.upto(pieces) do |i|
-      last = start+mid
-      last = last-1 unless len%pieces >= i
-      chunks << self[start..last] || []
-      start = last+1
-    end
-    chunks
-  end
-  
-  def repack
-    set = []
-    self.each do |slice|
-      set<<slice
-      yield set
+  def counts
+    self.inject(Hash.new(0)) do |hash,element|
+      hash[element] += 1
+      hash
     end
   end
-  
-  def centroid
-    dimensions = self.flatten
-    x_cent = (x_vals = 1.upto(dimensions.length).collect{|x| dimensions[x] if x.even?}.compact).sum/x_vals.length
-    y_cent = (y_vals = 1.upto(dimensions.length).collect{|y| dimensions[y] if !y.even?}.compact).sum/y_vals.length
-    return x_cent, y_cent
-  end
-  
-  def area
-    side_one = (self[0].to_f-self[2].to_f).abs
-    side_two = (self[1].to_f-self[3].to_f).abs
-    return side_one*side_two
-  end
-  
-  def all_combinations(length_range=1..self.length)
-    permutations = []
-    length_range.max.downto(length_range.min) do |length|
-      self.permutation(length).each do |perm|
-        permutations << perm.sort if !permutations.include?(perm.sort)
-      end
+
+	def percentile(percentile=0.0)
+	  if percentile == 0.0
+	    return self.first
+    else
+      return self ? self.sort[((self.length * percentile).ceil)-1] : nil
     end
-    return permutations
-  end
-  
-  def structs_to_hashes
-    keys = (self.first.methods-Class.methods).collect{|x| x.to_s.gsub("=", "") if x.to_s.include?("=") && x.to_s!= "[]="}.compact
-    hashed_set = []
-    self.each do |struct|
-      object = {}
-      keys.collect{|k| object[k] = k.class == DateTime ? struct.send(k).to_time : struct.send(k)}
-      hashed_set << object
-    end
-    return hashed_set
-  end
-  
-  def sth
-    structs_to_hashes
   end
 end

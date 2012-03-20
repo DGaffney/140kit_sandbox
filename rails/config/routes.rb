@@ -14,7 +14,10 @@ WWW140kit::Application.routes.draw do
   # The priority is based upon order of creation:
   # first created -> highest priority.
   #we should just do single show pages for all these results. Make it atomic, not overwhelming like old site?
+  get '/analytics/' => 'analytical_offerings#index', as: :analytical_offerings
+  put '/analytics/:id/details' => 'analytical_offerings#update', as: :update_analytical_offering
   get '/analytics/:id/details' => 'analytical_offerings#show', as: :analytical_offering
+  get '/analytics/:id/edit' => 'analytical_offerings#edit', as: :edit_analytical_offering
   get '/analytics/:id/:curation_id' => 'analytical_offerings#add', as: :add_analytical_offering
   post '/analytics/:id/:curation_id/validate' => 'analytical_offerings#validate', as: :validate_analysis_metadata
   get '/analytics/:id' => 'analysis_metadata#show', as: :analysis_metadata
@@ -31,13 +34,14 @@ WWW140kit::Application.routes.draw do
   post '/machines/:id/update' => 'instances#update', as: :update_machine
   post '/datasets/validate' => 'curations#validate', as: :validate_dataset
   get '/datasets/:id/verify' => 'curations#verify', as: :verify_dataset
+  get '/datasets/search' => 'curations#search', as: :search_dataset  
   get '/datasets/:id/alter' => 'curations#alter', as: :alter_dataset
   get '/datasets/:id/analyze' => 'curations#analyze', as: :analyze_dataset
   get '/datasets/:id/import' => 'curations#import', as: :import_dataset
   get '/analysis/:curation_id/:analysis_metadata_id' => 'analysis_metadata#results', as: :curation_analysis 
   get '/new/dataset' => 'curations#new', as: :new_dataset
   get '/researchers/:user_name' => 'researchers#show', as: :researcher
-
+  get '/admin/panel' => 'admin#panel', as: :admin_panel
   get '/researchers/:user_name/edit' => 'researchers#edit', as: :edit_researcher
   put'/researchers/:user_name' => 'researchers#update'
   get '/posts/:id/:slug' => 'posts#show', as: :post

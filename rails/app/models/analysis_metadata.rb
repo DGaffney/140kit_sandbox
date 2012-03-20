@@ -18,13 +18,13 @@ class AnalysisMetadata < ActiveRecord::Base
   def links
     links = []
     if self.finished
-      links << "<a href='/analysis/#{self.id}'>Results</a>"
+      links << "<a href='/analytics/#{self.id}'>Results</a>"
     elsif !self.ready && self.curation.status == "imported"
-      links << "<a href='/analysis/#{self.id}'>Results</a>"
+      links << "<a href='/analytics/#{self.id}'>Results</a>"
     elsif self.ready && self.curation.status == "imported"
-      links << "<a href='/analysis/#{self.id}'>Results</a>"
+      links << "<a href='/analytics/#{self.id}'>Results</a>"
     end
-    links << "<a href='/analysis/#{self.id}/destroy'>Remove</a>"
+    links << "<a href='/analytics/#{self.id}/destroy'>Remove</a>"
   end
 
   def verify_absolute_uniqueness

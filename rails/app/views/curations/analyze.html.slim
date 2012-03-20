@@ -1,5 +1,12 @@
 h1 = "Analysis for #{@curation.name}"
 h2 Already Applied
-== render partial: '/analysis_metadata/table', :locals => {:analysis_metadatas => @analysis_metadatas}
+- if @analysis_metadatas.length == 0
+  p No analytical offerings currently applied!
+- else
+  == render partial: '/analysis_metadata/table', :locals => {:analysis_metadatas => @analysis_metadatas}
+
 h2 Available
-== render partial: '/analytical_offerings/table', :locals => {:analytical_offerings => @analytical_offerings}
+- if @analytical_offerings.length == 0
+  p No more analytical offerings currently available!
+- else
+  == render partial: '/analytical_offerings/table', :locals => {:analytical_offerings => @analytical_offerings}

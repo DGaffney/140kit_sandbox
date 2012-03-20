@@ -1,6 +1,6 @@
 class ResearchersController < ApplicationController
   before_filter :login_required, except: [:index, :show]
-
+  before_filter :admin_required, except: [:index, :show, :edit, :update]
   def index
     @page_title = "Researchers"
     # select researchers.id, count(curations.id) from researchers left join curations on curations.researcher_id = researchers.id group by researchers.id;
@@ -47,5 +47,8 @@ class ResearchersController < ApplicationController
         format.js
       end
     end
+  end
+  
+  def panel
   end
 end

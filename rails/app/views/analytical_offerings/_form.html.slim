@@ -1,0 +1,38 @@
+= form_for(@analytical_offering) do |f|
+  fieldset
+    .span4    
+      label.control-label Title
+      .controls
+        = f.text_field :title, class: 'input-xlarge'
+      label.control-label Function
+      .controls
+        = f.text_field :function, class: 'input-xlarge'
+      label.control-label Created By
+      .controls
+        = f.text_field :created_by, class: 'input-xlarge'
+      label.control-label Created By Link
+      .controls
+        = f.text_field :created_by_link, class: 'input-xlarge'
+      label.control-label REST only?
+      .controls
+        = f.check_box :rest, class: 'input-xlarge'
+      label.control-label Enabled?
+      .controls
+        = f.check_box :enabled, class: 'input-xlarge'
+    .span4    
+      label.control-label Language
+      .controls
+        = f.text_field :language, class: 'input-xlarge'
+      label.control-label Access Level
+      .controls
+        = f.select :access_level, Researcher.roles[2..-1], class: 'input-xlarge'
+      label.control-label Source Code Link
+      .controls
+        = f.text_field :source_code_link, class: 'input-xlarge'
+    .span4    
+      label.control-label Description
+      .controls
+        = f.text_area :description, class: 'input-xlarge'
+    .span12
+      .form-actions
+        = submit_tag 'Submit', class: 'btn btn-primary'

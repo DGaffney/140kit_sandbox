@@ -30,6 +30,7 @@ require DIR+'/extensions/inflectors'
 require DIR+'/utils/git'
 require DIR+'/utils/sh'
 require DIR+'/extensions/string'
+require DIR+'/extensions/array'
 
 ENV['HOSTNAME'] = Sh::hostname.strip
 ENV['PID'] = Process.pid.to_s #because ENV only allows strings.

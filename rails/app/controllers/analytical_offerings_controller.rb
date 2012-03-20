@@ -3,6 +3,38 @@ class AnalyticalOfferingsController < ApplicationController
     @analytical_offering = AnalyticalOffering.find(params[:id])
   end
   
+  def index
+    @analytical_offerings = AnalyticalOffering.all
+  end
+
+  def edit
+    @analytical_offering = AnalyticalOffering.find(params[:id])
+  end
+  
+  def update
+    @analytical_offering = AnalyticalOffering.find(params[:id])
+
+    respond_to do |format|
+      if @analytical_offering.update_attributes(params[:analytical_offering])
+        format.html { redirect_to @analytical_offering, notice: 'Analytical Offering was successfully updated.' }
+        format.json { head :no_content }
+      else
+        format.html { render action: "edit" }
+        format.json { render json: @analytical_offering.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  def destroy
+    @analytical_offering = AnalyticalOffering.find(params[:id])
+    @analytical_offering.destroy
+
+    respond_to do |format|
+      format.html { redirect_to analytical_offerings_url }
+      format.json { head :no_content }
+    end
+  end
+
   def add
     @curation = Curation.find(params[:curation_id])
     @analytical_offering = AnalyticalOffering.find(params[:id])
