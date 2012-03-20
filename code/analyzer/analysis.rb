@@ -13,7 +13,7 @@ class Analysis
     #and save (may get ugly with lots of connections outside our system....)
     case ao.language
     when "ruby"
-      require "#{File.dirname(__FILE__)}/tools/#{ao.function}.rb"
+      require "#{File.dirname(__FILE__)}/tools/#{ao.function}.rb" if ao.enabled
     end
   end
   
