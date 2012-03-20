@@ -11,7 +11,7 @@ class AdvancedHistogram < AnalysisMetadata
     self.generate_sequential_user_graphs(curation)
     self.generate_user_avg_sum_graphs(curation)
     debugger
-    self.finalize(curation)
+    self.finalize_work(curation)
   end
 
   def self.generate_sequential_tweet_graphs(curation, additional_query={}, analytic=self, title_suffix="")
