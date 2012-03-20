@@ -76,7 +76,7 @@
   end
   def series(title)
     {"tweets_language" => "type: 'pie',",
-    "tweets_created_at" => "type: 'line',",
+    "tweets_created_at" => "type: 'spline',",
     "tweets_source" => nil,
     "tweets_location" => nil,
     "users_followers_count" => nil,
@@ -85,7 +85,7 @@
     "users_geo_enabled" => "type: 'pie',",
     "users_statuses_count" => nil,
     "users_time_zone" => "type: 'pie',",
-    "users_created_at" => "type: 'line',"}[title] || ""
+    "users_created_at" => "type: 'spline',"}[title] || ""
   end
   def plotOptions(title)
     {"tweets_language" => "{pie: {allowPointSelect: true,cursor: 'pointer',dataLabels: {enabled: false},showInLegend: true}},",
