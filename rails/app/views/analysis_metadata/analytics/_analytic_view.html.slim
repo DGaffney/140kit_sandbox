@@ -2,16 +2,17 @@ h2 Analytical Process: #{link_to @analysis_metadata.title, analytical_offering_p
 .row#graph_view
   .span3
     .well
-        h3 Options
-        - if @analysis_metadata.graphs.length == 0
-          p Sorry, haven't produced any graphs yet!
-        - else
-          ul
-            - for graph in @analysis_metadata.graphs
-              li = link_to graph.pretty_title, analysis_metadata_partial_graph_path(graph), :remote => true
+      h3 Options
 
-          
+      - if @analysis_metadata.graphs.length == 0
+        p Sorry, haven't produced any graphs yet!
+      - else
+        ul
+          - for graph in @analysis_metadata.graphs
+            li = link_to graph.pretty_title, analysis_metadata_partial_graph_path(graph), :remote => true
+
       h3 Details
+
       ul
         li 
           | Access Level: 
