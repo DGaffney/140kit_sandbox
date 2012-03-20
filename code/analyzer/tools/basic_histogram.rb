@@ -19,7 +19,6 @@ class BasicHistogram < AnalysisMetadata
       {:model => User,  :attribute => :time_zone},
       {:model => User,  :attribute => :created_at}
     ], curation)
-    self.push_tmp_folder(curation.stored_folder_name)
     self.finalize_work(curation)
   end
 
@@ -55,12 +54,8 @@ class BasicHistogram < AnalysisMetadata
   def self.frequency_graphs(fs, graph, conditional, path=ENV['TMP_PATH'])
     limit = DEFAULT_CHUNK_SIZE||1000
     offset = 0
-    sub_directory = "/"+[fs[:year],fs[:month],fs[:date],fs[:hour]].compact.join("/")
-    full_path_with_file = sub_directory == "/" ? path+"/"+fs[:title]+".csv" : path+sub_directory+"/"+fs[:title]+".csv"    
-    Sh::mkdir(path+sub_directory, {"type"=>"local"})
-    csv = CSV.open(full_path_with_file, "w")
     if block_given?
-      yield fs, graph, conditional, csv, limit, offset
+      yield fs, graph, conditional, limit, offset
     else
       records = lambda{|limit, offset| 
         data = []
@@ -74,22 +69,17 @@ class BasicHistogram < AnalysisMetadata
         end
         return data
       }
-      csv << ["label", "value"]
       if fs[:attribute].to_s == "created_at"
-        first = DataMapper.repository.adapter.select("select #{fs[:attribute]} from #{fs[:model].storage_name} #{Analysis.conditions_to_mysql_query(conditional)} order by #{fs[:attribute]} asc limit 1").first
-        last = DataMapper.repository.adapter.select("select #{fs[:attribute]} from #{fs[:model].storage_name} #{Analysis.conditions_to_mysql_query(conditional)} order by #{fs[:attribute]} desc limit 1").first
+        first = DataMapper.repository.adapter.select("select #{fs[:attribute]} from #{fs[:model].storage_name} #{Analysis.conditions_to_mysql_query(conditional)} order by #{fs[:attribute]} asc limit 1").first.to_time
+        last = DataMapper.repository.adapter.select("select #{fs[:attribute]} from #{fs[:model].storage_name} #{Analysis.conditions_to_mysql_query(conditional)} order by #{fs[:attribute]} desc limit 1").first.to_time
         length = (first-last).abs
         date_format = Pretty.time_interval(length, DataMapper.repository.adapter.options["adapter"])
-        results = DataMapper.repository.adapter.select("select count(distinct(twitter_id)) as value,date_format(#{fs[:attribute].to_s}, '#{date_format}') as #{fs[:attribute]} from #{fs[:model].storage_name} #{Analysis.conditions_to_mysql_query(conditional)} group by date_format(#{fs[:attribute].to_s}, '%b %d, %Y, %H:%M') order by count(distinct(twitter_id)) asc limit #{limit} offset #{offset}")
+        results = DataMapper.repository.adapter.select("select count(distinct(twitter_id)) as value,date_format(#{fs[:attribute].to_s}, '#{date_format}') as #{fs[:attribute]} from #{fs[:model].storage_name} #{Analysis.conditions_to_mysql_query(conditional)} group by date_format(#{fs[:attribute].to_s}, '#{date_format}') order by count(distinct(twitter_id)) asc limit #{limit} offset #{offset}")
         while !results.empty?
-          debugger
           graph_points = results.collect{|record| {:label => record.send(fs[:attribute].to_s), :value => record.value, :graph_id => graph.id, :curation_id => graph.curation_id}}
           GraphPoint.save_all(graph_points) if fs[:generate_graph_points]
-          graph_points.each do |graph_point|
-            csv << [graph_point[:label],graph_point[:value]]
-          end
           offset+=limit
-          results = DataMapper.repository.adapter.select("select count(distinct(twitter_id)) as value,date_format(#{fs[:attribute].to_s}, '#{date_format}') from #{fs[:model].storage_name} #{Analysis.conditions_to_mysql_query(conditional)} group by date_format(#{fs[:attribute].to_s}, '%b %d, %Y, %H:%M') order by count(distinct(twitter_id)) asc limit #{limit} offset #{offset}")            
+          results = DataMapper.repository.adapter.select("select count(distinct(twitter_id)) as value,date_format(#{fs[:attribute].to_s}, '#{date_format}') from #{fs[:model].storage_name} #{Analysis.conditions_to_mysql_query(conditional)} group by date_format(#{fs[:attribute].to_s}, '#{date_format}') order by count(distinct(twitter_id)) asc limit #{limit} offset #{offset}")            
         end
       else
         results = records.call(limit, offset)
@@ -97,13 +87,9 @@ class BasicHistogram < AnalysisMetadata
           graph_points = results.collect{|record| {:label => record.first, :value => record.last, :graph_id => graph.id, :curation_id => graph.curation_id}}
           graph_points = graph.sanitize_points(graph_points)
           GraphPoint.save_all(graph_points) if fs[:generate_graph_points]
-          graph_points.each do |graph_point|
-            csv << [graph_point[:label],graph_point[:value]]
-          end
           offset+=limit
           results = records.call(limit, offset)
         end
-        
       end
     end
     graph.written = true
@@ -114,7 +100,7 @@ class BasicHistogram < AnalysisMetadata
     response = {}
     response[:recipient] = curation.researcher.email
     response[:subject] = "#{curation.researcher.user_name}, the raw Graph data for the basic histograms in the \"#{curation.name}\" data set is complete."
-    response[:message_content] = "Your CSV files are ready for download. You can grab them by visiting the collection's page: <a href=\"http://140kit.com/#{curation.researcher.user_name}/collections/#{curation.id}\">http://140kit.com/#{curation.researcher.user_name}/collections/#{curation.id}</a>."
+    response[:message_content] = "DOWNLOAD!"
     return response
   end
 end
