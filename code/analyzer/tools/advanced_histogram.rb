@@ -10,6 +10,7 @@ class AdvancedHistogram < AnalysisMetadata
     self.generate_sequential_tweet_graphs(curation)
     self.generate_sequential_user_graphs(curation)
     self.generate_user_avg_sum_graphs(curation)
+    debugger
     self.finalize(curation)
   end
 
@@ -17,14 +18,14 @@ class AdvancedHistogram < AnalysisMetadata
     title_suffix = title_suffix.empty? ? "" : "_#{title_suffix}"
     sequential_tweet_graphs = []
     #can be run sequentially
-    sequential_tweet_graphs << Graph.first_or_create(:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "hashtag_count|retweet_count#{title_suffix}")
-    sequential_tweet_graphs << Graph.first_or_create(:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "link_count|retweet_count#{title_suffix}")
-    sequential_tweet_graphs << Graph.first_or_create(:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "mention_count|retweet_count#{title_suffix}")
-    sequential_tweet_graphs << Graph.first_or_create(:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "entity_count|retweet_count#{title_suffix}")
-    sequential_tweet_graphs << Graph.first_or_create(:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "source_retweet_counts#{title_suffix}")
-    sequential_tweet_graphs << Graph.first_or_create(:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "source_link_count#{title_suffix}")
-    sequential_tweet_graphs << Graph.first_or_create(:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "source_mention_count#{title_suffix}")
-    sequential_tweet_graphs << Graph.first_or_create(:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "source_entity_count#{title_suffix}")
+    sequential_tweet_graphs << Graph.first_or_create(:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "hashtag_count|retweet_count#{title_suffix}")
+    sequential_tweet_graphs << Graph.first_or_create(:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "link_count|retweet_count#{title_suffix}")
+    sequential_tweet_graphs << Graph.first_or_create(:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "mention_count|retweet_count#{title_suffix}")
+    sequential_tweet_graphs << Graph.first_or_create(:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "entity_count|retweet_count#{title_suffix}")
+    sequential_tweet_graphs << Graph.first_or_create(:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "source_retweet_counts#{title_suffix}")
+    sequential_tweet_graphs << Graph.first_or_create(:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "source_link_count#{title_suffix}")
+    sequential_tweet_graphs << Graph.first_or_create(:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "source_mention_count#{title_suffix}")
+    sequential_tweet_graphs << Graph.first_or_create(:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "source_entity_count#{title_suffix}")
     sequential_tweet_graph_initialized = sequential_tweet_graphs.collect{|graph| true}
     conditional = Analysis.curation_conditional(curation).merge(additional_query)
     full_entity_matched_query = lambda{|conditional, limit, offset| 
@@ -70,8 +71,8 @@ class AdvancedHistogram < AnalysisMetadata
     conditional = Analysis.curation_conditional(curation)
     FilePathing.tmp_folder(curation, analytic.underscore)
     #need to be run on their own
-    tweets_per_minute = Graph.first_or_create(:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "tweets|minute#{title_suffix}")
-    retweets_per_minute = Graph.first_or_create(:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "retweets|minute#{title_suffix}")
+    tweets_per_minute = Graph.first_or_create(:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "tweets|minute#{title_suffix}")
+    retweets_per_minute = Graph.first_or_create(:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "retweets|minute#{title_suffix}")
     time_based_tweet_query = ""
     case DataMapper.repository.adapter.options["adapter"]
     when "mysql"
@@ -95,15 +96,15 @@ class AdvancedHistogram < AnalysisMetadata
     FilePathing.tmp_folder(curation, analytic.underscore)    
     #can be run sequentially
     sequential_user_graphs = []
-    sequential_user_graphs << Graph.first_or_create(:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "followers_count|friends_count#{title_suffix}")
-    sequential_user_graphs << Graph.first_or_create(:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "followers_count|statuses_count#{title_suffix}")
-    sequential_user_graphs << Graph.first_or_create(:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "friends_count|statuses_count#{title_suffix}")
-    sequential_user_graphs << Graph.first_or_create(:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "followers_per_day#{title_suffix}")
-    sequential_user_graphs << Graph.first_or_create(:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "friends_per_day#{title_suffix}")
-    sequential_user_graphs << Graph.first_or_create(:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "statuses_per_day#{title_suffix}")
-    sequential_user_graphs << Graph.first_or_create(:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "avg_followers_per_day|avg_friends_per_day#{title_suffix}")
-    sequential_user_graphs << Graph.first_or_create(:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "avg_followers_per_day|avg_statuses_per_day#{title_suffix}")
-    sequential_user_graphs << Graph.first_or_create(:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "avg_friends_per_day|avg_statuses_per_day#{title_suffix}")
+    sequential_user_graphs << Graph.first_or_create(:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "followers_count|friends_count#{title_suffix}")
+    sequential_user_graphs << Graph.first_or_create(:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "followers_count|statuses_count#{title_suffix}")
+    sequential_user_graphs << Graph.first_or_create(:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "friends_count|statuses_count#{title_suffix}")
+    sequential_user_graphs << Graph.first_or_create(:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "followers_per_day#{title_suffix}")
+    sequential_user_graphs << Graph.first_or_create(:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "friends_per_day#{title_suffix}")
+    sequential_user_graphs << Graph.first_or_create(:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "statuses_per_day#{title_suffix}")
+    sequential_user_graphs << Graph.first_or_create(:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "avg_followers_per_day|avg_friends_per_day#{title_suffix}")
+    sequential_user_graphs << Graph.first_or_create(:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "avg_followers_per_day|avg_statuses_per_day#{title_suffix}")
+    sequential_user_graphs << Graph.first_or_create(:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "avg_friends_per_day|avg_statuses_per_day#{title_suffix}")
     offset = 0
     records = User.all(conditional.merge({:limit => limit, :offset => offset}))
     while !records.empty?
@@ -140,18 +141,18 @@ class AdvancedHistogram < AnalysisMetadata
     FilePathing.tmp_folder(curation, analytic.underscore)
     #need to be run on their own
     user_avg_sum_graphs = []
-    user_avg_sum_graphs << Graph.first_or_create(:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "location|avg_followers_counts#{title_suffix}")
-    user_avg_sum_graphs << Graph.first_or_create(:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "location|avg_friends_counts#{title_suffix}")
-    user_avg_sum_graphs << Graph.first_or_create(:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "location|avg_statuses_counts#{title_suffix}")
-    user_avg_sum_graphs << Graph.first_or_create(:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "location|sum_followers_counts#{title_suffix}")
-    user_avg_sum_graphs << Graph.first_or_create(:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "location|sum_friends_counts#{title_suffix}")
-    user_avg_sum_graphs << Graph.first_or_create(:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "location|sum_statuses_counts#{title_suffix}")
-    user_avg_sum_graphs << Graph.first_or_create(:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "avg_followers_counts|avg_friends_counts#{title_suffix}")
-    user_avg_sum_graphs << Graph.first_or_create(:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "avg_followers_counts|avg_statuses_counts#{title_suffix}")
-    user_avg_sum_graphs << Graph.first_or_create(:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "avg_friends_counts|avg_statuses_counts#{title_suffix}")
-    user_avg_sum_graphs << Graph.first_or_create(:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "sum_followers_counts|sum_friends_counts#{title_suffix}")
-    user_avg_sum_graphs << Graph.first_or_create(:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "sum_followers_counts|sum_statuses_counts#{title_suffix}")
-    user_avg_sum_graphs << Graph.first_or_create(:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "sum_friends_counts|sum_statuses_counts#{title_suffix}")
+    user_avg_sum_graphs << Graph.first_or_create(:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "location|avg_followers_counts#{title_suffix}")
+    user_avg_sum_graphs << Graph.first_or_create(:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "location|avg_friends_counts#{title_suffix}")
+    user_avg_sum_graphs << Graph.first_or_create(:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "location|avg_statuses_counts#{title_suffix}")
+    user_avg_sum_graphs << Graph.first_or_create(:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "location|sum_followers_counts#{title_suffix}")
+    user_avg_sum_graphs << Graph.first_or_create(:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "location|sum_friends_counts#{title_suffix}")
+    user_avg_sum_graphs << Graph.first_or_create(:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "location|sum_statuses_counts#{title_suffix}")
+    user_avg_sum_graphs << Graph.first_or_create(:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "avg_followers_counts|avg_friends_counts#{title_suffix}")
+    user_avg_sum_graphs << Graph.first_or_create(:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "avg_followers_counts|avg_statuses_counts#{title_suffix}")
+    user_avg_sum_graphs << Graph.first_or_create(:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "avg_friends_counts|avg_statuses_counts#{title_suffix}")
+    user_avg_sum_graphs << Graph.first_or_create(:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "sum_followers_counts|sum_friends_counts#{title_suffix}")
+    user_avg_sum_graphs << Graph.first_or_create(:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "sum_followers_counts|sum_statuses_counts#{title_suffix}")
+    user_avg_sum_graphs << Graph.first_or_create(:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :style => "histogram", :title => "sum_friends_counts|sum_statuses_counts#{title_suffix}")
     location_grouped_user_query = lambda{|limit, offset| "select avg(followers_count) as avg_followers_count,avg(friends_count) as avg_friends_count,avg(statuses_count) as avg_statuses_count,sum(followers_count) as sum_followers_count,sum(friends_count) as sum_friends_count,sum(statuses_count) as sum_statuses_count,location from users #{Analysis.conditions_to_mysql_query(conditional).gsub("dataset_id","users.dataset_id")} group by location limit #{limit} offset #{offset}"}
     offset = 0
     records = DataMapper.repository.adapter.select(location_grouped_user_query.call(limit, offset))
