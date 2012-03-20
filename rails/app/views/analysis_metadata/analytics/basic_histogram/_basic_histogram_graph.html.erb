@@ -1,30 +1,38 @@
 
 <%
+  debugger
   @dataset = @graph.graph_points.collect{|gp| {:label => gp.label, :value => gp.value}}
-  def time_generalize(start_time,end_time)
-    length = (start_time-end_time).abs
-    if length < 60
-      return 60*1000
-    elsif length < 3600
-      return 3600*1000
-    elsif length < 86400
-      return 86400*1000
-    elsif length < 11536000 #31536000
-      return 11536000*1000
-    else 
-      return 31536000*1000
-    end
-  end
+  # def time_generalize(start_time,end_time)
+  #   length = (start_time-end_time).abs
+  #   if length < 60
+  #     return 60*1000
+  #   elsif length < 3600
+  #     return 3600*1000
+  #   elsif length < 86400
+  #     return 86400*1000
+  #   elsif length < 11536000 #31536000
+  #     return 11536000*1000
+  #   else 
+  #     return 31536000*1000
+  #   end
+  # end
   if ["tweets_created_at", "users_created_at"].include?(@graph.title)
-    debugger
     @dataset.collect{|x| x[:label] = Time.parse(x[:label])}
     @dataset.sort!{|x,y| x[:label].to_i<=>y[:label].to_i}
     start_time = @dataset.first[:label]
     end_time = @dataset.last[:label]
-    @end_time_string = start_time.strftime("new Date(%Y,%m,%d,%H,%M,%S)")
+    @end_time_string = start_time.strftime("Date.UTC(%Y,%m,%d,%H,%M,%S)")
     @length = time_generalize(start_time,end_time)
-    @dataset.collect{|x| x[:label] = x[:label].strftime("new Date(%Y,%m,%d,%H,%M,%S)")}
+    @dataset.collect{|x| x[:label] = x[:label].strftime("Date.UTC(%Y,%m,%d,%H,%M,%S)")}
     @dataset.collect{|x| x[:value] = x[:value].to_i}
+    @dataset = @dataset.collect{|x| [x[:label], x[:value]]}
+    results = "["
+    @dataset.each do |row|
+      results << "[#{row.first},#{row.last}],\n"
+    end
+    results.chop!.chop!
+    results << "]"
+    @datasets = results
   elsif ["users_statuses_count", "users_followers_count", "users_friends_count", "users_favourites_count"].include?(@graph.title)
     @dataset.sort!{|x,y| x[:label].to_i<=>y[:label].to_i}
     @dataset = @dataset.collect{|x| x.values.collect(&:to_i)}
@@ -49,7 +57,7 @@
     "users_geo_enabled" => nil,
     "users_statuses_count" => "{title: {text: 'Number of Users that have X Statuses (log(10))'}},",
     "users_time_zone" => "{title: {text: 'Number of Users'}},",
-    "users_created_at" =>"{title: {text: 'Exchange rate'},min: 0.6,startOnTick: false,showFirstLabel: false,day: '%b %e',hour: '%b %e'},"}[title] || "{title: {text: 'Total'},plotLines: [{value: 0,width: 1,color: '#808080'}]},"
+    "users_created_at" =>"{title: {text: 'Snow depth (m)'},min: 0},"}[title] || "{title: {text: 'Total'},plotLines: [{value: 0,width: 1,color: '#808080'}]},"
   end
   def xAxis(title)
     {"tweets_language" => nil,
@@ -62,7 +70,7 @@
     "users_geo_enabled" => nil,
     "users_statuses_count" => "{title: {text: 'Number of Statuses Posted (log(10))'}, startOnTick: true, endOnTick: true, showLastLabel: true},",
     "users_time_zone" => nil,
-    "users_created_at" => "{type: 'datetime',maxZoom: 14 * 24 * 3600000,title: {text: null}},"}[title] || "{title: {text: 'Total'},plotLines: [{value: 0,width: 1,color: '#808080'}]},"
+    "users_created_at" => "{type: 'datetime',dateTimeLabelFormats: {month: '%e. %b',year: '%b'}},"}[title] || "{title: {text: 'Total'},plotLines: [{value: 0,width: 1,color: '#808080'}]},"
   end
   def chart(title)
     {"tweets_language" => "{renderTo: 'container',plotBackgroundColor: null,plotBorderWidth: null,plotShadow: false},",
@@ -75,7 +83,7 @@
     "users_geo_enabled" => "{renderTo: 'container',plotBackgroundColor: null,plotBorderWidth: null,plotShadow: false},",
     "users_statuses_count" => "{renderTo: 'container',type: 'scatter',marginRight: 130,marginBottom: 50},",
     "users_time_zone" => "{renderTo: 'container',plotBackgroundColor: null,plotBorderWidth: null,plotShadow: false},",
-    "users_created_at" => "{renderTo: 'container',zoomType: 'x',spacingRight: 20},"}[title] || "{renderTo: 'container',type: 'scatter',marginRight: 130,marginBottom: 50},"
+    "users_created_at" => "{renderTo: 'container',type: 'spline'},"}[title] || "{renderTo: 'container',type: 'scatter',marginRight: 130,marginBottom: 50},"
   end
   def series(title)
     {"tweets_language" => "type: 'pie',",
@@ -114,11 +122,11 @@
     "users_geo_enabled" => "{formatter: function() {return this.point.name +': '+ Math.round(this.percentage) +' % ('+ this.point.y + ')';}},",
     "users_statuses_count" => nil,
     "users_time_zone" => "{formatter: function() {return this.point.name +': '+ Math.round(this.percentage) +' % ('+ this.point.y + ')';}},",
-    "users_created_at" =>"{formatter: function() {return '<b>'+ this.series.name +'</b><br/>'+Highcharts.dateFormat('%e. %b', this.x) +': '+ this.y ;}},"}[title] || "{},"
+    "users_created_at" =>"{formatter: function() {return '<b>'+ this.series.name +'</b><br/>'+Highcharts.dateFormat('%e. %b', this.x) +': '+ this.y +' m';}},"}[title] || "{},"
   end
   def google_number(title)
     {"tweets_language" => "'number', 'Number of Users'",
-    "tweets_created_at" => "'number', 'Number of Tweets'",
+    "tweets_created_at" => nil,
     "tweets_source" => "'number', 'Number of Users'",
     "tweets_location" => nil,
     "users_followers_count" => nil,
@@ -127,11 +135,11 @@
     "users_geo_enabled" => nil,
     "users_statuses_count" => nil,
     "users_time_zone" => "'number', 'Number of Users'",
-    "users_created_at" => "'number', 'Number of Users'"}[title] || "'number', 'Number'"
+    "users_created_at" => nil}[title] || "'number', 'Number'"
   end
   def google_string(title)
     {"tweets_language" => "'string', 'Language'",
-    "tweets_created_at" => "'date', 'Time'",
+    "tweets_created_at" => nil,
     "tweets_source" => "'string', 'Source Application'",
     "tweets_location" => "'string', 'Location'",
     "users_followers_count" => nil,
@@ -140,11 +148,11 @@
     "users_geo_enabled" => nil,
     "users_statuses_count" => nil,
     "users_time_zone" => "'string', 'Time Zone'",
-    "users_created_at" => "'date', 'Time'"}[title] || "'string', 'String'"
+    "users_created_at" => nil}[title] || "'string', 'String'"
   end
   def google_table_type(title)
     {"tweets_language" => 'Table',
-    "tweets_created_at" => 'AnnotatedTimeLine',
+    "tweets_created_at" => nil,
     "tweets_source" => 'Table',
     "tweets_location" => 'Table',
     "users_followers_count" => nil,
@@ -153,7 +161,7 @@
     "users_geo_enabled" => nil,
     "users_statuses_count" => nil,
     "users_time_zone" => 'Table',
-    "users_created_at" => 'AnnotatedTimeLine'}[title] || "Number"
+    "users_created_at" => nil}[title] || "Number"
   end
   def google_params(title)
     {"tweets_language" => "{showRowNumber: true, page: 'enable', width: 680, height: 800, pageSize: 100}",
@@ -190,7 +198,7 @@
     
     });
   </script>
-<% elsif ["tweets_language", "tweets_source", "tweets_location", "users_time_zone", "tweets_created_at", "users_created_at"].include?(@graph.title) %>
+<% elsif ["tweets_language", "tweets_source", "tweets_location", "users_time_zone"].include?(@graph.title) %>
   <script type='text/javascript'>
     var data = new google.visualization.DataTable();
     data.addColumn(<%= google_string(@graph.title) %>);
