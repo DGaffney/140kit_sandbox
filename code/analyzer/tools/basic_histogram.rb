@@ -4,7 +4,7 @@ class BasicHistogram < AnalysisMetadata
   
   #Results: Frequency Charts of basic data on Tweets and Users per data set
   def self.run(analysis_metadata_id)
-    analysis_metadata = AnalysisMedata.first(:id => analysis_metadata_id)
+    analysis_metadata = AnalysisMetadata.first(:id => analysis_metadata_id)
     curation = analysis_metadata.curation
     FilePathing.tmp_folder(curation, self.underscore)
     self.generate_graphs([
