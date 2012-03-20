@@ -37,32 +37,71 @@ class Importer < Instance
   end
   
   def work_routine
-    @curation = select_curation
-    if @curation
-      import_datasets_to_database
-    end
+    import_datasets("importable")
+    import_datasets("reimportable")
+    archive_datasets
   end
   
-  def select_curation
+  def select_curation(curations_type)
     puts "select_curation..."
-    curations = Curation.unlocked.all(:status => "needs_import").reject {|c| c.datasets.collect {|d| d.scrape_finished }.include?(false) }.shuffle
+    curations = self.send(curations_type+"_curations")
     for curation in curations
       curation.lock
       return curation if curation.owned_by_me?
     end
     return nil
   end
+  
+  def importable_curations
+    Curation.unlocked.all(:status => "needs_import", :previously_imported => false).reject {|c| c.datasets.collect {|d| d.scrape_finished }.include?(false) }.shuffle
+  end
+  
+  def archivable_curations
+    Curation.unlocked.all(:status => "needs_drop")
+  end
+  
+  def reimportable_curations
+    Curation.unlocked.all(:status => "needs_import", :previously_imported => true)
+  end
 
-  def import_datasets_to_database
-    dataset = @curation.datasets.first
+  def archive_datasets
+    @curation = select_curation("archivable")
+    return nil if @curation.nil?
+    models = [Tweet, User, Entity, Geo, Coordinate, Graph, GraphPoint, Edge, Location, TrendingTopic, Friendship]
+    storage = Machine.first(:id => dataset.storage_machine_id).machine_storage_details
     @curation.datasets.each do |dataset|
-      storage = Machine.first(:id => dataset.storage_machine_id).machine_storage_details
-      models = []
-      if @curation.previously_imported
-        models = [Tweet, User, Entity, Geo, Coordinate, Graph, GraphPoint, Edge, Location, TrendingTopic, Friendship]
-      else
-        models = [Tweet, User, Entity, Geo, Coordinate]
+      models.each do |model|
+        offset = 0
+        limit = 10000
+        results = model.all(:dataset_id => dataset.id, :offset => offset, :limit => limit)
+        while !results.empty?
+          next_set = results.length==limit ? limit : results.length
+          filename = "#{ENV["TMP_PATH"]}/#{dataset.id}_#{offset}_#{offset+next_set}.tsv"
+          model.store_to_flat_file(results, filename)
+          Sh::mkdir("#{STORAGE["path"]}/raw_catalog/#{model}", storage)
+          Sh::compress(filename)
+          Sh::store_to_disk(filename, "raw_catalog/#{model}/#{filename}.zip", storage)
+          Sh::rm(filename)
+          Sh::rm(filename+".zip")
+          offset += limit
+          results = model.all(:dataset_id => dataset.id, :offset => offset, :limit => limit)
+        end
       end
+      dataset.status = "dropped"
+      dataset.save!
+    end
+    @curation.status = "dropped"
+    @curation.save!
+    @curation.unlock
+  end
+  
+  def import_datasets(import_type)
+    @curation = select_curation(import_type)
+    return nil if @curation.nil?
+    model_groups = {"importable" => [Tweet, User, Entity, Geo, Coordinate], "reimportable" => [Tweet, User, Entity, Geo, Coordinate, Graph, GraphPoint, Edge, Location, TrendingTopic, Friendship]}
+    models = model_groups[import_type]
+    storage = Machine.first(:id => dataset.storage_machine_id).machine_storage_details
+    @curation.datasets.each do |dataset|
       models.each do |model|
         files = Sh::storage_ls("raw_catalog/#{model}", storage).select{|x| dataset.id == x.split("_").first.to_i}
         files.each do |file|
@@ -87,13 +126,14 @@ class Importer < Instance
           end
         end
       end
-      dataset.tweets_count = Tweet.count(:dataset_id => dataset.id)
-      dataset.users_count = User.count(:dataset_id => dataset.id)
-      dataset.entities_count = Entity.count(:dataset_id => dataset.id)
+      dataset.tweets_count = Tweet.count(:dataset_id => dataset.id) if import_type == "importable"
+      dataset.users_count = User.count(:dataset_id => dataset.id) if import_type == "importable"
+      dataset.entities_count = Entity.count(:dataset_id => dataset.id) if import_type == "importable"
       dataset.status = "imported"
       dataset.save!
     end
     @curation.status = "imported"
+    @curation.previously_imported = true if import_type == "importable"
     @curation.save!
     @curation.unlock
   end

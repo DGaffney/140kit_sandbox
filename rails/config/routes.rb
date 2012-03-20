@@ -38,6 +38,7 @@ WWW140kit::Application.routes.draw do
   get '/datasets/:id/alter' => 'curations#alter', as: :alter_dataset
   get '/datasets/:id/analyze' => 'curations#analyze', as: :analyze_dataset
   get '/datasets/:id/import' => 'curations#import', as: :import_dataset
+  get '/datasets/:id/archive' => 'curations#archive', as: :archive_dataset
   get '/analysis/:curation_id/:analysis_metadata_id' => 'analysis_metadata#results', as: :curation_analysis 
   get '/new/dataset' => 'curations#new', as: :new_dataset
   get '/researchers/:user_name' => 'researchers#show', as: :researcher

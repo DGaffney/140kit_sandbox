@@ -26,7 +26,6 @@ class AnalysisMetadata < ActiveRecord::Base
     elsif self.ready && self.curation.status == "imported"
       links << "<a href='/analytics/#{self.id}'>Results</a>"
     end
-    links << "<a href='/analytics/#{self.id}/destroy'>Remove</a>"
   end
 
   def verify_absolute_uniqueness

@@ -3,4 +3,8 @@ class DatasetsController < ApplicationController
     @datasets = Dataset.all
   end
   
+  def archive
+    debugger
+    
+  end
 end

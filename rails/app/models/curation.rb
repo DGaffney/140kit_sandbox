@@ -39,7 +39,7 @@ class Curation < ActiveRecord::Base
     #this is bad design, I know. It's just the first thing I thought of that could do this - problem is I'm not sure you can access a specific object from within model?
     case self.status
     when "tsv_storing"
-      return "<a href='/datasets/#{self.id}/analyze'>Set Analytics</a> | <a href='/datasets/#{self.id}/destroy'>Destroy</a>"
+      return "<a href='/datasets/#{self.id}/analyze'>Set Analytics</a>"
     when "tsv_stored"
       return "<a href='/datasets/#{self.id}/analyze'>Set Analytics</a> | <a href='/datasets/#{self.id}/import'>Bring it live</a>"
     when "needs_import"
@@ -49,7 +49,7 @@ class Curation < ActiveRecord::Base
     when "needs_drop"
       return "Sit tight..."
     when "dropped"
-      return "<a href='/datasets/#{self.id}/analyze'>Set Analytics</a> | <a href='/datasets/#{self.id}/restore'>restore</a>"
+      return "<a href='/datasets/#{self.id}/analyze'>Set Analytics</a> | <a href='/datasets/#{self.id}/restore'>Restore</a>"
     else
       return "Sit tight..."
     end
