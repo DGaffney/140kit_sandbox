@@ -36,6 +36,8 @@ class AnalyticalOfferingsController < ApplicationController
     validation_results.merge!(@analysis_metadata.verify_absolute_uniqueness)
     if validation_results[:success]
       flash[:notice] = "Analytic Added!"
+      @analysis_metadata.ready = true
+      @analysis_metadata.save!
       redirect_to analyze_dataset_path(@curation) and return
     else
       @analysis_metadata.variables.each do |var|

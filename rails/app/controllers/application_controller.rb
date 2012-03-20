@@ -8,6 +8,7 @@ class ApplicationController < ActionController::Base
   end
   def login_required
     if current_user.nil?
+      flash[:notice] = "You must be logged in to view this page."
       redirect_to root_path, alert: "You must be logged in to view this page."
     end
   end

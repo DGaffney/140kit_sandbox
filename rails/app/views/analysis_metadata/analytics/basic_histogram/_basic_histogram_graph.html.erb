@@ -1,6 +1,5 @@
 
 <%
-debugger
   @dataset = @graph.graph_points.collect{|gp| {:label => gp.label, :value => gp.value}}
   if ["tweets_created_at", "users_created_at"].include?(@graph.title)
     @dataset.collect{|x| x[:label] = Time.parse(x[:label])}
@@ -26,34 +25,39 @@ debugger
     @dataset.sort!{|x,y| x[:value].to_i<=>y[:value].to_i}
     @dataset = @dataset.collect{|x| [x[:label], x[:value].to_f]}
     @dataset = @dataset.inspect.html_safe
-  elsif ["tweets_language", "tweets_location", "tweets_source", "users_time_zone"].include?(@graph.title)
+  elsif ["tweets_language", "tweets_location", "users_time_zone"].include?(@graph.title)
     @dataset.sort!{|x,y| x[:value].to_i<=>y[:value].to_i}
     @dataset = @dataset.reverse
     @dataset.collect{|d| d[:label] = "Not Set" if d[:label].empty?}
+  elsif ["tweets_source"].include?(@graph.title)
+    @dataset.sort!{|x,y| x[:value].to_i<=>y[:value].to_i}
+    @dataset = @dataset.reverse
+    @dataset.collect{|d| d[:label] = "Not Set" if d[:label].empty?}
+    @dataset.collect{|d| d[:label] = d[:label].gsub("rel=\"nofollow\">", " target=\"_blank\">")}
   end
   def yAxis(title)
     {"tweets_language" => nil,
-    "tweets_created_at" => "{title: {text: 'Snow depth (m)'},min: 0},",
+    "tweets_created_at" => "{title: {text: 'Number of Tweets Posted'},min: 0},",
     "tweets_source" => nil,
     "tweets_location" => nil,
-    "users_followers_count" => "{title: {text: 'Number of Users that have X Followers (log(10))'}},",
-    "users_friends_count" => "{title: {text: 'Number of Users that have X Friends (log(10))'}},",
-    "users_favourites_count" => "{title: {text: 'Number of Users that have X Favourites (log(10))'}},",
+    "users_followers_count" => "{title: {text: 'Number of Users that have X Followers (log(10))'},min: 0},",
+    "users_friends_count" => "{title: {text: 'Number of Users that have X Friends (log(10))'},min: 0},",
+    "users_favourites_count" => "{title: {text: 'Number of Users that have X Favourites (log(10))'},min: 0},",
     "users_geo_enabled" => nil,
-    "users_statuses_count" => "{title: {text: 'Number of Users that have X Statuses (log(10))'}},",
-    "users_time_zone" => "{title: {text: 'Number of Users'}},",
-    "users_created_at" =>"{title: {text: 'Snow depth (m)'},min: 0},"}[title] || "{title: {text: 'Total'},plotLines: [{value: 0,width: 1,color: '#808080'}]},"
+    "users_statuses_count" => "{title: {text: 'Number of Users that have X Statuses (log(10))'},min: 0},",
+    "users_time_zone" => "{title: {text: 'Number of Users'},min: 0},",
+    "users_created_at" =>"{title: {text: 'Number of Users Created'},min: 0},"}[title] || "{title: {text: 'Total'},plotLines: [{value: 0,width: 1,color: '#808080'}]},"
   end
   def xAxis(title)
     {"tweets_language" => nil,
     "tweets_created_at" => "{type: 'datetime',dateTimeLabelFormats: {month: '%e. %b',year: '%b'}},",
     "tweets_source" => nil,
     "tweets_location" => nil,
-    "users_followers_count" => "{title: {text: 'Number of Followers (log(10))'}, startOnTick: true, endOnTick: true, showLastLabel: true},",
-    "users_friends_count" => "{title: {text: 'Number of Friends (log(10))'}, startOnTick: true, endOnTick: true, showLastLabel: true},",
-    "users_favourites_count" => "{title: {text: 'Number of Favourites (log(10))'}, startOnTick: true, endOnTick: true, showLastLabel: true},",
+    "users_followers_count" => "{title: {text: 'Number of Followers (log(10))'}, startOnTick: true, endOnTick: true, showLastLabel: true,min: 0},",
+    "users_friends_count" => "{title: {text: 'Number of Friends (log(10))'}, startOnTick: true, endOnTick: true, showLastLabel: true,min: 0},",
+    "users_favourites_count" => "{title: {text: 'Number of Favourites (log(10))'}, startOnTick: true, endOnTick: true, showLastLabel: true,min: 0},",
     "users_geo_enabled" => nil,
-    "users_statuses_count" => "{title: {text: 'Number of Statuses Posted (log(10))'}, startOnTick: true, endOnTick: true, showLastLabel: true},",
+    "users_statuses_count" => "{title: {text: 'Number of Statuses Posted (log(10))'}, startOnTick: true, endOnTick: true, showLastLabel: true,min: 0},",
     "users_time_zone" => nil,
     "users_created_at" => "{type: 'datetime',dateTimeLabelFormats: {month: '%e. %b',year: '%b'}},"}[title] || "{title: {text: 'Total'},plotLines: [{value: 0,width: 1,color: '#808080'}]},"
   end
@@ -72,7 +76,7 @@ debugger
   end
   def series(title)
     {"tweets_language" => "type: 'pie',",
-    "tweets_created_at" => "type: 'area',name: 'USD to EUR',",
+    "tweets_created_at" => "type: 'line',",
     "tweets_source" => nil,
     "tweets_location" => nil,
     "users_followers_count" => nil,
@@ -81,7 +85,7 @@ debugger
     "users_geo_enabled" => "type: 'pie',",
     "users_statuses_count" => nil,
     "users_time_zone" => "type: 'pie',",
-    "users_created_at" => "type: 'area',name: 'USD to EUR',"}[title] || ""
+    "users_created_at" => "type: 'line',"}[title] || ""
   end
   def plotOptions(title)
     {"tweets_language" => "{pie: {allowPointSelect: true,cursor: 'pointer',dataLabels: {enabled: false},showInLegend: true}},",
@@ -98,16 +102,16 @@ debugger
   end
   def tooltip(title)
     {"tweets_language" => "{formatter: function() {return this.point.name +': '+ Math.round(this.percentage) +' % ('+ this.point.y + ')';}},",
-    "tweets_created_at" => "{formatter: function() {return '<b>'+ this.series.name +'</b><br/>'+Highcharts.dateFormat('%e. %b', this.x) +': '+ this.y +' m';}},",
+    "tweets_created_at" => "{formatter: function() {return 'Time:' + dateSet(this.x) + '; Number of Tweets: '+ this.y;}},",
     "tweets_source" => nil,
     "tweets_location" => nil,
     "users_followers_count" => nil,
     "users_friends_count" => nil,
     "users_favourites_count" => nil,
-    "users_geo_enabled" => "{formatter: function() {return this.point.name +': '+ Math.round(this.percentage) +' % ('+ this.point.y + ')';}},",
+    "users_geo_enabled" => "{formatter: function() {return boolToYesNo(this.point.name) +': '+ Math.round(this.percentage) +' % ('+ this.point.y + ')';}},",
     "users_statuses_count" => nil,
     "users_time_zone" => "{formatter: function() {return this.point.name +': '+ Math.round(this.percentage) +' % ('+ this.point.y + ')';}},",
-    "users_created_at" =>"{formatter: function() {return '<b>'+ this.series.name +'</b><br/>'+Highcharts.dateFormat('%e. %b', this.x) +': '+ this.y +' m';}},"}[title] || "{},"
+    "users_created_at" =>"{formatter: function() {return 'Time:' + dateSet(this.x) + '; Number of Tweets: '+ this.y;}},"}[title] || "{},"
   end
   def google_number(title)
     {"tweets_language" => "'number', 'Number of Users'",
@@ -151,7 +155,7 @@ debugger
   def google_params(title)
     {"tweets_language" => "{showRowNumber: true, page: 'enable', width: 680, height: 800, pageSize: 100}",
     "tweets_created_at" => nil,
-    "tweets_source" => "{showRowNumber: true, page: 'enable', width: 680, height: 800, pageSize: 100}",
+    "tweets_source" => "{showRowNumber: true, page: 'enable', width: 680, height: 800, pageSize: 100, allowHtml: true}",
     "tweets_location" => "{showRowNumber: true, page: 'enable', width: 680, height: 800, pageSize: 100}",
     "users_followers_count" => nil,
     "users_friends_count" => nil,
@@ -166,11 +170,24 @@ debugger
   <script type="text/javascript">
     $(function () {
         var chart;
+        function dateSet(value){
+          var date = new Date(value);
+          date.setMonth(date.getMonth() - 1);
+          return date;
+        }
+        function boolToYesNo(value){
+          if (value == 0 || value == "0"){
+            return "No";
+          } else if (value == 1 || value == "1"){
+            return "Yes";            
+          };
+        }
         $(document).ready(function() {
             chart = new Highcharts.Chart({
                 chart: <%= chart(@graph.title) %>
                 yAxis: <%= yAxis(@graph.title) %>
                 xAxis: <%= xAxis(@graph.title) %>
+                legend: {enabled: false},
                 title: {text: '<%= @graph.pretty_title %>',x: -20},
                 tooltip: <%= tooltip(@graph.title) %>
             		plotOptions: <%= plotOptions(@graph.title) %>
@@ -188,11 +205,19 @@ debugger
     var data = new google.visualization.DataTable();
     data.addColumn(<%= google_string(@graph.title) %>);
     <% count = 0 %>
-    <% if ["tweets_language", "tweets_source", "tweets_location", "users_time_zone"].include?(@graph.title) %>
+    <% if ["tweets_language", "tweets_location", "users_time_zone"].include?(@graph.title) %>
       data.addColumn(<%= google_number(@graph.title) %>);
       data.addRows(<%= @dataset.length %>);
       <% @dataset.each do |row| %>
         data.setCell(<%= count %>, 0, '<%= escape_javascript(row[:label]) %>');
+        data.setCell(<%= count %>, 1, <%= row[:value].to_i %>);
+        <% count+=1 %>
+      <% end %>
+    <% elsif ["tweets_source"].include?(@graph.title) %>
+      data.addColumn(<%= google_number(@graph.title) %>);
+      data.addRows(<%= @dataset.length %>);
+      <% @dataset.each do |row| %>
+        data.setCell(<%= count %>, 0, '<%= row[:label].html_safe %>');
         data.setCell(<%= count %>, 1, <%= row[:value].to_i %>);
         <% count+=1 %>
       <% end %>

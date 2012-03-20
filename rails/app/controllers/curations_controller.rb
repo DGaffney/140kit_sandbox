@@ -1,4 +1,5 @@
 class CurationsController < ApplicationController
+  before_filter :login_required, except: [:index, :researcher, :show]
   def index
     @curations = Curation.all
   end
