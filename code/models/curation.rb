@@ -4,12 +4,12 @@ class Curation
   property :id, Serial
   property :name, String, :index => [:curation_researcher_id]
   property :single_dataset, Boolean, :index => [:researcher_id_single_dataset], :default => true
-  property :analyzed, Boolean, :index => [:researcher_id_analyzed], :default => false
+  property :previously_imported, Boolean, :index => [:researcher_id_previously_imported], :default => false
   property :created_at, Time, :default => Time.now
   property :updated_at, Time, :default => Time.now
   property :archived, ParanoidBoolean, :default => false
   property :status, String, :default => "tsv_storing"
-  property :researcher_id, Integer, :index => [:curation_researcher_id, :researcher_id, :researcher_id_analyzed, :researcher_id_single_dataset]
+  property :researcher_id, Integer, :index => [:curation_researcher_id, :researcher_id, :researcher_id_previously_imported, :researcher_id_single_dataset]
   belongs_to :researcher, :child_key => :researcher_id
   has n, :datasets, :through => Resource
   has n, :analysis_metadatas

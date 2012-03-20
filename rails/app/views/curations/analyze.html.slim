@@ -1,4 +1,4 @@
-h1 = "Analysis for #{@curation.name}"
+h1 Analysis for #{link_to @curation.name, dataset_path(@curation)}
 h2 Already Applied
 - if @analysis_metadatas.length == 0
   p No analytical offerings currently applied!

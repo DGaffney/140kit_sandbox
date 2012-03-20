@@ -23,4 +23,16 @@ module CurationsHelper
     end
     return statement.chop.chop
   end
+  
+  def current_status(curation)
+    ["tsv_storing", "tsv_stored", "needs_import", "imported", "live", "needs_drop", "dropped"]
+    if curation.status == "tsv_storing"
+    elsif curation.status == "tsv_stored"
+    elsif curation.status == "needs_import"
+    elsif curation.status == "imported"
+    elsif curation.status == "live"
+    elsif curation.status == "needs_drop"
+    elsif curation.status == "dropped"
+    end
+  end
 end

@@ -34,6 +34,17 @@ module Sh
     return result
   end
   
+  def self.storage_rm(path="", credentials=STORAGE)
+    result = nil
+    case credentials["type"]
+    when "local"
+      result = self.bt("rm -r #{credentials["path"]}/#{path}").split("\n")
+    when "remote"
+      result = self.bt("ssh #{credentials["user"]}@#{credentials["hostname"]} 'rm -r #{credentials["path"]}/#{path}'")
+    end
+    return result
+  end
+  
   def self.bt(command)
     return `#{command}`
   end

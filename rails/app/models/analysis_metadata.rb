@@ -11,6 +11,8 @@ class AnalysisMetadata < ActiveRecord::Base
       return "Verifying"
     elsif self.ready && self.curation.status == "imported"
       return "Processing"
+    elsif self.ready && self.curation.status == "tsv_stored"
+      return "Waiting on Import"
     else return "Unknown"
     end
   end

@@ -56,9 +56,13 @@ class Importer < Instance
   def import_datasets_to_database
     dataset = @curation.datasets.first
     @curation.datasets.each do |dataset|
-      debugger
       storage = Machine.first(:id => dataset.storage_machine_id).machine_storage_details
-      models = [Tweet, User, Entity, Geo, Coordinate]
+      models = []
+      if @curation.previously_imported
+        models = [Tweet, User, Entity, Geo, Coordinate, Graph, GraphPoint, Edge, Location, TrendingTopic, Friendship]
+      else
+        models = [Tweet, User, Entity, Geo, Coordinate]
+      end
       models.each do |model|
         files = Sh::storage_ls("raw_catalog/#{model}", storage).select{|x| dataset.id == x.split("_").first.to_i}
         files.each do |file|
@@ -76,6 +80,7 @@ class Importer < Instance
             config = DataMapper.repository.adapter.options
             puts "mysql -u #{config["user"]} --password='#{config["password"]}' -P #{config["port"]} -h #{config["host"]} #{config["path"].gsub("/", "")} < #{ENV["TMP_PATH"]}/#{mysql_filename} --local-infile=1"
             Sh::sh("mysql -u #{config["user"]} --password='#{config["password"]}' -P #{config["port"]} -h #{config["host"] || "localhost"} #{config["path"].gsub("/", "")} < #{ENV["TMP_PATH"]}/#{mysql_filename} --local-infile=1")
+            Sh::storage_remove("raw_catalog/#{model.to_s}/#{file}", storage)
             Sh::remove("#{ENV["TMP_PATH"]}/#{mysql_filename}")
             Sh::remove("#{decompressed_file}")
             Sh::remove("#{file_location}")

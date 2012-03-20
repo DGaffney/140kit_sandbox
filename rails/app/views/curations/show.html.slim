@@ -5,8 +5,12 @@ h2
   | Uploaded by: 
   a href=researcher_path(@curation.researcher.user_name) = @curation.researcher.user_name
 
+p = current_status(@curation)
 h2 Overview:
 == render partial: '/datasets/table', locals: {datasets: @curation.datasets}  
 h2 Analytics:
-== render partial: 'analytics', locals: {analysis_metadatas: @curation.analysis_metadatas}
+- if @curation.analysis_metadatas.empty?
+  p No datasets added yet. #{link_to "Add one?", analyze_dataset_path(@curation)}
+- else
+  == render partial: 'analytics', locals: {analysis_metadatas: @curation.analysis_metadatas}
 
