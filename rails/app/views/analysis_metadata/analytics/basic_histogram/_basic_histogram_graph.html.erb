@@ -1,21 +1,7 @@
 
 <%
-  debugger
+debugger
   @dataset = @graph.graph_points.collect{|gp| {:label => gp.label, :value => gp.value}}
-  # def time_generalize(start_time,end_time)
-  #   length = (start_time-end_time).abs
-  #   if length < 60
-  #     return 60*1000
-  #   elsif length < 3600
-  #     return 3600*1000
-  #   elsif length < 86400
-  #     return 86400*1000
-  #   elsif length < 11536000 #31536000
-  #     return 11536000*1000
-  #   else 
-  #     return 31536000*1000
-  #   end
-  # end
   if ["tweets_created_at", "users_created_at"].include?(@graph.title)
     @dataset.collect{|x| x[:label] = Time.parse(x[:label])}
     start_time = @dataset.first[:label]
@@ -31,7 +17,7 @@
     end
     results.chop!.chop!
     results << "]"
-    @datasets = results
+    @dataset = results
   elsif ["users_statuses_count", "users_followers_count", "users_friends_count", "users_favourites_count"].include?(@graph.title)
     @dataset.sort!{|x,y| x[:label].to_i<=>y[:label].to_i}
     @dataset = @dataset.collect{|x| x.values.collect(&:to_i)}
@@ -47,7 +33,7 @@
   end
   def yAxis(title)
     {"tweets_language" => nil,
-    "tweets_created_at" => "{title: {text: 'Number of Users'}},",
+    "tweets_created_at" => "{title: {text: 'Snow depth (m)'},min: 0},",
     "tweets_source" => nil,
     "tweets_location" => nil,
     "users_followers_count" => "{title: {text: 'Number of Users that have X Followers (log(10))'}},",
@@ -60,7 +46,7 @@
   end
   def xAxis(title)
     {"tweets_language" => nil,
-    "tweets_created_at" => "{type: 'datetime',maxZoom: 14 * 24 * 3600000,title: {text: null}},",
+    "tweets_created_at" => "{type: 'datetime',dateTimeLabelFormats: {month: '%e. %b',year: '%b'}},",
     "tweets_source" => nil,
     "tweets_location" => nil,
     "users_followers_count" => "{title: {text: 'Number of Followers (log(10))'}, startOnTick: true, endOnTick: true, showLastLabel: true},",
@@ -73,7 +59,7 @@
   end
   def chart(title)
     {"tweets_language" => "{renderTo: 'container',plotBackgroundColor: null,plotBorderWidth: null,plotShadow: false},",
-    "tweets_created_at" => nil,
+    "tweets_created_at" => "{renderTo: 'container',type: 'spline'},",
     "tweets_source" => nil,
     "tweets_location" => nil,
     "users_followers_count" => "{renderTo: 'container',type: 'scatter',marginRight: 130,marginBottom: 50},",
@@ -86,7 +72,7 @@
   end
   def series(title)
     {"tweets_language" => "type: 'pie',",
-    "tweets_created_at" => nil,
+    "tweets_created_at" => "type: 'area',name: 'USD to EUR',",
     "tweets_source" => nil,
     "tweets_location" => nil,
     "users_followers_count" => nil,
@@ -95,7 +81,7 @@
     "users_geo_enabled" => "type: 'pie',",
     "users_statuses_count" => nil,
     "users_time_zone" => "type: 'pie',",
-    "users_created_at" => "type: 'area',name: 'USD to EUR',pointInterval: #{@length},pointStart: #{@end_time_string},"}[title] || ""
+    "users_created_at" => "type: 'area',name: 'USD to EUR',"}[title] || ""
   end
   def plotOptions(title)
     {"tweets_language" => "{pie: {allowPointSelect: true,cursor: 'pointer',dataLabels: {enabled: false},showInLegend: true}},",
@@ -176,7 +162,7 @@
     "users_created_at" => nil}[title] || "{}"
   end
 %>
-<% if ["tweets_source", "users_followers_count", "users_friends_count", "users_favourites_count", "users_geo_enabled", "users_statuses_count", "users_created_at", "tweets_created_at"].include?(@graph.title) %>
+<% if ["users_followers_count", "users_friends_count", "users_favourites_count", "users_geo_enabled", "users_statuses_count", "users_created_at", "tweets_created_at"].include?(@graph.title) %>
   <script type="text/javascript">
     $(function () {
         var chart;
