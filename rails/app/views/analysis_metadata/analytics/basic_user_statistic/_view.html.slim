@@ -1,0 +1,38 @@
+h1 Results
+p Below are the most useful descriptive statistics about this dataset. For a more general overview, please review values given from the "Basic Histogram" analytic.
+- results = {}; \
+  values = ["standard_deviation", "average", "sum", "n", "sample_variance", "0_percentile", "25_percentile", "50_percentile", "75_percentile", "100_percentile"]; \
+  variables = ["followers_count", "friends_count", "favourites_count", "statuses_count", "listed_count"]; \
+  graph_points = @graph.graph_points; \
+  variables.each do |variable|; \
+  results[variable] = {} if results[variable].nil?; \
+  values.each do |value|; \
+  if variable; \
+  results[variable][value] = graph_points.select{|graph_point| graph_point.label == "#{variable}_#{value}"}.first.value;end;end;end
+
+table.table.table-striped.table-bordered
+  thead
+    tr
+      th Variable
+      th Population Size
+      th Average
+      th Sample Variance
+      th Standard Deviation
+      th 0th Percentile
+      th 25th Percentile
+      th 50th Percentile
+      th 75th Percentile
+      th 100th Percentile
+  tbody
+    - results.each_pair do |variable, value_set|
+      tr
+        td = variable.split("_").collect{|x| x.capitalize}.join(" ")
+        td = number_with_delimiter(results[variable]["n"].to_i)
+        td = number_with_delimiter(results[variable]["average"].to_f.round(3))
+        td = number_with_delimiter(results[variable]["sample_variance"].to_f.round(3))
+        td = number_with_delimiter(results[variable]["standard_deviation"].to_f.round(3))
+        td = number_with_delimiter(results[variable]["0_percentile"].to_i)
+        td = number_with_delimiter(results[variable]["25_percentile"].to_i)
+        td = number_with_delimiter(results[variable]["50_percentile"].to_i)
+        td = number_with_delimiter(results[variable]["75_percentile"].to_i)
+        td = number_with_delimiter(results[variable]["100_percentile"].to_i)
