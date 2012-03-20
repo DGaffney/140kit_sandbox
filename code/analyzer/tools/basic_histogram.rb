@@ -4,8 +4,8 @@ class BasicHistogram < AnalysisMetadata
   
   #Results: Frequency Charts of basic data on Tweets and Users per data set
   def self.run(analysis_metadata_id)
-    analysis_metadata = AnalysisMetadata.first(:id => analysis_metadata_id)
-    curation = analysis_metadata.curation
+    @analysis_metadata = AnalysisMetadata.first(:id => analysis_metadata_id)
+    curation = @analysis_metadata.curation
     FilePathing.tmp_folder(curation, self.underscore)
     self.generate_graphs([
       {:model => Tweet, :attribute => :language},
@@ -36,7 +36,7 @@ class BasicHistogram < AnalysisMetadata
       graph = nil
       if fs[:generate_graph_points]
         graph_attrs = Hash[fs.select{|k,v| Graph.attributes.include?(k)}]
-        graph = Graph.first_or_create({:curation_id => curation_id, :analysis_metadata_id => analytic.analysis_metadata(curation).id}.merge(graph_attrs))
+        graph = Graph.first_or_create({:curation_id => curation_id, :analysis_metadata_id => @analysis_metadata.id}.merge(graph_attrs))
         graph.save!
         graph.graph_points.destroy #can't call .new? as a condition for this, as it's created now.
         graph.edges.destroy #can't call .new? as a condition for this, as it's created now.
