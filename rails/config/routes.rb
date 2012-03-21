@@ -1,65 +1,94 @@
 WWW140kit::Application.routes.draw do
 
-  # resources :instances
-
-  # resources :analytical_offering_variables
-  # 
-  # resources :analytical_offering_variable_descriptors
-  # 
-  # resources :analytical_offerings
-  # 
-  # resources :analysis_metadatas
-
-
   # The priority is based upon order of creation:
   # first created -> highest priority.
-  #we should just do single show pages for all these results. Make it atomic, not overwhelming like old site?
-  get '/analytics/' => 'analytical_offerings#index', as: :analytical_offerings
-  put '/analytics/:id/details' => 'analytical_offerings#update', as: :update_analytical_offering
-  get '/analytics/:id/details' => 'analytical_offerings#show', as: :analytical_offering
-  get '/analytics/:id/edit' => 'analytical_offerings#edit', as: :edit_analytical_offering
-  get '/analytics/:id/:curation_id' => 'analytical_offerings#add', as: :add_analytical_offering
-  post '/analytics/:id/:curation_id/validate' => 'analytical_offerings#validate', as: :validate_analysis_metadata
-  get '/analytics/:id' => 'analysis_metadata#show', as: :analysis_metadata
-  get '/analytics/:id/:graph_id/graph' => 'analysis_metadata#graph', as: :analysis_metadata_graph
-  get '/analytics/:id/destroy' => 'analysis_metadata#show', as: :destroy_analysis_metadata
-  get '/analytics/:id/:curation_id/verify' => 'analytical_offerings#verify', as: :verify_analysis_metadata
-  get '/instances/' => 'instances#index_instance', as: :instances
-  get '/machines/' => 'instances#index_machine', as: :machines
-  get '/machines/:id/edit' => 'instances#edit', as: :edit_machine
-  get '/machines/:id/kill' => 'instances#kill_machine', as: :kill_machine
-  get '/instances/:id/kill' => 'instances#kill_instance', as: :kill_instance
-  get '/instances/:id' => 'instances#show_instance', as: :instance
-  get '/machines/:id' => 'instances#show_machine', as: :machine
-  post '/machines/:id/update' => 'instances#update', as: :update_machine
-  post '/datasets/validate' => 'curations#validate', as: :validate_dataset
-  get '/datasets/:id/verify' => 'curations#verify', as: :verify_dataset
-  get '/datasets/search' => 'curations#search', as: :search_dataset  
-  get '/datasets/:id/alter' => 'curations#alter', as: :alter_dataset
-  get '/datasets/:id/analyze' => 'curations#analyze', as: :analyze_dataset
-  get '/datasets/:id/import' => 'curations#import', as: :import_dataset
-  get '/datasets/:id/archive' => 'curations#archive', as: :archive_dataset
-  get '/analysis/:curation_id/:analysis_metadata_id' => 'analysis_metadata#results', as: :curation_analysis 
-  get '/new/dataset' => 'curations#new', as: :new_dataset
-  get '/researchers/:user_name' => 'researchers#show', as: :researcher
+
+  resources :analytical_offerings, path: '/analytics', only: [:index, :edit] do
+    member do
+      put 'details' => :update, as: :update
+      get 'details' => :show, as: ''
+      get ':curation_id' => :add, as: :add
+      post ':curation_id/validate' => :validate, as: :validate
+      get ':curation_id/verify' => :verify, as: :verify
+    end
+  end
+
+  scope '/analytics/:id' do
+    get '' => 'analysis_metadata#show', as: :analysis_metadata
+    get ':graph_id/graph' => 'analysis_metadata#graph', as: :analysis_metadata_graph
+    # get '/analytics/:id/destroy' => 'analysis_metadata#show', as: :destroy_analysis_metadata
+    # should be:
+    delete '' => 'analysis_metadata#destroy'
+  end
+
+  resources :instances, only: [] do
+    member do
+      get 'kill' => :kill_instance
+      get ':id' => :show_instance, as: ''
+    end
+    get '' => :index_instance, as: '', on: :collection
+  end
+
+  resources :instances, as: :machines, path: '/machines', only: [] do
+    get '' => :index_machine, as: '', on: :collection
+    member do
+      get 'edit' => :edit
+      get 'kill' => :kill_machine
+      get '' => :show_machine, as: ''
+      # this should really be a 'put' without '/update'
+      post 'update' => :update
+    end
+  end
+
+  resources :curations, only: [:index, :new, :show], path: '/datasets', as: :datasets do
+    member do
+      get 'verify'
+      get 'alter'
+      get 'analyze'
+      get 'import'
+      get 'archive'
+      # this _should_ be a member route, right?
+      post 'validate'
+    end
+    get 'search', on: :collection
+    # post '/datasets/validate' => 'curations#validate', as: :validate_dataset
+  end
+
+  get '/:user_name/datasets' => 'curations#researcher', as: :researcher_datasets
+  get '/analysis/:curation_id/:analysis_metadata_id' => 'analysis_metadata#results', as: :curation_analysis
+
   get '/admin/panel' => 'admin#panel', as: :admin_panel
-  get '/researchers/:user_name/edit' => 'researchers#edit', as: :edit_researcher
-  put'/researchers/:user_name' => 'researchers#update'
+
+  # super annoying that you can't specify a key other than :id in resources
+  # resources :researchers, key: :user_name, only: [:index, :show, :update, :edit, :destroy] do
+  #   member do
+  #     get 'dashboard'
+  #   end
+  # end
+  resources :researchers, only: [:index]
+  scope '/researchers/:user_name' do
+    get '' => 'researchers#show', as: :researcher
+    get 'edit' => 'researchers#edit', as: :edit_researcher
+    get 'new' => 'researchers#new', as: :new_researcher
+    put '' => 'researchers#update'
+    delete '' => 'researchers#destroy'
+  end
+
+  get 'dashboard' => 'researchers#dashboard', as: :dashboard
+
+  resources :posts, except: [:show]
+
   get '/posts/:id/:slug' => 'posts#show', as: :post
   get '/about' => 'posts#about', as: :about
-  delete '/researchers/:user_name' => 'researchers#destroy'
-  resources :researchers, only: [:index]
-  get '/datasets/:id' => 'curations#show', as: :dataset
-  resources :curations, only: [:index, :new], path: '/datasets', as: :datasets
-  resources :posts
-  resources :datasets
+
   match '/auth/:provider/callback' => 'sessions#create'
   match '/signout' => 'sessions#destroy', as: :signout
   match '/auth/failure' => 'sessions#fail'
+
   root to: 'home#index'
-  get '/dashboard' => 'researchers#dashboard', as: :dashboard
+
   get '/highchart/graph/:id' => 'high_chart#graph', as: :high_chart_graph
-  get '/:user_name/datasets' => 'curations#researcher', as: :researcher_datasets  
+
   # Sample of regular route:
   #   match 'products/:id' => 'catalog#view'
   # Keep in mind you can assign values other than :controller and :action
