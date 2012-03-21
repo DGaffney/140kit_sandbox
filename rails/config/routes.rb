@@ -56,9 +56,8 @@ WWW140kit::Application.routes.draw do
   match '/signout' => 'sessions#destroy', as: :signout
   match '/auth/failure' => 'sessions#fail'
   root to: 'home#index'
-  
+  get '/dashboard' => 'researchers#dashboard', as: :dashboard
   get '/highchart/graph/:id' => 'high_chart#graph', as: :high_chart_graph
-  
   get '/:user_name/datasets' => 'curations#researcher', as: :researcher_datasets  
   # Sample of regular route:
   #   match 'products/:id' => 'catalog#view'

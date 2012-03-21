@@ -183,7 +183,26 @@ li.open > a.dropdown-toggle {
   }
 }
 
-.navbar .nav > li > a {
+#user-nav { margin-right: -30px; }
+
+.navbar #user-nav.nav > li > a {
+  font-size: @navbarLinkSize;
+  line-height: @navbarLinkSize;
+  padding: floor((@navbarHeight - @navbarLinkSize) / 2) 10px ;
+  // margin: 0 0 0 1px;
+  text-shadow: 0 1px 0 @white;
+  &:hover {
+    background: transparent;
+    color: @navbarLinkColorHover;
+    // #gradient > .vertical(darken(@navbarBackground, 5%), @navbarBackground);
+  }
+  &:active {
+    color: @navbarLinkColorActive;
+    // #gradient > .vertical(darken(@navbarBackground, 5%), @navbarBackground);
+  }
+}
+
+.navbar #global-nav.nav > li > a {
   font-size: @navbarLinkSize;
   line-height: @navbarLinkSize;
   padding: floor((@navbarHeight - @navbarLinkSize) / 2) 20px ;

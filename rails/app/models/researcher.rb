@@ -11,6 +11,7 @@ class Researcher < ActiveRecord::Base
       user.oauth_token_secret = auth["credentials"]["secret"]
       user.user_name = auth["info"]["nickname"]
       user.name = auth["info"]["name"]
+      user.first_time = true
     end
   end
 
