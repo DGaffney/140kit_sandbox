@@ -104,6 +104,7 @@ class Importer < Instance
         puts "Archiving #{offset} - #{offset+next_set} (#{model})"
         path = ENV["TMP_PATH"]
         filename = "#{@curation.id}_#{offset}_#{offset+next_set}"
+        debugger if model == Graph
         model.store_to_flat_file(results, path+filename)
         Sh::mkdir("#{STORAGE["path"]}/raw_catalog/#{model}", storage)
         Sh::compress(path+filename+".tsv")
@@ -168,6 +169,7 @@ class Importer < Instance
           decompressed_files = Sh::decompress(file_location, File.dirname(file_location))
           decompressed_files.each do |decompressed_file|
             header = CSV.open(decompressed_file, "r", :col_sep => "\t", :row_sep => "\0", :quote_char => '"').first
+            debugger if model == Graph
             # header_row = header.index("id")
             # header[header_row] = "@id" if header_row
             mysql_file.write("load data local infile '#{decompressed_file}' ignore into table #{model.storage_name} fields terminated by '\\t' optionally enclosed by '\"' lines terminated by '\\0' ignore 1 lines (#{header.join(", ")});\n")
