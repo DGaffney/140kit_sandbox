@@ -71,6 +71,17 @@ module DataMapperExtensions
     f.write(csv_header) if f.size==0
     objs.each do |elem|
 #      begin
+      sanitized_elem = {}
+      keys.each do |k|
+        value = elem[k.to_sym]
+        if value == true
+          sanitized_elem[k.to_sym] = 1
+        elsif value == false
+          sanitized_elem[k.to_sym] = 0
+        else
+          sanitized_elem[k.to_sym] = elem[k.to_sym]
+        end
+      end
       row = CSV.generate_line(keys.collect{|k| elem[k.to_sym]}, :col_sep => "\t", :row_sep => "\0", :quote_char => '"')
 #      rescue
 #        ic = Iconv.new('UTF-8//IGNORE', 'UTF-8')

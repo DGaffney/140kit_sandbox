@@ -109,6 +109,7 @@ class Worker < Instance
       metadata.finished = true
       metadata.save
       metadata.unlock
+      metadata.curation.lock
     else 
       raise "Language #{metadata.language} is not currently supported for analytical routing!"
     end

@@ -1,4 +1,3 @@
-
 <%
   @dataset = @graph.graph_points.collect{|gp| {:label => gp.label, :value => gp.value}}
   if ["tweets_created_at", "users_created_at"].include?(@graph.title)

@@ -23,8 +23,8 @@ class BasicUserStatistic < AnalysisMetadata
         datapoints[:listed_count] << user.listed_count
         datapoints[:favourites_count] << user.favourites_count
       end
-      users = User.all(:limit => limit, :offset => offset, :dataset_id => curation.datasets.collect{|d| d.id})
       offset+=limit
+      users = User.all(:limit => limit, :offset => offset, :dataset_id => curation.datasets.collect{|d| d.id})
     end
     results = []
     datapoints.each_pair do |variable, values|
