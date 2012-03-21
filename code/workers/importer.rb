@@ -57,11 +57,11 @@ class Importer < Instance
   end
   
   def archivable_curations
-    Curation.unlocked.all(:status => "needs_drop")
+    Curation.unlocked.all(:status => "needs_import", :previously_imported => true)
   end
   
   def reimportable_curations
-    Curation.unlocked.all(:status => "needs_import", :previously_imported => true)
+    Curation.unlocked.all(:status => "needs_drop")
   end
 
   def archive_datasets

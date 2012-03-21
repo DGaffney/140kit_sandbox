@@ -89,6 +89,7 @@ class CurationsController < ApplicationController
     @curation = Curation.find(params[:id])
     @curation.status = "needs_import"
     @curation.datasets.update_all(:status => "needs_import")
+    @curation.save!
     redirect_to dataset_path(@curation), :notice => "Data has been sent off for a deep freeze."
   end
 end

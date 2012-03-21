@@ -39,16 +39,14 @@ class Worker < Instance
   end
   
   def work_routine
-    @curation = select_curation
     clean_orphans
     do_analysis_jobs
     switch_curation_statuses
-    @curation.unlock if @curation
   end
   
   def switch_curation_statuses
     statuses = ["tsv_storing", "tsv_stored", "needs_import", "imported", "live", "needs_drop", "dropped"]
-    Curation.all(:status.not => ["imported", "tsv_stored", "dropped"]).each do |curation|
+    Curation.all(:status.not => ["imported", "tsv_stored", "dropped"]).unlocked.each do |curation|
       datasets = curation.datasets
       if datasets.length == datasets.collect{|x| x.status if x.status == statuses[statuses.index(curation.status)+1]}.compact.length
         curation.status = statuses[statuses.index(curation.status)+1] 
