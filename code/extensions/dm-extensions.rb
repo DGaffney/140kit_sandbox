@@ -58,7 +58,7 @@ module DataMapperExtensions
   end
   
   def destroy_all(params)
-    DataMapper.repository.adapter.execute("delete from #{self.storage_name} #{Analysis.conditions_to_mysql_query(params)}")
+    DataMapper.repository.adapter.execute("delete quick from #{self.storage_name} #{Analysis.conditions_to_mysql_query(params)}")
   end
 
   def store_to_flat_file(objs, file=File.dirname(__FILE__)+"/../../data/raw/file")
