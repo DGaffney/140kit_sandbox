@@ -120,7 +120,6 @@ class Importer < Instance
   end
   
   def import_datasets(import_type)
-    debugger
     @curation = select_curation(import_type)
     return nil if @curation.nil?
     models = [Tweet, User, Entity, Geo, Coordinate, Location, TrendingTopic, Friendship]
