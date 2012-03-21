@@ -138,6 +138,7 @@ class Importer < Instance
   def import_datasets(import_type)
     @curation = select_curation(import_type)
     return nil if @curation.nil?
+    debugger
     models = [Tweet, User, Entity, Geo, Coordinate, Location, TrendingTopic, Friendship]
     optional_enclosed_by = import_type == "importable" ? "optionally enclosed by '\"'" : ""
     line_separator_escaped = import_type == "importable" ? "\\0" : "\\n"
