@@ -75,6 +75,8 @@ class Importer < Instance
         limit = 10000
         results = model.all(:dataset_id => dataset.id, :offset => offset, :limit => limit)
         while !results.empty?
+          debugger
+          puts "Archiving #{offset} - #{offset+next_set} (#{model})"
           next_set = results.length==limit ? limit : results.length
           filename = "#{ENV["TMP_PATH"]}/#{dataset.id}_#{offset}_#{offset+next_set}.tsv"
           model.store_to_flat_file(results, filename)
@@ -83,6 +85,7 @@ class Importer < Instance
           Sh::store_to_disk(filename, "raw_catalog/#{model}/#{filename}.zip", storage)
           Sh::rm(filename)
           Sh::rm(filename+".zip")
+          #delete from db
           offset += limit
           results = model.all(:dataset_id => dataset.id, :offset => offset, :limit => limit)
         end
