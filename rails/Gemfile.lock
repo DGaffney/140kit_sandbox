@@ -129,7 +129,6 @@ GEM
     uglifier (1.2.3)
       execjs (>= 0.3.0)
       multi_json (>= 1.0.2)
-    useful_class_extensions (0.0.6)
 
 PLATFORMS
   ruby
@@ -145,4 +144,3 @@ DEPENDENCIES
   ruby-debug19
   slim
   uglifier (>= 1.0.3)
-  useful_class_extensions (~> 0.0.6)

@@ -10,7 +10,8 @@ gem 'mysql2'
 gem 'slim'
 gem 'omniauth-twitter'
 gem 'ruby-debug19'
-gem 'useful_class_extensions', '~> 0.0.6'
+# useful_class_extensions causes 500 page to show instead of backtrace in development environment
+# gem 'useful_class_extensions', '~> 0.0.6'
 
 # Gems used only for assets and not required
 # in production environments by default.

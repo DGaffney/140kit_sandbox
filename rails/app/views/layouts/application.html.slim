@@ -6,55 +6,41 @@ html
       = ": #{@page_title}" if @page_title
     /[if lt IE 9]
       script src="http://html5shim.googlecode.com/svn/trunk/html5.js"
-    = javascript_include_tag "http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js", "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/jquery-ui.min.js", "http://code.highcharts.com/highcharts.js", "http://code.highcharts.com/modules/exporting.js", "https://www.google.com/jsapi", "application"
-    = stylesheet_link_tag "http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/redmond/jquery-ui.css", "application"
+    // = javascript_include_tag "http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js", "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/jquery-ui.min.js", "http://code.highcharts.com/highcharts.js", "http://code.highcharts.com/modules/exporting.js", "https://www.google.com/jsapi", "application"
+    // = stylesheet_link_tag "http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/redmond/jquery-ui.css", "application"
+    = stylesheet_link_tag "application"
     /* link rel="stylesheet" href="/css/bootstrap-responsive.min.css"*/
     = csrf_meta_tags
-    script type='text/javascript' google.load('visualization', '1', {packages:['table', 'annotatedtimeline']});
+    // script type='text/javascript' google.load('visualization', '1', {packages:['table', 'annotatedtimeline']});
   body
 
     .navbar#main-nav
       // .navbar-fixed-top
       .navbar-inner
         .container
-          /* a.btn.btn-navbar data-toggle="collapse" data-target=".nav-collapse"*/
-          /*   span.i-bar*/
-          /*   span.i-bar*/
-          /*   span.i-bar*/
           .stripe
           a.brand href=root_path 140kit
           .nav-collapse
-            ul.nav
+            ul.nav#global-nav
               li class=('active' if current_route?('home#index'))
                 = link_to 'Home', root_path
               li class=('active' if current_route?('researchers#index'))
                 = link_to 'Researchers', researchers_path
               li class=('active' if current_route?('curations#index'))
                 = link_to 'Datasets', datasets_path
-              - if current_user && current_user.admin?
-                li class=('active' if current_route?('admin#panel'))
-                  = link_to 'Admin Panel', admin_panel_path
-            ul.nav.pull-right
+            ul.nav.pull-right#user-nav
               - if current_user
-                /* li.divider-vertical*/
-                li.dropdown
-                  a.dropdown-toggle data-toggle="dropdown" href="#"
-                    span Logged in as 
-                    strong = current_user.name
-                    |  
-                    b.caret
-                  ul.dropdown-menu
-                    li
-                      a href=researcher_datasets_path(current_user.user_name) My Datasets
-                    li
-                      a href=new_dataset_path Add A Dataset
-                    li
-                      a href=researcher_path(current_user.user_name) View profile
-                    li.divider
-                    li
-                      a href='#' Sign out
-                // li
-                  = link_to "Sign out", signout_path
+                li style=('font-weight: bold;')
+                  = link_to current_user.name, researcher_path(current_user)
+                - if current_user.admin?
+                  li
+                    = link_to 'Admin', admin_panel_path
+                li
+                  a href=dashboard_path Dashboard
+                li
+                  a href=researcher_datasets_path(current_user.user_name) My Datasets
+                li
+                  = link_to 'Sign out', signout_path
               - else
                 li
                   a href="/auth/twitter"
@@ -73,6 +59,8 @@ html
     /* script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"*/
     /* script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"*/
     /* script src="/js/bootstrap.min.js" type="text/javascript"*/
+    //, "https://www.google.com/jsapi", "application"
     = javascript_include_tag 'application'
+    = javascript_include_tag "http://code.highcharts.com/highcharts.js", "http://code.highcharts.com/modules/exporting.js" 
     javascript:
       $(function() { $('.dropdown-toggle').dropdown(); });
