@@ -90,7 +90,8 @@ class Worker < Instance
     while AnalysisMetadata.unlocked.all(:finished => false, :ready => true).select{|am| ["imported", "live"].include?(am.curation.status)}.length!=0
       metadata = AnalysisMetadata.unlocked.all(:finished => false, :ready => true).select{|am| ["imported", "live"].include?(am.curation.status)}.first
       metadata.lock
-      if !metadata.nil? && metadata.owned_by_me?
+      metadata.curation.lock
+      if !metadata.nil? && metadata.owned_by_me? && !metadata.curation.nil? && metadata.curation.owned_by_me?
         $instance.metadata = metadata
         route(metadata)
       end
