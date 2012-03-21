@@ -166,7 +166,6 @@ class Filter < Instance
         dataset.users_count+=users.select{|t| t[:dataset_id]==dataset_id}.count
         Entity.store_to_flat_file(entities.select{|e| e[:dataset_id] == dataset_id}, dir(Entity, dataset_id, @start_time))
         dataset.entities_count+=entities.select{|t| t[:dataset_id]==dataset_id}.count
-        debugger
         Geo.store_to_flat_file(geos.select{|g| g[:dataset_id] == dataset_id}, dir(Geo, dataset_id, @start_time))
         Coordinate.store_to_flat_file(coordinates.select{|c| c[:dataset_id] == dataset_id}, dir(Coordinate, dataset_id, @start_time))
         dataset.save
