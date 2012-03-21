@@ -10,7 +10,6 @@ class AdvancedHistogram < AnalysisMetadata
     self.generate_sequential_tweet_graphs(curation)
     self.generate_sequential_user_graphs(curation)
     self.generate_user_avg_sum_graphs(curation)
-    debugger
     self.finalize_work(curation)
   end
 

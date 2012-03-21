@@ -7,6 +7,8 @@ class AnalysisMetadata < ActiveRecord::Base
   def status
     if self.finished
       return "Finished"
+    elsif !self.finished && self.ready
+      "Waiting on import"
     elsif !self.ready && self.curation.status == "imported"
       return "Verifying"
     elsif self.ready && self.curation.status == "imported"
@@ -21,12 +23,14 @@ class AnalysisMetadata < ActiveRecord::Base
     links = []
     if self.finished
       links << "<a href='/analytics/#{self.id}'>Results</a>"
+    elsif !self.finished && self.ready
+      links << "Waiting on import"
     elsif !self.ready && self.curation.status == "imported"
       links << "<a href='/analytics/#{self.id}'>Results</a>"
     elsif self.ready && self.curation.status == "imported"
       links << "<a href='/analytics/#{self.id}'>Results</a>"
     end
-    links << "<a href='/analytics/#{self.id}/destroy'>Remove</a>"
+    return links
   end
 
   def verify_absolute_uniqueness

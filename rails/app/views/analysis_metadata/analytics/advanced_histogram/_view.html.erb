@@ -2,8 +2,6 @@
 <%
   @dataset = @graph.graph_points.collect{|gp| {:label => gp.label, :value => gp.value}}
   if ["hashtag_count|retweet_count", "link_count|retweet_count", "mention_count|retweet_count", "entity_count|retweet_count", "followers_count|friends_count", "followers_count|statuses_count", "friends_count|statuses_count", "source_retweet_counts", "source_link_count", "source_mention_count", "source_entity_count","followers_per_day", "friends_per_day", "statuses_per_day", "avg_followers_per_day|avg_friends_per_day", "avg_followers_per_day|avg_statuses_per_day", "avg_friends_per_day|avg_statuses_per_day", "location|avg_followers_counts", "location|avg_friends_counts", "location|avg_statuses_counts", "location|sum_followers_counts", "location|sum_friends_counts", "location|sum_statuses_counts", "avg_followers_counts|avg_friends_counts", "avg_followers_counts|avg_statuses_counts", "avg_friends_counts|avg_statuses_counts", "sum_followers_counts|sum_friends_counts", "sum_followers_counts|sum_statuses_counts", "sum_friends_counts|sum_statuses_counts","count_differentials","counts_by_app","counts_by_location","average_differentials"].include?(@graph.title)
-    debugger
-    gg = ""
   end
   def yAxis(title)
     {"hashtag_count|retweet_count" => nil, 

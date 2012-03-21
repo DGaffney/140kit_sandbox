@@ -39,16 +39,14 @@ class Worker < Instance
   end
   
   def work_routine
-    @curation = select_curation
     clean_orphans
     do_analysis_jobs
     switch_curation_statuses
-    @curation.unlock if @curation
   end
   
   def switch_curation_statuses
     statuses = ["tsv_storing", "tsv_stored", "needs_import", "imported", "live", "needs_drop", "dropped"]
-    Curation.all(:status.not => ["imported", "tsv_stored", "dropped"]).each do |curation|
+    Curation.all(:status.not => ["imported", "tsv_stored", "dropped"]).unlocked.each do |curation|
       datasets = curation.datasets
       if datasets.length == datasets.collect{|x| x.status if x.status == statuses[statuses.index(curation.status)+1]}.compact.length
         curation.status = statuses[statuses.index(curation.status)+1] 
@@ -75,6 +73,12 @@ class Worker < Instance
         Sh::bt("ssh #{instance.hostname} 'rm -r 140kit_sandbox/code/tmp_files/#{instance.instance_id}'")
         Lock.all(:instance_id => instance.instance_id).destroy
         instance.destroy
+      end
+    end
+    Machine.all.each do |machine|
+      files = Sh::storage_bt("ls #{machine.working_path}/code/tmp_files", machine.machine_storage_details)
+      files.each do |file|
+        Sh::storage_bt("rm -r #{machine.working_path}/code/tmp_files/#{file}", machine.machine_storage_details) if !Instance.all.collect(&:instance_id).include?(file)
       end
     end
     Lock.all(:instance_id.not => Instance.all.collect{|instance| instance.instance_id}).destroy
