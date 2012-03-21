@@ -94,7 +94,7 @@ class Importer < Instance
           Sh::store_to_disk(path+filename+".tsv.zip", "raw_catalog/#{model}/#{filename}.tsv.zip", storage)
           Sh::rm(path+filename+".tsv")
           Sh::rm(path+filename+".tsv.zip")
-          model.destroy_all(:dataset_id => dataset.id)
+          model.destroy_all(:dataset_id => dataset.id, :limit => limit, :order => [:id.asc])
           offset += limit
           finished = true if remaining != 0
         end
@@ -106,7 +106,7 @@ class Importer < Instance
     secondary_models.each do |model|
       offset = 0
       limit = 100
-      remaining = model.count(:curation_id => @curation.id, :limit => limit, :order => [:id.asc])
+      remaining = model.count(:curation_id => @curation.id)
       finished = false
       while remaining != 0
         next_set = remaining>limit ? limit : remaining
@@ -138,7 +138,6 @@ class Importer < Instance
   def import_datasets(import_type)
     @curation = select_curation(import_type)
     return nil if @curation.nil?
-    debugger
     models = [Tweet, User, Entity, Geo, Coordinate, Location, TrendingTopic, Friendship]
     optional_enclosed_by = import_type == "importable" ? "optionally enclosed by '\"'" : ""
     line_separator_escaped = import_type == "importable" ? "\\0" : "\\n"
@@ -147,14 +146,12 @@ class Importer < Instance
       storage = Machine.first(:id => dataset.storage_machine_id).machine_storage_details
       models.each do |model|
         files = Sh::storage_ls("raw_catalog/#{model}", storage).select{|x| dataset.id == x.split("_").first.to_i}
-        debugger
         files.each do |file|
           mysql_filename = "mysql_tmp_#{Time.now.to_i}_#{rand(10000)}.sql"
           mysql_file = File.open("#{ENV['TMP_PATH']}/#{mysql_filename}", "w+")
           file_location = Sh::pull_file_from_storage("raw_catalog/#{model.to_s}/#{file}", storage)
           decompressed_files = Sh::decompress(file_location, File.dirname(file_location))
           decompressed_files.each do |decompressed_file|
-            debugger
             header = CSV.open(decompressed_file, "r", :col_sep => "\t", :row_sep => line_separator, :quote_char => '"').first
             # header_row = header.index("id")
             # header[header_row] = "@id" if header_row
@@ -189,7 +186,6 @@ class Importer < Instance
           decompressed_files = Sh::decompress(file_location, File.dirname(file_location))
           decompressed_files.each do |decompressed_file|
             header = CSV.open(decompressed_file, "r", :col_sep => "\t", :row_sep => line_separator, :quote_char => '"').first
-            debugger if model == Graph
             # header_row = header.index("id")
             # header[header_row] = "@id" if header_row
             mysql_file.write("load data local infile '#{decompressed_file}' ignore into table #{model.storage_name} fields terminated by '\\t' #{optional_enclosed_by} lines terminated by '#{line_separator_escaped}' ignore 1 lines (#{header.join(", ")});\n")
