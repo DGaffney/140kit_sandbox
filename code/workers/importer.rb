@@ -141,6 +141,7 @@ class Importer < Instance
     @curation.datasets.each do |dataset|
       storage = Machine.first(:id => dataset.storage_machine_id).machine_storage_details
       models.each do |model|
+        debugger if model == Entity
         files = Sh::storage_ls("raw_catalog/#{model}", storage).select{|x| dataset.id == x.split("_").first.to_i}
         files.each do |file|
           mysql_filename = "mysql_tmp_#{Time.now.to_i}_#{rand(10000)}.sql"
