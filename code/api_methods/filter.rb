@@ -207,7 +207,7 @@ class Filter < Instance
       dataset_ids = determine_datasets(json)
       tweets      = tweets+dataset_ids.collect{|dataset_id| tweet.merge({:dataset_id => dataset_id})}
       users       = users+dataset_ids.collect{|dataset_id| user.merge({:dataset_id => dataset_id})}
-      geos        = geos+dataset_ids.collect{|dataset_id| geo.reject{|x| x == {}}.merge({:dataset_id => dataset_id})}
+      geos        = geos+dataset_ids.collect{|dataset_id| geo.merge({:dataset_id => dataset_id})}.reject{|x| x == {:dataset_id => dataset_id}}
       coordinates = coordinates+CoordinateHelper.prepped_coordinates(json).collect{|coordinate| dataset_ids.collect{|dataset_id| coordinate.merge({:dataset_id => dataset_id})}}.flatten
       entities    = entities+EntityHelper.prepped_entities(json).collect{|entity| dataset_ids.collect{|dataset_id| entity.merge({:dataset_id => dataset_id})}}.flatten
     end
