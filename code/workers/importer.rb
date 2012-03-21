@@ -61,7 +61,7 @@ class Importer < Instance
   end
   
   def reimportable_curations
-    Curation.unlocked.all(:status => "needs_drop")
+    Curation.unlocked.all(:status => "dropped")
   end
 
   def archive_datasets
