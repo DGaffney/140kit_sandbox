@@ -3,7 +3,6 @@ require 'dm-core'
 require File.dirname(__FILE__)+'/array'
 
 module DataMapperExtensions
-  require 'faster_csv'
   MAX_ROW_COUNT_PER_BATCH = 1000
   include DataObjects::Quoting
   
@@ -56,6 +55,10 @@ module DataMapperExtensions
         inst_obj.update(obj)
       end
     end
+  end
+  
+  def destroy_all(params)
+    DataMapper.repository.adapter.execute("delete from #{self.storage_name} #{Analysis.conditions_to_mysql_query(params)}")
   end
 
   def store_to_flat_file(objs, file=File.dirname(__FILE__)+"/../../data/raw/file")

@@ -76,15 +76,17 @@ class Importer < Instance
         results = model.all(:dataset_id => dataset.id, :offset => offset, :limit => limit)
         while !results.empty?
           debugger
-          puts "Archiving #{offset} - #{offset+next_set} (#{model})"
           next_set = results.length==limit ? limit : results.length
-          filename = "#{ENV["TMP_PATH"]}/#{dataset.id}_#{offset}_#{offset+next_set}.tsv"
-          model.store_to_flat_file(results, filename)
+          puts "Archiving #{offset} - #{offset+next_set} (#{model})"
+          path = ENV["TMP_PATH"]+"/"
+          filename = "#{dataset.id}_#{offset}_#{offset+next_set}"
+          model.store_to_flat_file(results, path+filename)
           Sh::mkdir("#{STORAGE["path"]}/raw_catalog/#{model}", storage)
-          Sh::compress(filename)
-          Sh::store_to_disk(filename, "raw_catalog/#{model}/#{filename}.zip", storage)
-          Sh::rm(filename)
-          Sh::rm(filename+".zip")
+          Sh::compress(filename+".tsv")
+          Sh::store_to_disk(path+filename+".tsv.zip", "raw_catalog/#{model}/#{filename}.tsv.zip", storage)
+          Sh::rm(path+filename+".tsv")
+          Sh::rm(path+filename+".tsv.zip")
+          model.destroy_all(:id => results.collect(&:id))
           #delete from db
           offset += limit
           results = model.all(:dataset_id => dataset.id, :offset => offset, :limit => limit)

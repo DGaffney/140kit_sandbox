@@ -75,6 +75,7 @@ class Worker < Instance
         instance.destroy
       end
     end
+    #machines.each.check if the scratch folders are in sync with current instances.
     Lock.all(:instance_id.not => Instance.all.collect{|instance| instance.instance_id}).destroy
   end
   

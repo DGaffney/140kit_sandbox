@@ -35,7 +35,7 @@ require DIR+'/extensions/array'
 ENV['HOSTNAME'] = Sh::hostname.strip
 ENV['PID'] = Process.pid.to_s #because ENV only allows strings.
 ENV['INSTANCE_ID'] = Digest::SHA1.hexdigest("#{ENV['HOSTNAME']}#{ENV['PID']}")
-ENV['TMP_PATH'] = DIR+"/tmp_files/#{ENV['INSTANCE_ID']}/scratch_processes"
+ENV['TMP_PATH'] = DIR+"/tmp_files/#{ENV['INSTANCE_ID']}/scratch_processes/"
 
 require DIR+'/model'
 models = [
