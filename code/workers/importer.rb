@@ -106,7 +106,7 @@ class Importer < Instance
     secondary_models.each do |model|
       offset = 0
       limit = 100
-      remaining = model.count(:curation_id => @curation.id)
+      remaining = model.count(:curation_id => @curation.id, :limit => limit, :order => [:id.asc])
       finished = false
       while remaining != 0
         next_set = remaining>limit ? limit : remaining
@@ -125,7 +125,7 @@ class Importer < Instance
         Sh::store_to_disk(path+filename+".tsv.zip", "raw_catalog/#{model}/#{filename}.tsv.zip", storage)
         Sh::rm(path+filename+".tsv")
         Sh::rm(path+filename+".tsv.zip")
-        model.destroy_all(:curation_id => @curation.id)
+        model.destroy_all(:curation_id => @curation.id, :limit => limit, :order => [:id.asc])
         offset += limit
         finished = true if remaining != 0
       end
