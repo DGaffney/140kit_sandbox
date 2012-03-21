@@ -77,7 +77,7 @@ class Importer < Instance
         limit = 100
         finished = false
         remaining = model.count(:dataset_id => dataset.id)
-        while remaining != 0
+        while !finished
           next_set = remaining>limit ? limit : remaining
           remaining = (remaining-limit)>0 ? remaining-limit : 0        
           puts "Archiving #{offset} - #{offset+next_set} (#{model})"
@@ -85,7 +85,7 @@ class Importer < Instance
           Sh::mkdir(path)
           filename = "#{@curation.id}_#{offset}_#{offset+next_set}"
           mysql_section = "mysql -u #{config["user"]} --password='#{config["password"]}' -P #{config["port"]} -h #{config["host"]} #{config["path"].gsub("/", "")} -B -e "
-          mysql_statement = "\"select * from #{model.storage_name} where dataset_id = #{dataset.id} limit #{limit} offset #{offset};\""
+          mysql_statement = "\"select * from #{model.storage_name} where dataset_id = #{dataset.id} limit #{limit};\""
           file_push = " | sed -n -e 's/^\"//;s/\"$//;s/\",\"/ /;s/\",\"/\\n/;P' > #{path}#{filename}.tsv"
           command = "#{mysql_section}#{mysql_statement}#{file_push}"
           Sh::sh(command)
@@ -96,7 +96,7 @@ class Importer < Instance
           Sh::rm(path+filename+".tsv.zip")
           DataMapper.repository.adapter.execute("delete quick from #{model.storage_name} where dataset_id = #{dataset.id} order by id limit #{limit}")
           offset += limit
-          finished = true if remaining != 0
+          finished = true if remaining == 0
         end
       end
       dataset.status = "dropped"
