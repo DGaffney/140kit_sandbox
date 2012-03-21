@@ -1,0 +1,32 @@
+<h2>Google Compact Language Detection (CLD) Results</h2>
+<div class="row">
+  <div id="container" class="span12"></div>
+</div>
+
+<%
+@graph = @analysis_metadata.graphs.first
+@dataset = @graph.graph_points.collect{|gp| {:label => gp.label, :value => gp.value}}
+@dataset.sort!{|x,y| x[:value].to_i<=>y[:value].to_i}
+@dataset = @dataset.reverse
+@dataset.collect{|d| d[:label] = "Not Set" if d[:label].empty?}
+%>
+<%= javascript_include_tag "https://www.google.com/jsapi" %>
+
+<script type='text/javascript'>google.load('visualization', '1', {packages:['table', 'annotatedtimeline']});</script>
+<script type='text/javascript'>
+  var data = new google.visualization.DataTable();
+  data.addColumn('string', 'Language');
+  <% count = 0 %>
+    data.addColumn('number', 'Number of Users');
+    data.addRows(<%= @dataset.length %>);
+    <% @dataset.each do |row| %>
+      data.setCell(<%= count %>, 0, '<%= row[:label] %>');
+      data.setCell(<%= count %>, 1, <%= row[:value].to_i %>);
+      <% count+=1 %>
+    <% end %>
+  var table = new google.visualization.Table(document.getElementById('container'));
+  table.draw(data, {showRowNumber: true, page: 'enable', pageSize: 100});
+</script>
+
+
+<!-- {startOnTick: true, endOnTick: true, showLastLabel: true}, -->
