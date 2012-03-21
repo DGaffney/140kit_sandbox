@@ -125,7 +125,7 @@ class Importer < Instance
         Sh::store_to_disk(path+filename+".tsv.zip", "raw_catalog/#{model}/#{filename}.tsv.zip", storage)
         Sh::rm(path+filename+".tsv")
         Sh::rm(path+filename+".tsv.zip")
-          DataMapper.repository.adapter.execute("delete quick from #{model.storage_name} where curation_id = #{@curation.id} order by id limit #{limit}")
+        DataMapper.repository.adapter.execute("delete quick from #{model.storage_name} where curation_id = #{@curation.id} order by id limit #{limit}")
         offset += limit
         finished = true if remaining != 0
       end

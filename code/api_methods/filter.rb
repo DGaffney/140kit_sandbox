@@ -109,9 +109,9 @@ class Filter < Instance
       client.stop if add_datasets || need_to_stop
       time = @start_time
       datasets = @datasets
-      Thread.new do
+      # Thread.new do
         rsync_previous_files(datasets, time)
-      end
+      # end
       @start_time = Time.now
       print "[]"
     }
@@ -203,6 +203,7 @@ class Filter < Instance
     coordinates = []
     tmp_queue.each do |json|
       tweet, user = TweetHelper.prepped_tweet_and_user(json)
+      debugger
       geo = GeoHelper.prepped_geo(json)
       dataset_ids = determine_datasets(json)
       tweets      = tweets+dataset_ids.collect{|dataset_id| tweet.merge({:dataset_id => dataset_id})}
