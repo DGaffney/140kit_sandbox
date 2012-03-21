@@ -77,7 +77,7 @@ class Importer < Instance
         limit = 100
         finished = false
         remaining = model.count(:dataset_id => dataset.id)
-        while remaining != 0
+        while !finished
           next_set = remaining>limit ? limit : remaining
           remaining = (remaining-limit)>0 ? remaining-limit : 0        
           puts "Archiving #{offset} - #{offset+next_set} (#{model})"
@@ -85,7 +85,7 @@ class Importer < Instance
           Sh::mkdir(path)
           filename = "#{@curation.id}_#{offset}_#{offset+next_set}"
           mysql_section = "mysql -u #{config["user"]} --password='#{config["password"]}' -P #{config["port"]} -h #{config["host"]} #{config["path"].gsub("/", "")} -B -e "
-          mysql_statement = "\"select * from #{model.storage_name} where dataset_id = #{dataset.id} limit #{limit} offset #{offset};\""
+          mysql_statement = "\"select * from #{model.storage_name} where dataset_id = #{dataset.id} limit #{limit};\""
           file_push = " | sed -n -e 's/^\"//;s/\"$//;s/\",\"/ /;s/\",\"/\\n/;P' > #{path}#{filename}.tsv"
           command = "#{mysql_section}#{mysql_statement}#{file_push}"
           Sh::sh(command)
@@ -94,9 +94,9 @@ class Importer < Instance
           Sh::store_to_disk(path+filename+".tsv.zip", "raw_catalog/#{model}/#{filename}.tsv.zip", storage)
           Sh::rm(path+filename+".tsv")
           Sh::rm(path+filename+".tsv.zip")
-          model.destroy_all(:dataset_id => dataset.id)
+          DataMapper.repository.adapter.execute("delete quick from #{model.storage_name} where dataset_id = #{dataset.id} order by id limit #{limit}")
           offset += limit
-          finished = true if remaining != 0
+          finished = true if remaining == 0
         end
       end
       dataset.status = "dropped"
@@ -106,7 +106,7 @@ class Importer < Instance
     secondary_models.each do |model|
       offset = 0
       limit = 100
-      remaining = model.count(:curation_id => @curation.id, :limit => limit, :order => [:id.asc])
+      remaining = model.count(:curation_id => @curation.id)
       finished = false
       while remaining != 0
         next_set = remaining>limit ? limit : remaining
@@ -125,7 +125,7 @@ class Importer < Instance
         Sh::store_to_disk(path+filename+".tsv.zip", "raw_catalog/#{model}/#{filename}.tsv.zip", storage)
         Sh::rm(path+filename+".tsv")
         Sh::rm(path+filename+".tsv.zip")
-        model.destroy_all(:curation_id => @curation.id, :limit => limit, :order => [:id.asc])
+        DataMapper.repository.adapter.execute("delete quick from #{model.storage_name} where curation_id = #{@curation.id} order by id limit #{limit}")
         offset += limit
         finished = true if remaining != 0
       end
@@ -138,7 +138,6 @@ class Importer < Instance
   def import_datasets(import_type)
     @curation = select_curation(import_type)
     return nil if @curation.nil?
-    debugger
     models = [Tweet, User, Entity, Geo, Coordinate, Location, TrendingTopic, Friendship]
     optional_enclosed_by = import_type == "importable" ? "optionally enclosed by '\"'" : ""
     line_separator_escaped = import_type == "importable" ? "\\0" : "\\n"
@@ -147,14 +146,12 @@ class Importer < Instance
       storage = Machine.first(:id => dataset.storage_machine_id).machine_storage_details
       models.each do |model|
         files = Sh::storage_ls("raw_catalog/#{model}", storage).select{|x| dataset.id == x.split("_").first.to_i}
-        debugger
         files.each do |file|
           mysql_filename = "mysql_tmp_#{Time.now.to_i}_#{rand(10000)}.sql"
           mysql_file = File.open("#{ENV['TMP_PATH']}/#{mysql_filename}", "w+")
           file_location = Sh::pull_file_from_storage("raw_catalog/#{model.to_s}/#{file}", storage)
           decompressed_files = Sh::decompress(file_location, File.dirname(file_location))
           decompressed_files.each do |decompressed_file|
-            debugger
             header = CSV.open(decompressed_file, "r", :col_sep => "\t", :row_sep => line_separator, :quote_char => '"').first
             # header_row = header.index("id")
             # header[header_row] = "@id" if header_row
@@ -164,7 +161,7 @@ class Importer < Instance
             config = DataMapper.repository.adapter.options
             puts "mysql -u #{config["user"]} --password='#{config["password"]}' -P #{config["port"]} -h #{config["host"]} #{config["path"].gsub("/", "")} < #{ENV["TMP_PATH"]}/#{mysql_filename} --local-infile=1"
             Sh::sh("mysql -u #{config["user"]} --password='#{config["password"]}' -P #{config["port"]} -h #{config["host"] || "localhost"} #{config["path"].gsub("/", "")} < #{ENV["TMP_PATH"]}/#{mysql_filename} --local-infile=1")
-            # Sh::storage_rm("raw_catalog/#{model.to_s}/#{file}", storage)
+            Sh::storage_rm("raw_catalog/#{model.to_s}/#{file}", storage)
             Sh::rm("#{ENV["TMP_PATH"]}/#{mysql_filename}")
             Sh::rm("#{decompressed_file}")
             Sh::rm("#{file_location}")
@@ -189,7 +186,6 @@ class Importer < Instance
           decompressed_files = Sh::decompress(file_location, File.dirname(file_location))
           decompressed_files.each do |decompressed_file|
             header = CSV.open(decompressed_file, "r", :col_sep => "\t", :row_sep => line_separator, :quote_char => '"').first
-            debugger if model == Graph
             # header_row = header.index("id")
             # header[header_row] = "@id" if header_row
             mysql_file.write("load data local infile '#{decompressed_file}' ignore into table #{model.storage_name} fields terminated by '\\t' #{optional_enclosed_by} lines terminated by '#{line_separator_escaped}' ignore 1 lines (#{header.join(", ")});\n")
@@ -198,7 +194,7 @@ class Importer < Instance
             config = DataMapper.repository.adapter.options
             puts "mysql -u #{config["user"]} --password='#{config["password"]}' -P #{config["port"]} -h #{config["host"]} #{config["path"].gsub("/", "")} < #{ENV["TMP_PATH"]}/#{mysql_filename} --local-infile=1"
             Sh::sh("mysql -u #{config["user"]} --password='#{config["password"]}' -P #{config["port"]} -h #{config["host"] || "localhost"} #{config["path"].gsub("/", "")} < #{ENV["TMP_PATH"]}/#{mysql_filename} --local-infile=1")
-            # Sh::storage_rm("raw_catalog/#{model.to_s}/#{file}", storage)
+            Sh::storage_rm("raw_catalog/#{model.to_s}/#{file}", storage)
             Sh::rm("#{ENV["TMP_PATH"]}/#{mysql_filename}")
             Sh::rm("#{decompressed_file}")
             Sh::rm("#{file_location}")

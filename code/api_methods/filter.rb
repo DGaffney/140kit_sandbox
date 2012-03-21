@@ -109,9 +109,9 @@ class Filter < Instance
       client.stop if add_datasets || need_to_stop
       time = @start_time
       datasets = @datasets
-      Thread.new do
+      # Thread.new do
         rsync_previous_files(datasets, time)
-      end
+      # end
       @start_time = Time.now
       print "[]"
     }
@@ -166,6 +166,7 @@ class Filter < Instance
         dataset.users_count+=users.select{|t| t[:dataset_id]==dataset_id}.count
         Entity.store_to_flat_file(entities.select{|e| e[:dataset_id] == dataset_id}, dir(Entity, dataset_id, @start_time))
         dataset.entities_count+=entities.select{|t| t[:dataset_id]==dataset_id}.count
+        geos.reject!{|x| x == {:dataset_id => dataset_id}}
         Geo.store_to_flat_file(geos.select{|g| g[:dataset_id] == dataset_id}, dir(Geo, dataset_id, @start_time))
         Coordinate.store_to_flat_file(coordinates.select{|c| c[:dataset_id] == dataset_id}, dir(Coordinate, dataset_id, @start_time))
         dataset.save
