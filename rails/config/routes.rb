@@ -7,7 +7,7 @@ WWW140kit::Application.routes.draw do
     member do
       put 'details' => :update, as: :update
       get 'details' => :show, as: ''
-      get ':curation_id' => :add, as: :add
+      get ':curation_id/add' => :add, as: :add
       post ':curation_id/validate' => :validate, as: :validate
       get ':curation_id/verify' => :verify, as: :verify
     end

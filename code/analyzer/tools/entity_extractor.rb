@@ -6,7 +6,6 @@ class EntityExtractor < AnalysisMetadata
     curation = @analysis_metadata.curation
     conditional = Analysis.curation_conditional(curation)
     entities = Entity.all({:fields => [:name], :unique => true}.merge(conditional)).collect{|e| e.name}
-    ["display_url", "id", "screen_name", "expanded_url", "url", "text"]
     graph_sets = {"hashtag" => "text", "mention" => "screen_name", "url" => "expanded_url"}
     graph_sets.each_pair do |graph_title, name|
       graph = Graph.first_or_create(:title => graph_title, :style => "histogram", :analysis_metadata_id => @analysis_metadata.id, :curation_id => curation.id)
