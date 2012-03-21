@@ -86,7 +86,7 @@ class Importer < Instance
           Sh::store_to_disk(path+filename+".tsv.zip", "raw_catalog/#{model}/#{filename}.tsv.zip", storage)
           Sh::rm(path+filename+".tsv")
           Sh::rm(path+filename+".tsv.zip")
-          model.destroy_all(:id => results.collect(&:id))
+          # model.destroy_all(:id => results.collect(&:id))
           #delete from db
           offset += limit
           results = model.all(:dataset_id => dataset.id, :offset => offset, :limit => limit)
