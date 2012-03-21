@@ -68,8 +68,8 @@ class Importer < Instance
     @curation = select_curation("archivable")
     return nil if @curation.nil?
     models = [Tweet, User, Entity, Geo, Coordinate, Graph, GraphPoint, Edge, Location, TrendingTopic, Friendship]
-    storage = Machine.first(:id => dataset.storage_machine_id).machine_storage_details
     @curation.datasets.each do |dataset|
+      storage = Machine.first(:id => dataset.storage_machine_id).machine_storage_details
       models.each do |model|
         offset = 0
         limit = 10000
@@ -100,8 +100,8 @@ class Importer < Instance
     return nil if @curation.nil?
     model_groups = {"importable" => [Tweet, User, Entity, Geo, Coordinate], "reimportable" => [Tweet, User, Entity, Geo, Coordinate, Graph, GraphPoint, Edge, Location, TrendingTopic, Friendship]}
     models = model_groups[import_type]
-    storage = Machine.first(:id => dataset.storage_machine_id).machine_storage_details
     @curation.datasets.each do |dataset|
+      storage = Machine.first(:id => dataset.storage_machine_id).machine_storage_details
       models.each do |model|
         files = Sh::storage_ls("raw_catalog/#{model}", storage).select{|x| dataset.id == x.split("_").first.to_i}
         files.each do |file|
