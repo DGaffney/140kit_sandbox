@@ -87,8 +87,8 @@ class CurationsController < ApplicationController
     
   def archive
     @curation = Curation.find(params[:id])
-    @curation.status = "needs_import"
-    @curation.datasets.update_all(:status => "needs_import")
+    @curation.status = "needs_drop"
+    @curation.datasets.update_all(:status => "needs_drop")
     @curation.save!
     redirect_to dataset_path(@curation), :notice => "Data has been sent off for a deep freeze."
   end

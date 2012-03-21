@@ -26,7 +26,10 @@ table.table.table-striped.table-bordered
   tbody
     - results.each_pair do |variable, value_set|
       tr
-        td = variable.split("_").collect{|x| x.capitalize}.join(" ")
+        - if variable == "statuses_count"
+          td = "<b>#{variable.split("_").collect{|x| x.capitalize}.join(" ")}*</b>".html_safe
+        - else
+          td = "<b>#{variable.split("_").collect{|x| x.capitalize}.join(" ")}</b>".html_safe
         td = number_with_delimiter(results[variable]["n"].to_i)
         td = number_with_delimiter(results[variable]["average"].to_f.round(3))
         td = number_with_delimiter(results[variable]["sample_variance"].to_f.round(3))
@@ -36,3 +39,5 @@ table.table.table-striped.table-bordered
         td = number_with_delimiter(results[variable]["50_percentile"].to_i)
         td = number_with_delimiter(results[variable]["75_percentile"].to_i)
         td = number_with_delimiter(results[variable]["100_percentile"].to_i)
+
+p * This number typically seems to not include the most recent status posted (ie the one we collected on)

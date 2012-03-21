@@ -62,7 +62,7 @@ class Importer < Instance
   end
   
   def reimportable_curations
-    Curation.unlocked.all(:status => "dropped")
+    Curation.unlocked.all(:status => "needs_import", :previously_imported => true)
   end
 
   def archive_datasets
@@ -77,7 +77,7 @@ class Importer < Instance
         results = model.all(:dataset_id => dataset.id, :offset => offset, :limit => limit)
         while !results.empty?
           next_set = results.length==limit ? limit : results.length
-          puts "Archiving #{offset} - #{offset+next_set} (#{model})"
+          puts "Archiving #{offset} - #{offset+next_set} (#{model}, Dataset ID: #{dataset.id})"
           path = ENV["TMP_PATH"]
           filename = "#{dataset.id}_#{offset}_#{offset+next_set}"
           model.store_to_flat_file(results, path+filename)
