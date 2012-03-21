@@ -70,25 +70,31 @@ class Importer < Instance
     return nil if @curation.nil?
     primary_models = [Tweet, User, Entity, Geo, Coordinate, Location, TrendingTopic, Friendship]
     storage = Machine.first(:id => @curation.datasets.first.storage_machine_id).machine_storage_details
+    config = DataMapper.repository.adapter.options
     @curation.datasets.each do |dataset|
       primary_models.each do |model|
         offset = 0
         limit = 10000
-        results = model.all(:dataset_id => dataset.id, :offset => offset, :limit => limit)
+        remaining = model.count(:dataset_id => dataset.id)
         while !results.empty?
-          next_set = results.length==limit ? limit : results.length
-          puts "Archiving #{offset} - #{offset+next_set} (#{model}, Dataset ID: #{dataset.id})"
+          next_set = remaining>limit ? limit : remaining
+          remaining = (remaining-limit)>0 ? remaining-limit : 0        
+          puts "Archiving #{offset} - #{offset+next_set} (#{model})"
           path = ENV["TMP_PATH"]
-          filename = "#{dataset.id}_#{offset}_#{offset+next_set}"
-          model.store_to_flat_file(results, path+filename)
-          Sh::mkdir("#{STORAGE["path"]}/raw_catalog/#{model}", storage)
+          Sh::mkdir(path)
+          filename = "#{@curation.id}_#{offset}_#{offset+next_set}"
+          mysql_section = "mysql -u #{config["user"]} --password='#{config["password"]}' -P #{config["port"]} -h #{config["host"]} #{config["path"].gsub("/", "")} -B -e "
+          mysql_statement = "\"select * from #{model.storage_name} where dataset_id = #{dataset.id} limit #{limit} offset #{offset};\""
+          file_push = " | sed -n -e 's/^\"//;s/\"$//;s/\",\"/ /;s/\",\"/\\n/;P' > #{path}#{filename}.tsv"
+          command = "#{mysql_section}#{mysql_statement}#{file_push}"
+          Sh::sh(command)
           Sh::compress(path+filename+".tsv")
+          Sh::mkdir("#{STORAGE["path"]}/raw_catalog/#{model}", storage)
           Sh::store_to_disk(path+filename+".tsv.zip", "raw_catalog/#{model}/#{filename}.tsv.zip", storage)
           Sh::rm(path+filename+".tsv")
           Sh::rm(path+filename+".tsv.zip")
-          model.destroy_all(:id => results.collect(&:id))
+          model.destroy_all(:dataset_id => dataset.id)
           offset += limit
-          results = model.all(:dataset_id => dataset.id, :offset => offset, :limit => limit)
         end
       end
       dataset.status = "dropped"
@@ -98,22 +104,26 @@ class Importer < Instance
     secondary_models.each do |model|
       offset = 0
       limit = 10000
-      results = model.all(:curation_id => @curation.id, :offset => offset, :limit => limit)
+      remaining = model.count(:curation_id => @curation.id)
       while !results.empty?
-        next_set = results.length==limit ? limit : results.length
+        next_set = remaining>limit ? limit : remaining
+        remaining = (remaining-limit)>0 ? remaining-limit : 0        
         puts "Archiving #{offset} - #{offset+next_set} (#{model})"
         path = ENV["TMP_PATH"]
+        Sh::mkdir(path)
         filename = "#{@curation.id}_#{offset}_#{offset+next_set}"
-        debugger if model == Graph
-        model.store_to_flat_file(results, path+filename)
-        Sh::mkdir("#{STORAGE["path"]}/raw_catalog/#{model}", storage)
+        mysql_section = "mysql -u #{config["user"]} --password='#{config["password"]}' -P #{config["port"]} -h #{config["host"]} #{config["path"].gsub("/", "")} -B -e "
+        mysql_statement = "\"select * from #{model.storage_name} where curation_id = #{@curation.id} limit #{limit} offset #{offset};\""
+        file_push = " | sed -n -e 's/^\"//;s/\"$//;s/\",\"/ /;s/\",\"/\\n/;P' > #{path}#{filename}.tsv"
+        command = "#{mysql_section}#{mysql_statement}#{file_push}"
+        Sh::sh(command)
         Sh::compress(path+filename+".tsv")
+        Sh::mkdir("#{STORAGE["path"]}/raw_catalog/#{model}", storage)
         Sh::store_to_disk(path+filename+".tsv.zip", "raw_catalog/#{model}/#{filename}.tsv.zip", storage)
         Sh::rm(path+filename+".tsv")
         Sh::rm(path+filename+".tsv.zip")
-        model.destroy_all(:id => results.collect(&:id))
+        model.destroy_all(:curation_id => @curation.id)
         offset += limit
-        results = model.all(:curation_id => @curation.id, :offset => offset, :limit => limit)
       end
     end
     @curation.status = "dropped"
@@ -138,13 +148,13 @@ class Importer < Instance
             header = CSV.open(decompressed_file, "r", :col_sep => "\t", :row_sep => "\0", :quote_char => '"').first
             # header_row = header.index("id")
             # header[header_row] = "@id" if header_row
-            mysql_file.write("load data local infile '#{decompressed_file}' ignore into table #{model.storage_name} fields terminated by '\\t' optionally enclosed by '\"' lines terminated by '\\0' ignore 1 lines (#{header.join(", ")});\n")
+            mysql_file.write("load data local infile '#{decompressed_file}' ignore into table #{model.storage_name} fields terminated by '\\t' lines terminated by '\\n' ignore 1 lines (#{header.join(", ")});\n")
             mysql_file.close
             puts "Executing mysql block..."
             config = DataMapper.repository.adapter.options
             puts "mysql -u #{config["user"]} --password='#{config["password"]}' -P #{config["port"]} -h #{config["host"]} #{config["path"].gsub("/", "")} < #{ENV["TMP_PATH"]}/#{mysql_filename} --local-infile=1"
             Sh::sh("mysql -u #{config["user"]} --password='#{config["password"]}' -P #{config["port"]} -h #{config["host"] || "localhost"} #{config["path"].gsub("/", "")} < #{ENV["TMP_PATH"]}/#{mysql_filename} --local-infile=1")
-            # Sh::storage_rm("raw_catalog/#{model.to_s}/#{file}", storage)
+            Sh::storage_rm("raw_catalog/#{model.to_s}/#{file}", storage)
             Sh::rm("#{ENV["TMP_PATH"]}/#{mysql_filename}")
             Sh::rm("#{decompressed_file}")
             Sh::rm("#{file_location}")
@@ -172,7 +182,7 @@ class Importer < Instance
             debugger if model == Graph
             # header_row = header.index("id")
             # header[header_row] = "@id" if header_row
-            mysql_file.write("load data local infile '#{decompressed_file}' ignore into table #{model.storage_name} fields terminated by '\\t' optionally enclosed by '\"' lines terminated by '\\0' ignore 1 lines (#{header.join(", ")});\n")
+            mysql_file.write("load data local infile '#{decompressed_file}' ignore into table #{model.storage_name} fields terminated by '\\t' lines terminated by '\\0' ignore 1 lines (#{header.join(", ")});\n")
             mysql_file.close
             puts "Executing mysql block..."
             config = DataMapper.repository.adapter.options
