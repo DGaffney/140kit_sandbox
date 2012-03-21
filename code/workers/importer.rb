@@ -135,6 +135,9 @@ class Importer < Instance
     @curation = select_curation(import_type)
     return nil if @curation.nil?
     models = [Tweet, User, Entity, Geo, Coordinate, Location, TrendingTopic, Friendship]
+    optional_enclosed_by = import_type == "importable" ? "optionally enclosed by '\"'" : ""
+    line_separator_escaped = import_type == "importable" ? "\\0" : "\\n"
+    line_separator = import_type == "importable" ? "\0" : "\n"
     @curation.datasets.each do |dataset|
       storage = Machine.first(:id => dataset.storage_machine_id).machine_storage_details
       models.each do |model|
@@ -145,16 +148,16 @@ class Importer < Instance
           file_location = Sh::pull_file_from_storage("raw_catalog/#{model.to_s}/#{file}", storage)
           decompressed_files = Sh::decompress(file_location, File.dirname(file_location))
           decompressed_files.each do |decompressed_file|
-            header = CSV.open(decompressed_file, "r", :col_sep => "\t", :row_sep => "\0", :quote_char => '"').first
+            header = CSV.open(decompressed_file, "r", :col_sep => "\t", :row_sep => line_separator, :quote_char => '"').first
             # header_row = header.index("id")
             # header[header_row] = "@id" if header_row
-            mysql_file.write("load data local infile '#{decompressed_file}' ignore into table #{model.storage_name} fields terminated by '\\t' lines terminated by '\\n' ignore 1 lines (#{header.join(", ")});\n")
+            mysql_file.write("load data local infile '#{decompressed_file}' ignore into table #{model.storage_name} fields terminated by '\\t' #{optional_enclosed_by} lines terminated by '#{line_separator_escaped}' ignore 1 lines (#{header.join(", ")});\n")
             mysql_file.close
             puts "Executing mysql block..."
             config = DataMapper.repository.adapter.options
             puts "mysql -u #{config["user"]} --password='#{config["password"]}' -P #{config["port"]} -h #{config["host"]} #{config["path"].gsub("/", "")} < #{ENV["TMP_PATH"]}/#{mysql_filename} --local-infile=1"
             Sh::sh("mysql -u #{config["user"]} --password='#{config["password"]}' -P #{config["port"]} -h #{config["host"] || "localhost"} #{config["path"].gsub("/", "")} < #{ENV["TMP_PATH"]}/#{mysql_filename} --local-infile=1")
-            Sh::storage_rm("raw_catalog/#{model.to_s}/#{file}", storage)
+            # Sh::storage_rm("raw_catalog/#{model.to_s}/#{file}", storage)
             Sh::rm("#{ENV["TMP_PATH"]}/#{mysql_filename}")
             Sh::rm("#{decompressed_file}")
             Sh::rm("#{file_location}")
@@ -178,17 +181,17 @@ class Importer < Instance
           file_location = Sh::pull_file_from_storage("raw_catalog/#{model.to_s}/#{file}", storage)
           decompressed_files = Sh::decompress(file_location, File.dirname(file_location))
           decompressed_files.each do |decompressed_file|
-            header = CSV.open(decompressed_file, "r", :col_sep => "\t", :row_sep => "\0", :quote_char => '"').first
+            header = CSV.open(decompressed_file, "r", :col_sep => "\t", :row_sep => line_separator, :quote_char => '"').first
             debugger if model == Graph
             # header_row = header.index("id")
             # header[header_row] = "@id" if header_row
-            mysql_file.write("load data local infile '#{decompressed_file}' ignore into table #{model.storage_name} fields terminated by '\\t' lines terminated by '\\0' ignore 1 lines (#{header.join(", ")});\n")
+            mysql_file.write("load data local infile '#{decompressed_file}' ignore into table #{model.storage_name} fields terminated by '\\t' #{optional_enclosed_by} lines terminated by '#{line_separator_escaped}' ignore 1 lines (#{header.join(", ")});\n")
             mysql_file.close
             puts "Executing mysql block..."
             config = DataMapper.repository.adapter.options
             puts "mysql -u #{config["user"]} --password='#{config["password"]}' -P #{config["port"]} -h #{config["host"]} #{config["path"].gsub("/", "")} < #{ENV["TMP_PATH"]}/#{mysql_filename} --local-infile=1"
             Sh::sh("mysql -u #{config["user"]} --password='#{config["password"]}' -P #{config["port"]} -h #{config["host"] || "localhost"} #{config["path"].gsub("/", "")} < #{ENV["TMP_PATH"]}/#{mysql_filename} --local-infile=1")
-            Sh::storage_rm("raw_catalog/#{model.to_s}/#{file}", storage)
+            # Sh::storage_rm("raw_catalog/#{model.to_s}/#{file}", storage)
             Sh::rm("#{ENV["TMP_PATH"]}/#{mysql_filename}")
             Sh::rm("#{decompressed_file}")
             Sh::rm("#{file_location}")
