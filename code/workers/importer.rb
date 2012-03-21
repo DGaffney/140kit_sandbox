@@ -67,10 +67,10 @@ class Importer < Instance
   def archive_datasets
     @curation = select_curation("archivable")
     return nil if @curation.nil?
-    models = [Tweet, User, Entity, Geo, Coordinate, Graph, GraphPoint, Edge, Location, TrendingTopic, Friendship]
+    primary_models = [Tweet, User, Entity, Geo, Coordinate]
     @curation.datasets.each do |dataset|
       storage = Machine.first(:id => dataset.storage_machine_id).machine_storage_details
-      models.each do |model|
+      primary_models.each do |model|
         offset = 0
         limit = 10000
         results = model.all(:dataset_id => dataset.id, :offset => offset, :limit => limit)
@@ -93,6 +93,28 @@ class Importer < Instance
       end
       dataset.status = "dropped"
       dataset.save!
+    end
+    secondary_models = [Graph, GraphPoint, Edge, Location, TrendingTopic, Friendship]
+    secondary_models.each do |model|
+      offset = 0
+      limit = 10000
+      results = model.all(:curation_id => @curation.id, :offset => offset, :limit => limit)
+      while !results.empty?
+        debugger
+        next_set = results.length==limit ? limit : results.length
+        puts "Archiving #{offset} - #{offset+next_set} (#{model})"
+        path = ENV["TMP_PATH"]
+        filename = "#{dataset.id}_#{offset}_#{offset+next_set}"
+        model.store_to_flat_file(results, path+filename)
+        Sh::mkdir("#{STORAGE["path"]}/raw_catalog/#{model}", storage)
+        Sh::compress(path+filename+".tsv")
+        Sh::store_to_disk(path+filename+".tsv.zip", "raw_catalog/#{model}/#{filename}.tsv.zip", storage)
+        Sh::rm(path+filename+".tsv")
+        Sh::rm(path+filename+".tsv.zip")
+        model.destroy_all(:id => results.collect(&:id))
+        offset += limit
+        results = model.all(:curation_id => @curation.id, :offset => offset, :limit => limit)
+      end
     end
     @curation.status = "dropped"
     @curation.save!
