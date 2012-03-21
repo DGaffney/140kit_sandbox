@@ -51,12 +51,14 @@ class Pretty
   end
   
   def self.time_interval(length, platform="ruby")
-    if length < 60
+    if length < 1800
       return {"ruby" => "%Y-%m-%d %H:%M:%S", "mysql" => "%Y-%m-%d %H:%i:%S"}[platform]
     elsif length < 3600
       return {"ruby" => "%Y-%m-%d %H:%M:00", "mysql" => "%Y-%m-%d %H:%i:00"}[platform]
     elsif length < 86400
       return {"ruby" => "%Y-%m-%d %H:00:00", "mysql" => "%Y-%m-%d %H:00:00"}[platform]
+    elsif length < 345600
+      return {"ruby" => "%Y-%m-%d 00:00:00", "mysql" => "%Y-%m-%d 00:00:00"}[platform]
     elsif length < 11536000 #31536000
       return {"ruby" => "%Y-%m-%d 00:00:00", "mysql" => "%Y-%m-%d 00:00:00"}[platform]
     else
