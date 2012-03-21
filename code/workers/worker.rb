@@ -75,7 +75,12 @@ class Worker < Instance
         instance.destroy
       end
     end
-    #machines.each.check if the scratch folders are in sync with current instances.
+    Machine.all.each do |machine|
+      files = Sh::storage_bt("ls #{machine.working_path}/code/tmp_files", machine.machine_storage_details)
+      files.each do |file|
+        Sh::storage_bt("rm -r #{machine.working_path}/code/tmp_files/#{file}", machine.machine_storage_details) if !Instance.all.collect(&:instance_id).include?(file)
+      end
+    end
     Lock.all(:instance_id.not => Instance.all.collect{|instance| instance.instance_id}).destroy
   end
   

@@ -78,16 +78,15 @@ class Importer < Instance
           debugger
           next_set = results.length==limit ? limit : results.length
           puts "Archiving #{offset} - #{offset+next_set} (#{model})"
-          path = ENV["TMP_PATH"]+"/"
+          path = ENV["TMP_PATH"]
           filename = "#{dataset.id}_#{offset}_#{offset+next_set}"
           model.store_to_flat_file(results, path+filename)
           Sh::mkdir("#{STORAGE["path"]}/raw_catalog/#{model}", storage)
-          Sh::compress(filename+".tsv")
+          Sh::compress(path+filename+".tsv")
           Sh::store_to_disk(path+filename+".tsv.zip", "raw_catalog/#{model}/#{filename}.tsv.zip", storage)
           Sh::rm(path+filename+".tsv")
           Sh::rm(path+filename+".tsv.zip")
-          # model.destroy_all(:id => results.collect(&:id))
-          #delete from db
+          model.destroy_all(:id => results.collect(&:id))
           offset += limit
           results = model.all(:dataset_id => dataset.id, :offset => offset, :limit => limit)
         end
