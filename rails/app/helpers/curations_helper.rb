@@ -27,7 +27,7 @@ module CurationsHelper
   def current_status(curation)
     case curation.status
     when "tsv_storing"
-      return "Your dataset is currently storing. Take this opportunity to review available analytics, and add the ones you think may be useful for your research. When the data stream is complete, you will be able to import the dataset, at which point analysis can be run."
+      return "Your dataset is currently streaming. Take this opportunity to review available analytics, and add the ones you think may be useful for your research. When the data stream is complete, you will be able to import the dataset, at which point analysis can be run."
     when "tsv_stored"
       return "Your dataset has now been stored! At this point, you may add any analytical process you want. After you're done, go ahead and import the dataset, and we will begin processing analytics."
     when "needs_import"
@@ -83,7 +83,7 @@ module CurationsHelper
   
   def next_step_badge(curation)
     tag = "a"
-    if ["tsv_storing", "needs_drop"].include?(curation.status)
+    if ["needs_drop"].include?(curation.status)
       tag = "span"
     end
     return "<#{tag} class='btn btn-primary btn-large' href='#{next_step_badge_link(curation)}'>#{next_step_badge_text(curation)}</#{tag}>".html_safe
