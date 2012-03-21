@@ -3,7 +3,7 @@ WWW140kit::Application.routes.draw do
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
-  resources :analytical_offerings, path: '/analytics', only: [:index, :edit] do
+  resources :analytical_offerings, path: '/analytics', only: [:index, :edit, :new, :create] do
     member do
       put 'details' => :update, as: :update
       get 'details' => :show, as: ''

@@ -7,6 +7,24 @@ class AnalyticalOfferingsController < ApplicationController
     @analytical_offerings = AnalyticalOffering.all
   end
 
+  def new
+    @analytical_offering = AnalyticalOffering.new
+  end
+  
+  def create
+    @analytical_offering = AnalyticalOffering.new(params[:analytical_offering])
+
+    respond_to do |format|
+      if @analytical_offering.save
+        format.html { redirect_to @analytical_offering, notice: 'Analytical Offering was successfully created.' }
+        format.json { render json: @analytical_offering, status: :created, location: @analytical_offering }
+      else
+        format.html { render action: "new" }
+        format.json { render json: @analytical_offering.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
   def edit
     @analytical_offering = AnalyticalOffering.find(params[:id])
   end

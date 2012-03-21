@@ -17,6 +17,10 @@ module Analysis::Dependencies
       super
     end
   end
+  
+  def self.compact_language_detection_dependencies
+    ['cld']
+  end
 
   def self.bitly_api_chart_dependencies
     ['open-uri', 'nokogiri', 'json']

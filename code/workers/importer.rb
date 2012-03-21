@@ -74,7 +74,7 @@ class Importer < Instance
     @curation.datasets.each do |dataset|
       primary_models.each do |model|
         offset = 0
-        limit = 100
+        limit = 10000
         finished = false
         remaining = model.count(:dataset_id => dataset.id)
         while !finished
@@ -105,7 +105,7 @@ class Importer < Instance
     secondary_models = [Graph, GraphPoint, Edge]
     secondary_models.each do |model|
       offset = 0
-      limit = 100
+      limit = 10000
       remaining = model.count(:curation_id => @curation.id)
       finished = false
       while remaining != 0

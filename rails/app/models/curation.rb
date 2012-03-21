@@ -49,7 +49,7 @@ class Curation < ActiveRecord::Base
     when "needs_drop"
       return "Sit tight..."
     when "dropped"
-      return "<a href='/datasets/#{self.id}/analyze'>Set Analytics</a> | <a href='/datasets/#{self.id}/restore'>Restore</a>"
+      return "<a href='/datasets/#{self.id}/analyze'>Set Analytics</a> | <a href='/datasets/#{self.id}/import'>Restore</a>"
     else
       return "Sit tight..."
     end
