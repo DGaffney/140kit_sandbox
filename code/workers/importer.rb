@@ -153,6 +153,7 @@ class Importer < Instance
           file_location = Sh::pull_file_from_storage("raw_catalog/#{model.to_s}/#{file}", storage)
           decompressed_files = Sh::decompress(file_location, File.dirname(file_location))
           decompressed_files.each do |decompressed_file|
+            debugger
             header = CSV.open(decompressed_file, "r", :col_sep => "\t", :row_sep => line_separator, :quote_char => '"').first
             # header_row = header.index("id")
             # header[header_row] = "@id" if header_row
