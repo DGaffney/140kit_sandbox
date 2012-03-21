@@ -67,7 +67,7 @@ class Importer < Instance
   def archive_datasets
     @curation = select_curation("archivable")
     return nil if @curation.nil?
-    primary_models = [Tweet, User, Entity, Geo, Coordinate]
+    primary_models = [Tweet, User, Entity, Geo, Coordinate, Location, TrendingTopic, Friendship]
     storage = Machine.first(:id => @curation.datasets.first.storage_machine_id).machine_storage_details
     @curation.datasets.each do |dataset|
       primary_models.each do |model|
@@ -93,7 +93,7 @@ class Importer < Instance
       dataset.status = "dropped"
       dataset.save!
     end
-    secondary_models = [Graph, GraphPoint, Edge, Location, TrendingTopic, Friendship]
+    secondary_models = [Graph, GraphPoint, Edge]
     secondary_models.each do |model|
       offset = 0
       limit = 10000
@@ -122,7 +122,7 @@ class Importer < Instance
   def import_datasets(import_type)
     @curation = select_curation(import_type)
     return nil if @curation.nil?
-    models = [Tweet, User, Entity, Geo, Coordinate]
+    models = [Tweet, User, Entity, Geo, Coordinate, Location, TrendingTopic, Friendship]
     @curation.datasets.each do |dataset|
       storage = Machine.first(:id => dataset.storage_machine_id).machine_storage_details
       models.each do |model|
@@ -155,7 +155,7 @@ class Importer < Instance
       dataset.status = "imported"
       dataset.save!
     end
-    models = [Graph, GraphPoint, Edge, Location, TrendingTopic, Friendship]
+    models = [Graph, GraphPoint, Edge]
     if import_type == "reimportable"
       storage = Machine.first(:id => @curation.datasets.first.storage_machine_id).machine_storage_details
       models.each do |model|
