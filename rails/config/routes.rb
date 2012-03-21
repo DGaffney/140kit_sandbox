@@ -40,7 +40,7 @@ WWW140kit::Application.routes.draw do
     end
   end
 
-  resources :curations, only: [:index, :new, :show], path: '/datasets', as: :datasets do
+  resources :curations, only: [:index, :new, :show, :validate, :analyze, :alter, :import, :verify], path: '/datasets', as: :datasets do
     member do
       get 'verify'
       get 'alter'
@@ -48,12 +48,11 @@ WWW140kit::Application.routes.draw do
       get 'import'
       get 'archive'
       # this _should_ be a member route, right?
-      post 'validate'
+      # post 'validate'
     end
     get 'search', on: :collection
-    # post '/datasets/validate' => 'curations#validate', as: :validate_dataset
   end
-
+  post '/datasets/validate' => 'curations#validate', as: :dataset_validate
   get '/:user_name/datasets' => 'curations#researcher', as: :researcher_datasets
   get '/analysis/:curation_id/:analysis_metadata_id' => 'analysis_metadata#results', as: :curation_analysis
 

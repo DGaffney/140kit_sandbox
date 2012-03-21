@@ -5,14 +5,14 @@ br
   .span6
     - if @analytical_offering.analytical_offering_variable_descriptors.length == 0
       p No further settings need to be applied! Just click validate to submit this task.
-      = form_tag(validate_analysis_metadata_path, :method => "post") do
+      = form_tag(validate_analytical_offering_path, :method => "post") do
         fieldset
           .control_group
             .form-actions
               = submit_tag 'Validate', class: 'btn btn-primary'
     - else
       p Below are the current settings for your proposed analysis. Some values may not be modifiable, and are just shown for transparency's sake. Please review your settings carefully, then click verify to validate the settings and kick off the analysis.
-      = form_tag(validate_analysis_metadata_path, :method => "post") do
+      = form_tag(validate_analytical_offering_path, :method => "post") do
         fieldset
           .control_group
             - for aovd in @analytical_offering.analytical_offering_variable_descriptors

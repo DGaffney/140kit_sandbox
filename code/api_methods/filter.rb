@@ -53,7 +53,7 @@ class Filter < Instance
     if !@datasets.empty?
       update_next_dataset_ends
       update_params
-      puts "Collecting..."
+      puts "Collecting... "
       collect
       save_queue(@queue)
       clean_up_datasets
