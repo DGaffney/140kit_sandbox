@@ -5,7 +5,7 @@ class SessionsController < ApplicationController
     researcher = Researcher.find_by_provider_and_uid(auth["provider"], auth["uid"]) || Researcher.create_with_omniauth(auth)
     session[:researcher_id] = researcher.id
     if researcher.first_time
-      redirect_to edit_researcher_url(researcher), :notice => "Welcome, #{researcher.name}!"
+      redirect_to new_researcher_url(researcher), :notice => "Welcome, #{researcher.name}!"
     else
       redirect_to dashboard_url, :notice => "Hi, #{researcher.name}!"
     end

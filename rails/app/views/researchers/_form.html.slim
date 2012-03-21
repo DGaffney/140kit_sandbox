@@ -1,38 +1,38 @@
 = form_for(@researcher, class: 'form-horizontal') do |f|
-  = f.hidden :first_time, value: false
+  = f.hidden_field :first_time, value: false
   fieldset
     .control-group
       .span5
-        = f.label :name, class: 'control-label'
         .controls
+          = f.label :name, class: 'control-label'
           = f.text_field :name, class: 'input-xlarge'
-        = f.label "E-mail Address", class: 'control-label'
         .controls
+          = f.label :email, "E-mail Address", class: 'control-label'
           = f.text_field :email, class: 'input-xlarge'
-        = f.label :info, class: 'control-label'
         .controls
+          = f.label :info, class: 'control-label'
           = f.text_area :info, class: 'input-xlarge'
       .span5
-        = f.label "Website URL", class: 'control-label'
         .controls
+          = f.label :website_url, "Website URL", class: 'control-label'
           = f.text_field :website_url, class: 'input-xlarge'
-        = f.label :affiliation, class: 'control-label'
         .controls
+          = f.label :affiliation, class: 'control-label'
           = f.text_field :affiliation, class: 'input-xlarge'
-        = f.label "Affiliate URL", class: 'control-label'
         .controls
+          = f.label :affiliation_url, "Affiliate URL", class: 'control-label'
           = f.text_field :affiliation_url, class: 'input-xlarge'
-        = f.label :location, class: 'control-label'
         .controls
+          = f.label :location, class: 'control-label'
           = f.text_field :location, class: 'input-xlarge'
-        = f.label "Do you want us to e-mail you about your datasets?", class: 'control-label'
         .controls
-        = f.check_box :share_email, class: 'input-xlarge'
-        = f.label "Do you want to make your datasets private to only you?", class: 'control-label'
+          = f.check_box :share_email, class: 'input-xlarge pull-left'
+          = f.label :share_email, "Turn on email notifications?", class: 'control-label'
         .controls
-        = f.check_box :private_data, class: 'input-xlarge'
-        = f.label "Do you want your account to go deep-cover (invisible to all other users)?", class: 'control-label'
+          = f.check_box :private_data, class: 'input-xlarge pull-left'
+          = f.label :private_data, "Make my datasets private?", class: 'control-label'
         .controls
-          = f.check_box :hidden_account, class: 'input-xlarge'
+          = f.check_box :hidden_account, class: 'input-xlarge pull-left'
+          = f.label :hidden_account, "Make my account private?", class: 'control-label'
         .form-actions
           = f.submit 'Update', class: 'btn btn-primary'
