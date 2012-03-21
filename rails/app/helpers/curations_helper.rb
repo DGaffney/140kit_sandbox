@@ -77,7 +77,7 @@ module CurationsHelper
     when "needs_drop"
       return "#"
     when "dropped"
-      return "#"
+      return import_dataset_url(curation)
     end
   end
   
