@@ -7,6 +7,8 @@ class AnalysisMetadata < ActiveRecord::Base
   def status
     if self.finished
       return "Finished"
+    elsif !self.finished && self.ready && self.locked?
+      "Analyzing"
     elsif !self.finished && self.ready
       "Waiting on import"
     elsif !self.ready && self.curation.status == "imported"
@@ -19,10 +21,17 @@ class AnalysisMetadata < ActiveRecord::Base
     end
   end
   
+  def locked?
+    lock = Lock.find_by_classname_and_with_id("AnalysisMetadata", self.id)
+    return !lock.nil?
+  end
+
   def links
     links = []
     if self.finished
       links << "<a href='/analytics/#{self.id}'>Results</a>"
+    elsif !self.finished && self.ready && self.locked?
+      "Analyzing"
     elsif !self.finished && self.ready
       links << "Waiting on import"
     elsif !self.ready && self.curation.status == "imported"

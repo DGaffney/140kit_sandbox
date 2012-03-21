@@ -77,4 +77,10 @@ class Curation
     end
     return still_collecting
   end
+  
+  def all_analysis_metadatas_clear?
+    all_free = self.analysis_metadatas.collect{|am| !am.owned?}.include?(true)
+    all_finished = !self.analysis_metadatas.collect{|am| !am.finished}.include?(true)
+    return all_free && all_finished
+  end
 end

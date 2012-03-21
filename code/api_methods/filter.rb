@@ -53,6 +53,7 @@ class Filter < Instance
     if !@datasets.empty?
       update_next_dataset_ends
       update_params
+      puts "Collecting..."
       collect
       save_queue(@queue)
       clean_up_datasets
@@ -104,6 +105,8 @@ class Filter < Instance
     puts "Collecting: #{params_for_stream.inspect}"
     client = TweetStream::Client.new
     client.on_interval(CHECK_FOR_NEW_DATASETS_INTERVAL) { 
+      need_to_stop = touch_and_check_for_finished
+      client.stop if add_datasets || need_to_stop
       time = @start_time
       datasets = @datasets
       Thread.new do
@@ -111,8 +114,6 @@ class Filter < Instance
       end
       @start_time = Time.now
       print "[]"
-      need_to_stop = touch_and_check_for_finished
-      client.stop if add_datasets || need_to_stop
     }
     client.on_limit { |skip_count| print "*#{skip_count}*" }
     client.on_error { |message| puts "\nError: #{message}\n";client.stop }
@@ -292,6 +293,14 @@ class Filter < Instance
          dataset.storage_machine_id = Machine.first(:user => STORAGE["hostname"]).id
          dataset.save!
        end
+       # maybe?
+       # time = @start_time
+       # datasets = @datasets
+       # Thread.new do
+       #   rsync_previous_files(datasets, time)
+       # end
+       # @start_time = Time.now
+       # print "[]"
        update_datasets(claimed_datasets)
        return true
      end

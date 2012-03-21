@@ -43,10 +43,11 @@ class Importer < Instance
   end
   
   def select_curation(curations_type)
+    #we can't import/archive until all workers have let go of the dataset, so we need to check for unlocked status of all analysis metadatas... I think. something is occuring where graphs are getting deleted/not getting re-imported.
     puts "select_curation..."
     curations = self.send(curations_type+"_curations")
     for curation in curations
-      curation.lock
+      curation.lock if curation.all_analysis_metadatas_clear?
       return curation if curation.owned_by_me?
     end
     return nil
@@ -57,7 +58,7 @@ class Importer < Instance
   end
   
   def archivable_curations
-    Curation.unlocked.all(:status => "needs_import", :previously_imported => true)
+    Curation.unlocked.all(:status => "needs_drop", :previously_imported => true)
   end
   
   def reimportable_curations

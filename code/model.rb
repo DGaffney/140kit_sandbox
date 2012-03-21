@@ -195,12 +195,20 @@ module Locking
     def owned_by_me?
       lock = Lock.first(:classname => self.class.to_s, :with_id => self.id, :instance_id => ENV['INSTANCE_ID'])
       return !lock.nil? && Lock.all(:classname => self.class.to_s, :with_id => self.id).count == 1
-    end    
-
+    end
+        
+    def locked_by_me?
+      return self.owned_by_me?
+    end
+    
     def owned?
       lock = Lock.first(:classname => self.class.to_s, :with_id => self.id)
       return !lock.nil?
     end    
+    
+    def locked?
+      return self.owned?
+    end
   end
   
 end

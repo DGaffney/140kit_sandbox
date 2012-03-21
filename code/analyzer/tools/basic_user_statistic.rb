@@ -6,10 +6,10 @@ class BasicUserStatistic < AnalysisMetadata
   def self.run(analysis_metadata_id)
     @analysis_metadata = AnalysisMetadata.first(:id => analysis_metadata_id)
     curation = @analysis_metadata.curation
-    self.generate_stats
+    self.generate_stats(curation)
   end
 
-  def self.generate_stats
+  def self.generate_stats(curation)
     graph = Graph.first_or_create({:title => "basic_user_statistics", :style => "histogram", :curation_id => @analysis_metadata.curation_id, :analysis_metadata_id => @analysis_metadata.id})
     limit = 1000
     offset = 0
@@ -23,7 +23,7 @@ class BasicUserStatistic < AnalysisMetadata
         datapoints[:listed_count] << user.listed_count
         datapoints[:favourites_count] << user.favourites_count
       end
-      users = User.all(:limit => limit, :offset => offset)
+      users = User.all(:limit => limit, :offset => offset, :dataset_id => curation.collect{|c| c.dataset_id})
       offset+=limit
     end
     results = []

@@ -5,6 +5,7 @@ GEM
     ParseTree (3.0.8)
       RubyInline (>= 3.7.0)
       sexp_processor (>= 3.0.0)
+    RedCloth (4.2.9)
     RubyInline (3.11.0)
       ZenTest (~> 4.3)
     ZenTest (4.6.2)
@@ -130,6 +131,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  RedCloth
   cld
   dm-aggregates
   dm-chunked_query
