@@ -75,6 +75,7 @@ class Importer < Instance
       primary_models.each do |model|
         offset = 0
         limit = 10000
+        finished = false
         remaining = model.count(:dataset_id => dataset.id)
         while remaining != 0
           next_set = remaining>limit ? limit : remaining
@@ -95,6 +96,7 @@ class Importer < Instance
           Sh::rm(path+filename+".tsv.zip")
           model.destroy_all(:dataset_id => dataset.id)
           offset += limit
+          finished = true if remaining != 0
         end
       end
       dataset.status = "dropped"
@@ -105,6 +107,7 @@ class Importer < Instance
       offset = 0
       limit = 10000
       remaining = model.count(:curation_id => @curation.id)
+      finished = false
       while remaining != 0
         next_set = remaining>limit ? limit : remaining
         remaining = (remaining-limit)>0 ? remaining-limit : 0        
@@ -124,6 +127,7 @@ class Importer < Instance
         Sh::rm(path+filename+".tsv.zip")
         model.destroy_all(:curation_id => @curation.id)
         offset += limit
+        finished = true if remaining != 0
       end
     end
     @curation.status = "dropped"
