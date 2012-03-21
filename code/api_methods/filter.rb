@@ -166,6 +166,7 @@ class Filter < Instance
         dataset.users_count+=users.select{|t| t[:dataset_id]==dataset_id}.count
         Entity.store_to_flat_file(entities.select{|e| e[:dataset_id] == dataset_id}, dir(Entity, dataset_id, @start_time))
         dataset.entities_count+=entities.select{|t| t[:dataset_id]==dataset_id}.count
+        geos.reject!{|x| x == {:dataset_id => dataset_id}}
         Geo.store_to_flat_file(geos.select{|g| g[:dataset_id] == dataset_id}, dir(Geo, dataset_id, @start_time))
         Coordinate.store_to_flat_file(coordinates.select{|c| c[:dataset_id] == dataset_id}, dir(Coordinate, dataset_id, @start_time))
         dataset.save
@@ -207,7 +208,7 @@ class Filter < Instance
       dataset_ids = determine_datasets(json)
       tweets      = tweets+dataset_ids.collect{|dataset_id| tweet.merge({:dataset_id => dataset_id})}
       users       = users+dataset_ids.collect{|dataset_id| user.merge({:dataset_id => dataset_id})}
-      geos        = geos+dataset_ids.collect{|dataset_id| geo.merge({:dataset_id => dataset_id})}.reject{|x| x == {:dataset_id => dataset_id}}
+      geos        = geos+dataset_ids.collect{|dataset_id| geo.merge({:dataset_id => dataset_id})}
       coordinates = coordinates+CoordinateHelper.prepped_coordinates(json).collect{|coordinate| dataset_ids.collect{|dataset_id| coordinate.merge({:dataset_id => dataset_id})}}.flatten
       entities    = entities+EntityHelper.prepped_entities(json).collect{|entity| dataset_ids.collect{|dataset_id| entity.merge({:dataset_id => dataset_id})}}.flatten
     end
