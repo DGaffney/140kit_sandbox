@@ -62,7 +62,7 @@ class InteractionList < AnalysisMetadata
     ["retweet", "mention"].each do |style|
       offset = 0
       limit = 1000
-      counts = DataMapper.repository.adapter.select("select count(*) as count from edges where curation_id = #{curation.id} and style = '#{settings.last}' group by edge_id order by count(*) desc limit #{limit} offset #{offset};")
+      counts = DataMapper.repository.adapter.select("select count(*) as count from edges where curation_id = #{curation.id} and style = '#{style}' group by edge_id order by count(*) desc limit #{limit} offset #{offset};")
       while !counts.empty?
         counts.each do |count|
           if style == "retweet"
@@ -72,7 +72,7 @@ class InteractionList < AnalysisMetadata
           end
         end
         offset += limit
-        counts = DataMapper.repository.adapter.select("select count(*) as count from edges where curation_id = #{curation.id} and style = '#{settings.last}' group by edge_id order by count(*) desc limit #{limit} offset #{offset};")
+        counts = DataMapper.repository.adapter.select("select count(*) as count from edges where curation_id = #{curation.id} and style = '#{style}' group by edge_id order by count(*) desc limit #{limit} offset #{offset};")
       end
     end
     overview[:average_coretweets] = overview[:average_coretweets]/overview[:total_distinct_retweets].to_f
