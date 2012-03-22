@@ -4,9 +4,9 @@ class InteractionList < AnalysisMetadata
     @analysis_metadata = AnalysisMetadata.first(:id => analysis_metadata_id)
     curation = @analysis_metadata.curation
     conditional = Analysis.curation_conditional(curation)
-    calculate_raw_edges(curation, conditional)
-    calculate_degrees(curation, conditional)
-    calculate_overview(curation, conditional)
+    self.calculate_raw_edges(curation, conditional)
+    self.calculate_degrees(curation, conditional)
+    self.calculate_overview(curation, conditional)
   end
   
   def calculate_raw_edges(curation, conditional)
