@@ -1,0 +1,27 @@
+- position_select = [[0, 0]]
+- @analytical_offering.analytical_offering_variable_descriptors.each_index{|x| position_select << [x+1, x+1]}
+= form_for(@analytical_offering_variable_descriptor) do |f|
+  fieldset
+    .span4    
+      = f.hidden_field :analytical_offering_id, :value => @analytical_offering.id, class: 'input-xlarge'
+      label.control-label Name
+      .controls
+        = f.text_field :name, class: 'input-xlarge'
+      label.control-label Position
+      .controls
+        = f.select :position, position_select, class: 'input-xlarge'
+      label.control-label Kind
+      .controls
+        = f.select :kind, [["Integer", "integer"], ["Float", "float"], ["String", "string"], ["Array", "array"], ["Hash", "hash"], ["Enumerator", "enum"]], class: 'input-xlarge'
+      label.control-label Possible values (split by comma)
+      .controls
+        = f.text_field :values, class: 'input-xlarge'
+      label.control-label Description
+      .controls
+        = f.text_area :description, class: 'input-xlarge'
+      label.control-label User Modifiable?
+      .controls
+        = f.check_box :user_modifiable, class: 'input-xlarge'
+    .span12
+      .form-actions
+        = submit_tag 'Submit', class: 'btn btn-primary'

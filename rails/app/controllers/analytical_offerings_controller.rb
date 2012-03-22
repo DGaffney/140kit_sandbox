@@ -60,6 +60,7 @@ class AnalyticalOfferingsController < ApplicationController
   end
   
   def validate
+    debugger
     @curation = Curation.find(params[:curation_id])
     @analytical_offering = AnalyticalOffering.find(params[:id])
     @analysis_metadata = AnalysisMetadata.new(:curation_id => params[:curation_id], :analytical_offering_id => params[:id], :ready => false)
@@ -67,13 +68,20 @@ class AnalyticalOfferingsController < ApplicationController
     redirect_url = []
     validation_results = {}
     failed = false
-    @analysis_metadata.set_variables.each do |variable|
-      variable.save!
-      value = params["aov_"+variable.name]
-      result = @analysis_metadata.verify_variable(variable, value )
+    variables = []
+    @analysis_metadata.analytical_offering.variables.each do |variable|
+      aov = AnalyticalOfferingVariable.new
+      aov.analytical_offering_variable_descriptor_id = variable.id
+      aov.analysis_metadata_id = @analysis_metadata.id
+      aov.value = params["aovd"][aov.name]
+      result = @analysis_metadata.verify_variable(variable, aov.value)
       failed = !result[:reason].nil? && !result[:reason].empty?
       params["aov_"+variable.name+"_error"] = result[:reason]
       params["aov_"+variable.name] = result[:variable]
+      variables << aov
+    end
+    variables.each do |variable|
+      variable.save!
     end
     if failed
       @analysis_metadata.variables.each do |var|

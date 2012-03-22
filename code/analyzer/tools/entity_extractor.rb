@@ -1,7 +1,6 @@
 class EntityExtractor < AnalysisMetadata
 
   def self.run(analysis_metadata_id)
-    debugger
     @analysis_metadata = AnalysisMetadata.first(:id => analysis_metadata_id)
     curation = @analysis_metadata.curation
     conditional = Analysis.curation_conditional(curation)

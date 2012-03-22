@@ -1,0 +1,22 @@
+- if !@analytical_offering.variables.empty?
+  h1 Variables
+  .row
+    .span12
+      table.table.table-striped.table-bordered
+        thead
+          tr
+            th Name
+            th User Modifiable?
+            th Position
+            th Kind
+            th Description
+            th Possible Values
+        tbody
+          - for variable in @analytical_offering.variables
+            tr
+              td = variable.name
+              td = variable.user_modifiable ? "Yes" : "No"
+              td = variable.position
+              td = variable.kind
+              td = variable.description
+              td = variable.values.split(",").collect{|x| "'#{x}'"}.join(", ")

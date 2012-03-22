@@ -74,8 +74,8 @@
     <% count = 0 %>
     data.addRows(<%= @dataset.length %>);
     <% @dataset.each do |row| %>
-      data.setCell(<%= count %>, 0, "<%= row.start_node %>");
-      data.setCell(<%= count %>, 1, "<%= row.end_node %>");
+      data.setCell(<%= count %>, 0, "<a href='http://www.twitter.com/<%= row.start_node %>' target='_blank'><%= row.start_node %></a>");
+      data.setCell(<%= count %>, 1, "<a href='http://www.twitter.com/<%= row.start_node %>' target='_blank'><%= row.end_node %></a>");
       data.setCell(<%= count %>, 2, "<%= status_url(row).html_safe %>");
       data.setCell(<%= count %>, 3, "<%= row.time.strftime("%b, %d %Y at %H:%M:%S %Z") %>");
       <% count+=1 %>

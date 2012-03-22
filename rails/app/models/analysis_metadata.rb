@@ -21,6 +21,14 @@ class AnalysisMetadata < ActiveRecord::Base
     end
   end
   
+  def printed_variables
+    if !variables.empty?
+      return "("+variables.collect{|variable| "<b>#{variable.name}</b>: #{variable.value}"}.join(" | ")+")"
+    else
+      return ""
+    end
+  end
+  
   def locked?
     lock = Lock.find_by_classname_and_with_id("AnalysisMetadata", self.id)
     return !lock.nil?
@@ -63,20 +71,6 @@ class AnalysisMetadata < ActiveRecord::Base
     return analytical_offering_variables.sort{|x,y| x.position<=>y.position}
   end
 
-  def set_variables
-    variables = []
-    case language
-    when "ruby"
-      analytical_offering.variables.each do |variable|
-        analytical_offering_variable = AnalyticalOfferingVariable.new
-        analytical_offering_variable.analytical_offering_variable_descriptor_id = variable.id
-        analytical_offering_variable.analysis_metadata_id = self.id
-        analytical_offering_variable.value = datamapper_dumped_object(set_variable(analytical_offering_variable))
-        variables << analytical_offering_variable
-      end
-    end
-    return variables
-  end
   
   def datamapper_dumped_object(value)
     [ Marshal.dump(value) ].pack('m')
@@ -102,17 +96,7 @@ class AnalysisMetadata < ActiveRecord::Base
   end
 
   def verify_variable(analytical_offering_variable, answer)
-    case analytical_offering_variable.name
-    when "curation_id"
-      answer = answer.empty? ? self.curation_id : answer.to_i
-      response = {}
-      response[:reason] = "The curation id you specified (#{answer}) does not correspond to an existing curation. Please try again."
-      response[:variable] = answer
-      return response if Curation.find_by_id(answer).nil?
-    else
-      return function_class.verify_variable(self, analytical_offering_variable, answer).merge({:analytical_offering_variable_descriptor_id => analytical_offering_variable.id})
-    end
-    return {:variable => answer, :analytical_offering_variable_descriptor_id => analytical_offering_variable.id}
+    return function_class.verify_variable(self, analytical_offering_variable, answer).merge({:analytical_offering_variable_descriptor_id => analytical_offering_variable.id})
   end
   
   def self.verify_variable(metadata, variable_descriptor, answer)
@@ -146,12 +130,7 @@ class AnalysisMetadata < ActiveRecord::Base
   end
   
   def function_class
-    begin
-      return function.to_class
-    rescue
-      require "#{File.dirname(__FILE__)}/../../../code/analyzer/tools/#{function}.rb"
-      retry
-    end
+    return function.classify.constantize
   end
   
   def function_path

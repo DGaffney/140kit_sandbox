@@ -85,8 +85,10 @@ WWW140kit::Application.routes.draw do
   match '/auth/failure' => 'sessions#fail'
 
   root to: 'home#index'
-
-  get '/highchart/graph/:id' => 'high_chart#graph', as: :high_chart_graph
+  resources :analytical_offering_variable_descriptors, path: '/variables'
+  get '/dependencies/:id/new' => 'analytical_offering_requirements#new', as: :new_dependency
+  resources :analytical_offering_requirements, path: '/dependencies'
+  get '/variables/:id/new' => 'analytical_offering_variable_descriptors#new', as: :new_variable
 
   # Sample of regular route:
   #   match 'products/:id' => 'catalog#view'

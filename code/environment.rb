@@ -39,7 +39,7 @@ ENV['TMP_PATH'] = DIR+"/tmp_files/#{ENV['INSTANCE_ID']}/scratch_processes/"
 
 require DIR+'/model'
 models = [
-  "analysis_metadata", "analytical_offering", "analytical_offering_variable", "analytical_offering_variable_descriptor", "auth_user", "coordinate", "curation",
+  "analysis_metadata", "analytical_offering", "analytical_offering_requirement", "analytical_offering_variable", "analytical_offering_variable_descriptor", "auth_user", "coordinate", "curation",
   "dataset", "edge", "friendship", "entity", "geo", "graph", "graph_point", "importer_task", "instance", "location", "lock", "machine", "mail", "parameter", "post", 
   "researcher", "setting", "ticket", "trending_topic", "tweet", "user", "whitelisting", "worker_description"
 ]

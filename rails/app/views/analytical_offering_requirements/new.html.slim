@@ -1,0 +1,17 @@
+h1 = "Adding Dependency to #{@analytical_offering.title}"
+- position_select = [[0, 0]]
+- @analytical_offering.analytical_offering_requirements.each_index{|x| position_select << [x+1, x+1]}
+- select_options = @analytical_offerings.reject{|x| @analytical_offering.analytical_offering_requirements.include?(x)}.collect{|ao| [ao.title, ao.id]}
+= form_for(@analytical_offering_requirement) do |f|
+  fieldset
+    .span4    
+      = f.hidden_field :analytical_offering_id, :value => @analytical_offering.id, class: 'input-xlarge'
+      label.control-label Position
+      .controls
+        = f.select :position, position_select, class: 'input-xlarge'
+      label.control-label Select Dependency
+      .controls
+        = f.select :analytical_offering_requirement_id, select_options, class: 'input-xlarge'
+    .span12
+      .form-actions
+        = submit_tag 'Submit', class: 'btn btn-primary'
