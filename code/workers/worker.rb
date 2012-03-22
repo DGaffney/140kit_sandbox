@@ -105,8 +105,8 @@ class Worker < Instance
       Analysis::Dependencies.send(metadata.function)
       vars = [metadata.id]+metadata.run_vars
       puts "#{metadata.function.classify}.run(#{vars.join(", ")})"
-      metadata.function.classify.constantize.run(*vars)
-      metadata.finished = true
+      finished = metadata.function.classify.constantize.run(*vars) || false
+      metadata.finished = finished
       metadata.save
       metadata.unlock
       metadata.curation.unlock

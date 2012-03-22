@@ -26,6 +26,7 @@ class CompactLanguageDetection < AnalysisMetadata
       values << {:graph_id => graph.id, :label => language, :value => count, :analysis_metadata_id => @analysis_metadata.id, :curation_id => curation.id}
     end
     GraphPoint.save_all(values)
+    return true
   end
   
   def self.detect_language_name(data)

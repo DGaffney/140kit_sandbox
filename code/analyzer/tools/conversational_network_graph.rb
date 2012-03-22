@@ -15,7 +15,7 @@ class ConversationalNetworkGraph < AnalysisMetadata
     debugger
     @analysis_metadata = AnalysisMetadata.first(:id => analysis_metadata_id)
     curation = @analysis_metadata.curation
-    return nil if !self.requires(self.analysis_metadata(curation), [{:function => "interaction_list"}], curation)
+    return false if !self.requires(self.analysis_metadata(curation), [{:function => "interaction_list"}], curation)
     conditional = Analysis.curation_conditional(curation)
     graph = Graph.first_or_create(:title => "cld_value_overview", :style => "table", :analysis_metadata_id => @analysis_metadata.id, :curation_id => curation.id)
     offset = 0
@@ -39,6 +39,7 @@ class ConversationalNetworkGraph < AnalysisMetadata
       values << {:graph_id => graph.id, :label => language, :value => count, :analysis_metadata_id => @analysis_metadata.id, :curation_id => curation.id}
     end
     GraphPoint.save_all(values)
+    return true
   end
   
   def self.detect_language_name(data)

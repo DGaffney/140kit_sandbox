@@ -22,6 +22,7 @@ class EntityExtractor < AnalysisMetadata
         entities = DataMapper.repository.adapter.select("select count(*) as count,value from entities #{Analysis.conditions_to_mysql_query(conditional)} and name = '#{name}' group by value order by count(*) desc limit #{limit} offset #{offset}")
       end
     end
+    return true
   end
   
 end

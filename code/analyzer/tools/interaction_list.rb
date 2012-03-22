@@ -7,6 +7,7 @@ class InteractionList < AnalysisMetadata
     self.calculate_raw_edges(curation, conditional)
     self.calculate_degrees(curation, conditional)
     self.calculate_overview(curation)
+    return true
   end
   
   def self.calculate_raw_edges(curation, conditional)

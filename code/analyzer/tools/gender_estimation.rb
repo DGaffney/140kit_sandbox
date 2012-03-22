@@ -51,5 +51,6 @@ class GenderEstimation < AnalysisMetadata
       graph_points << graph_point
     end
     GraphPoint.save_all(graph_points)
+    return true
   end
 end
