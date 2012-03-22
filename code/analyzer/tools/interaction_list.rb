@@ -53,9 +53,8 @@ class InteractionList < AnalysisMetadata
   def self.calculate_overview(curation)
     overview_graph = Graph.first_or_create(:title => "overview", :style => "network", :analysis_metadata_id => @analysis_metadata.id, :curation_id => curation.id)
     overview = {:total_retweets => 0, :total_mentions => 0, :average_comentions => 0, :average_coretweets => 0, :most_mentioning => "", :most_mentioned => "", :most_retweeting => "", :most_retweeted => "", :total_distinct_retweets => 0, :total_distinct_mentions => 0}
-    debugger
-    overview[:total_distinct_retweets] = DataMapper.repository.adapter.select("select count(distinct(edge_id)) from edges where curation_id = #{curation.id} and style = 'retweet'")
-    overview[:total_distinct_mentions] = DataMapper.repository.adapter.select("select count(distinct(edge_id)) from edges where curation_id = #{curation.id} and style = 'mention'")
+    overview[:total_distinct_retweets] = DataMapper.repository.adapter.select("select count(distinct(edge_id)) from edges where curation_id = #{curation.id} and style = 'retweet'").first
+    overview[:total_distinct_mentions] = DataMapper.repository.adapter.select("select count(distinct(edge_id)) from edges where curation_id = #{curation.id} and style = 'mention'").first
     retweet_network = Graph.first_or_create(:title => "retweet_network", :style => "network", :analysis_metadata_id => @analysis_metadata.id, :curation_id => curation.id)
     mention_network = Graph.first_or_create(:title => "mention_network", :style => "network", :analysis_metadata_id => @analysis_metadata.id, :curation_id => curation.id)
     overview[:total_retweets] = Edge.count(:style => 'retweet', :curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :graph_id => retweet_network.id)
