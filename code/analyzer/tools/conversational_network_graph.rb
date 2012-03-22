@@ -13,13 +13,13 @@ class ConversationalNetworkGraph < AnalysisMetadata
   
   def self.run(analysis_metadata_id, network_type)
     @analysis_metadata = AnalysisMetadata.first(:id => analysis_metadata_id)
+    return false if !self.requires(@analysis_metadata.curation, [{:function => "interaction_list"}], curation)
     self.draw_graph(network_type)
     return true
   end
   
   def self.draw_graph(network_type)
     curation = @analysis_metadata.curation
-    return false if !self.requires(self.analysis_metadata(curation), [{:function => "interaction_list"}], curation)
     debugger
     conditional = Analysis.curation_conditional(curation)
     graph_ids = []
