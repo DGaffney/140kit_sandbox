@@ -60,7 +60,6 @@ class AnalyticalOfferingsController < ApplicationController
   end
   
   def validate
-    debugger
     @curation = Curation.find(params[:curation_id])
     @analytical_offering = AnalyticalOffering.find(params[:id])
     @analysis_metadata = AnalysisMetadata.new(:curation_id => params[:curation_id], :analytical_offering_id => params[:id], :ready => false)
