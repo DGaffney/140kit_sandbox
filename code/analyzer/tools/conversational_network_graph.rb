@@ -24,7 +24,7 @@ class ConversationalNetworkGraph < AnalysisMetadata
     conditional = Analysis.curation_conditional(curation)
     graph_ids = []
     edge_conditional = []
-    if network_type = "combined"
+    if network_type == "combined"
       graph_ids = Graph.all(:title => ["retweet_network", "mention_network"], :style => "network", :curation => curation.id).collect(&:id)
       edge_conditional << ["mention", "retweet"]
     else
@@ -41,7 +41,7 @@ class ConversationalNetworkGraph < AnalysisMetadata
       :analysis_metadata_id => @analysis_metadata.id, 
       :style => network_type+"_graph", 
       :title => "curation_#{curation.id}_#{curation.name}",
-      :edge_conditional => ,
+      :edge_conditional => edge_conditional,
       :total_range => Edge.last(:order => :time, :graph_id => graph_ids).time-Edge.first(:order => :time, :graph_id => graph_ids).time
     }
     Graphml::Writer::initialize_temp_data(options, graph)
