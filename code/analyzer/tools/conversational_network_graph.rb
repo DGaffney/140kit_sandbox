@@ -11,7 +11,7 @@ class ConversationalNetworkGraph < AnalysisMetadata
     return {:variable => answer}
   end
   
-  def self.run(analysis_metadata_id)
+  def self.run(analysis_metadata_id, network_type)
     @analysis_metadata = AnalysisMetadata.first(:id => analysis_metadata_id)
     curation = @analysis_metadata.curation
     return nil if !self.requires(self.analysis_metadata(curation), [{:function => "interaction_list"}], curation)

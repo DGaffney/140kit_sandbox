@@ -104,6 +104,7 @@ class Worker < Instance
     when "ruby"
       Analysis::Dependencies.send(metadata.function)
       vars = [metadata.id]+metadata.run_vars
+      debugger
       puts "#{metadata.function.classify}.run(#{vars.join(", ")})"
       metadata.function.classify.constantize.run(*vars)
       metadata.finished = true
