@@ -20,6 +20,7 @@ class InteractionList < AnalysisMetadata
     while !interactions.empty?
       interactions.each do |interaction|
         style = interaction.retweeted.nil? ? "mention" : "retweet"
+        graph = interaction.retweeted.nil? ? mention_network : retweet_network
         edge = {:start_node => interaction.start_node, :end_node => interaction.end_node, :edge_id => interaction.edge_id, :time => interaction.time, :style => style, :analysis_metadata_id => @analysis_metadata.id, :graph_id => graph.id, :curation_id => curation.id}
         if style == "mention"
           mention_network << edge
