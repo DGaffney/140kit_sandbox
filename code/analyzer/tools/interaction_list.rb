@@ -75,8 +75,8 @@ class InteractionList < AnalysisMetadata
         counts = DataMapper.repository.adapter.select("select count(*) as count from edges where curation_id = #{curation.id} and style = '#{style}' group by edge_id order by count(*) desc limit #{limit} offset #{offset};")
       end
     end
-    overview[:average_coretweets] = overview[:average_coretweets]/overview[:total_distinct_retweets].to_f
-    overview[:average_comentions] = overview[:average_comentions]/overview[:total_distinct_mentions].to_f
+    overview[:average_coretweets] = overview[:average_coretweets].sum/overview[:total_distinct_retweets].to_f
+    overview[:average_comentions] = overview[:average_comentions].sum/overview[:total_distinct_mentions].to_f
     graph = Graph.first(:title => "retweet_out_degrees", :analysis_metadata_id => @analysis_metadata.id, :curation => curation.id)
     overview[:most_retweeting] = DataMapper.repository.adapter.select("select * from graph_points where graph_id = #{graph.id} order by cast(value as signed) desc limit 1;").first.label
     graph = Graph.first(:title => "retweet_in_degrees", :analysis_metadata_id => @analysis_metadata.id, :curation => curation.id)
