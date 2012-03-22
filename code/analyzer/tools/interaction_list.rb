@@ -9,7 +9,7 @@ class InteractionList < AnalysisMetadata
     self.calculate_overview(curation, conditional)
   end
   
-  def calculate_raw_edges(curation, conditional)
+  def self.calculate_raw_edges(curation, conditional)
     debugger
     retweet_network = Graph.first_or_create(:title => "retweet_network", :style => "network", :analysis_metadata_id => @analysis_metadata.id, :curation_id => curation.id)
     mention_network = Graph.first_or_create(:title => "mention_network", :style => "network", :analysis_metadata_id => @analysis_metadata.id, :curation_id => curation.id)
@@ -34,7 +34,7 @@ class InteractionList < AnalysisMetadata
     end
   end
   
-  def calculate_degrees(curation, conditional)
+  def self.calculate_degrees(curation, conditional)
     debugger
     degrees = []
     graph_set = {:retweet_out_degrees => ["start_node", "retweet"], :retweet_in_degrees => ["end_node", "retweet"], :mention_out_degrees => ["start_node", "mention"], :mention_in_degrees => ["start_node", "retweet"]}
@@ -55,7 +55,7 @@ class InteractionList < AnalysisMetadata
     end
   end
   
-  def calculate_overview(curation)
+  def self.calculate_overview(curation)
     debugger
     overview_graph = Graph.first_or_create(:title => "overview", :style => "network", :analysis_metadata_id => @analysis_metadata.id, :curation_id => curation.id)
     overview = {:total_retweets => 0, :total_mentions => 0, :average_comentions => 0, :average_coretweets => 0, :most_mentioning => "", :most_mentioned => "", :most_retweeting => "", :most_retweeted => "", :total_distinct_retweets => 0, :total_distinct_mentions => 0}
