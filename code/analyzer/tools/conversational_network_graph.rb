@@ -12,36 +12,26 @@ class ConversationalNetworkGraph < AnalysisMetadata
   end
   
   def self.run(analysis_metadata_id, network_type)
-    debugger
     @analysis_metadata = AnalysisMetadata.first(:id => analysis_metadata_id)
+    debugger
+    gg = ""
+    if network_type == "combined"
+      self.draw_combined_graph
+    else
+      self.draw_individual_graph(network_type)
+    end
+  end
+  
+  def self.draw_individual_graph(network_type)
     curation = @analysis_metadata.curation
     return false if !self.requires(self.analysis_metadata(curation), [{:function => "interaction_list"}], curation)
     conditional = Analysis.curation_conditional(curation)
-    graph = Graph.first_or_create(:title => "cld_value_overview", :style => "table", :analysis_metadata_id => @analysis_metadata.id, :curation_id => curation.id)
+    graph = Graph.first(:title => "#{network_type}_network", :style => "network", :curation_id => curation.id)
     offset = 0
     limit = 20000
-    tweets = Tweet.all({:limit => limit, :offset => offset, :fields => [:twitter_id, :text]}.merge(conditional))
-    language_set = {}
-    while !tweets.empty?
-      tweets.each do |tweet|
-        language = self.detect_language_name(tweet.text)
-        if language_set[language].nil?
-          language_set[language] = 1
-        else
-          language_set[language] += 1
-        end
-      end
-      offset += limit
-      tweets = Tweet.all({:limit => limit, :offset => offset, :fields => [:twitter_id, :text]}.merge(conditional))
-    end
-    values = []
-    language_set.each_pair do |language, count|
-      values << {:graph_id => graph.id, :label => language, :value => count, :analysis_metadata_id => @analysis_metadata.id, :curation_id => curation.id}
-    end
-    GraphPoint.save_all(values)
-    return true
+    
+    header_file = File.opwn
   end
-  
   def self.detect_language_name(data)
     value = $language_map.invert[CLD.detect_language(data)]
     value = "unknown" if value == "TG_UNKNOWN_LANGUAGE"
