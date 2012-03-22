@@ -1,0 +1,111 @@
+<%
+  if ["retweet_out_degrees", "retweet_in_degrees", "mention_out_degrees", "mention_in_degrees"].include?(@graph.title)
+    @dataset = @graph.graph_points.collect{|gp| {:label => gp.label, :value => gp.value}}
+    @dataset.sort!{|x,y| x[:value].to_i<=>y[:value].to_i}
+    @dataset = @dataset.reverse
+    @dataset.collect{|d| d[:label] = "Not Set" if d[:label].empty?}
+    @dataset.collect{|d| d[:label] = "<a href='http://www.twitter.com/#{d[:label]}' target='_blank'>@#{d[:label]}</a>"}
+  elsif ["retweet_network", "mention_network"].include?(@graph.title)
+    @dataset = @graph.edges
+  elsif ["overview"].include?(@graph.title)
+    @dataset = {}
+    @graph.graph_points.each{|gp| @dataset[gp.label] = gp.value}    
+  end
+  def google_number(title)
+    {"retweet_out_degrees" => "'number', 'Number of Users'",
+    "mention_out_degrees" => "'number', 'Number of Users'",
+    "retweet_in_degrees" => "'number', 'Number of Users'",
+    "mention_in_degrees" => "'number', 'Number of Users'"}[title]
+  end
+  def google_string(title)
+    {"retweet_out_degrees" => "'string', 'Language'",
+    "mention_out_degrees" => "'string', 'Language'",
+    "retweet_in_degrees" => "'string', 'Language'",
+    "mention_in_degrees" => "'string', 'Language'"}[title]
+  end
+  def google_table_type(title)
+    {"retweet_network" => 'Table',
+    "mention_network" => 'Table',
+    "retweet_out_degrees" => 'Table',
+    "mention_out_degrees" => 'Table',
+    "retweet_in_degrees" => 'Table',
+    "mention_in_degrees" => 'Table'}[title]
+  end
+  def google_params(title)
+    {"retweet_network" => "{showRowNumber: true, page: 'enable', width: 680, height: 800, pageSize: 100, allowHtml: true}",
+    "mention_network" => "{showRowNumber: true, page: 'enable', width: 680, height: 800, pageSize: 100, allowHtml: true}",
+    "retweet_out_degrees" => "{showRowNumber: true, page: 'enable', width: 680, height: 800, pageSize: 100, allowHtml: true}",
+    "mention_out_degrees" => "{showRowNumber: true, page: 'enable', width: 680, height: 800, pageSize: 100, allowHtml: true}",
+    "retweet_in_degrees" => "{showRowNumber: true, page: 'enable', width: 680, height: 800, pageSize: 100, allowHtml: true}",
+    "mention_in_degrees" => "{showRowNumber: true, page: 'enable', width: 680, height: 800, pageSize: 100, allowHtml: true}"}[title]
+  end
+
+  def term(title)
+    {"retweet_network" => "Retweet",
+     "mention_network" => "Mention"}[title]
+  end
+  def status_url(row)
+    "<a href='http://twitter.com/#{row.start_node}/status/#{row.edge_id}' target='_blank'>Status</a>"
+  end
+%>
+<% if ["retweet_out_degrees", "retweet_in_degrees", "mention_out_degrees", "mention_in_degrees"].include?(@graph.title) %>
+  <script type='text/javascript'>
+    var data = new google.visualization.DataTable();
+    data.addColumn(<%= google_string(@graph.title) %>);
+    <% count = 0 %>
+    data.addColumn(<%= google_number(@graph.title) %>);
+    data.addRows(<%= @dataset.length %>);
+    <% @dataset.each do |row| %>
+      data.setCell(<%= count %>, 0, "<%= row[:label].html_safe %>");
+      data.setCell(<%= count %>, 1, <%= row[:value].to_i %>);
+      <% count+=1 %>
+    <% end %>
+    var table = new google.visualization.<%= google_table_type(@graph.title) %>(document.getElementById('container'));
+    table.draw(data, <%= google_params(@graph.title) %>);
+  </script>
+  <h1><%= @graph.pretty_title %></h1>
+<% elsif ["retweet_network", "mention_network"].include?(@graph.title) %>
+  <script type='text/javascript'>
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', '<%= term(@graph.title) %>ing User');
+    data.addColumn('string', '<%= term(@graph.title) %>ed User');
+    data.addColumn('string', 'Status Link');
+    data.addColumn('string', 'Time');
+    <% count = 0 %>
+    data.addRows(<%= @dataset.length %>);
+    <% @dataset.each do |row| %>
+      data.setCell(<%= count %>, 0, "<%= row.start_node %>");
+      data.setCell(<%= count %>, 1, "<%= row.end_node %>");
+      data.setCell(<%= count %>, 2, "<%= status_url(row).html_safe %>");
+      data.setCell(<%= count %>, 3, "<%= row.time.strftime("%b, %d %Y at %H:%M:%S %Z") %>");
+      <% count+=1 %>
+    <% end %>
+    var table = new google.visualization.<%= google_table_type(@graph.title) %>(document.getElementById('container'));
+    table.draw(data, <%= google_params(@graph.title) %>);
+  </script>
+  <h1><%= @graph.pretty_title %></h1>
+<% end %>
+<div id="container" style="min-width: 400px; height: 400px; margin: 0 auto">
+  <% if @graph.title == "overview" -%>
+  <br />
+  <br />
+  <ul>
+    <li><b>Total Retweets:</b><%= @dataset["total_retweets"] %></li>
+    <li><b>Total <em>Distinct</em> Retweets:</b><%= @dataset["total_distinct_retweets"] %></li>
+    <li><b>Most Retweeted:</b><a href="http://twitter.com/<%= @dataset["most_retweeted"] %>" target="_blank"><%= @dataset["most_retweeted"] %></a></li>
+    <li><b>Most Retweeting:</b><a href="http://twitter.com/<%= @dataset["most_retweeting"] %>" target="_blank"><%= @dataset["most_retweeting"] %></a></li>
+    <li><b>Average number of Users in each Retweeting Tweet:</b><%= @dataset["average_coretweets"].to_f.round(2) %></li>
+  </ul>
+  <br />
+  <br />
+  <ul>
+    <li><b>Total Mentions: </b><%= @dataset["total_mentions"] %></li>
+    <li><b>Total <em>Distinct</em> Mentions: </b><%= @dataset["total_distinct_mentions"] %></li>
+    <li><b>Most Mentioned: </b><a href="http://twitter.com/<%= @dataset["most_mentioned"] %>" target="_blank"><%= @dataset["most_mentioned"] %></a></li>
+    <li><b>Most Mentioning: </b><a href="http://twitter.com/<%= @dataset["most_mentioning"] %>" target="_blank"><%= @dataset["most_mentioning"] %></a></li>
+    <li><b>Average number of Users in each Mentioning Tweet: </b><%= @dataset["average_comentions"].to_f.round(2) %></li>
+  </ul>
+  <% end -%>
+</div>
+
+<!-- {startOnTick: true, endOnTick: true, showLastLabel: true}, -->
