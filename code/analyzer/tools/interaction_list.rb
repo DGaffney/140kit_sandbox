@@ -53,6 +53,7 @@ class InteractionList < AnalysisMetadata
   def self.calculate_overview(curation)
     overview_graph = Graph.first_or_create(:title => "overview", :style => "network", :analysis_metadata_id => @analysis_metadata.id, :curation_id => curation.id)
     overview = {:total_retweets => 0, :total_mentions => 0, :average_comentions => 0, :average_coretweets => 0, :most_mentioning => "", :most_mentioned => "", :most_retweeting => "", :most_retweeted => "", :total_distinct_retweets => 0, :total_distinct_mentions => 0}
+    debugger
     overview[:total_distinct_retweets] = DataMapper.repository.adapter.select("select count(distinct(edge_id)) from edges where curation_id = #{curation.id} and style = 'retweet'")
     overview[:total_distinct_mentions] = DataMapper.repository.adapter.select("select count(distinct(edge_id)) from edges where curation_id = #{curation.id} and style = 'mention'")
     retweet_network = Graph.first_or_create(:title => "retweet_network", :style => "network", :analysis_metadata_id => @analysis_metadata.id, :curation_id => curation.id)
@@ -75,8 +76,8 @@ class InteractionList < AnalysisMetadata
         counts = DataMapper.repository.adapter.select("select count(*) as count from edges where curation_id = #{curation.id} and style = '#{style}' group by edge_id order by count(*) desc limit #{limit} offset #{offset};")
       end
     end
-    overview[:average_coretweets] = overview[:average_coretweets].sum/overview[:total_distinct_retweets].to_f
-    overview[:average_comentions] = overview[:average_comentions].sum/overview[:total_distinct_mentions].to_f
+    overview[:average_coretweets] = overview[:average_coretweets]/overview[:total_distinct_retweets].to_f
+    overview[:average_comentions] = overview[:average_comentions]/overview[:total_distinct_mentions].to_f
     graph = Graph.first(:title => "retweet_out_degrees", :analysis_metadata_id => @analysis_metadata.id, :curation => curation.id)
     overview[:most_retweeting] = DataMapper.repository.adapter.select("select * from graph_points where graph_id = #{graph.id} order by cast(value as signed) desc limit 1;").first.label
     graph = Graph.first(:title => "retweet_in_degrees", :analysis_metadata_id => @analysis_metadata.id, :curation => curation.id)
