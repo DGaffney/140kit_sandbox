@@ -66,9 +66,9 @@ class InteractionList < AnalysisMetadata
       while !counts.empty?
         counts.each do |count|
           if style == "retweet"
-            overview[:average_coretweets] += count.count
+            overview[:average_coretweets] += count
           else
-            overview[:average_comentions] += count.count
+            overview[:average_comentions] += count
           end
         end
         offset += limit
