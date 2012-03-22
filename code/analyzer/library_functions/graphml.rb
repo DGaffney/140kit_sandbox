@@ -1,5 +1,5 @@
 module Graphml
-  def self.header(key)
+  def self.header(key=rand(10000))
     %{<?xml version="1.0" encoding="UTF-8"?>\n<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" \nxsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">\n\t<graph id="#{key}" edgedefault="directed">}
   end
   
@@ -28,6 +28,7 @@ module Graphml
   #nodes look like {:id => screen_name}
   def self.node(node)
     node_data = ""
+    debugger
     metadata_keys = [:attributes]
     non_metadata_node = Hash[node.select{|k,v| !metadata_keys.include?(k)}]
     if !node[:label].to_s.blank? && !node[:id].to_s.blank?
