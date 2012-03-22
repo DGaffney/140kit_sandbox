@@ -160,14 +160,14 @@ class AnalysisMetadata
       analytical_offering = AnalyticalOffering.first(:function => analysis_metadata_set[:function])
       analysis_metadata = analytical_offering.analysis_metadatas.all(:curation_id => curation.id).select{|am| am.run_vars == analysis_metadata_set[:with_options]}.first
       if analysis_metadata.nil?
-        new_analysis_metadata = AnalysisMetadata.create(:curation_id => curation.id, :analytical_offering_id => analytical_offering.id, :rest => (!analysis_metadata_set[:rest].nil? || analysis_metadata_set[:rest]), :finished => true)
+        new_analysis_metadata = AnalysisMetadata.create(:curation_id => curation.id, :analytical_offering_id => analytical_offering.id, :rest => (!analysis_metadata_set[:rest].nil? || analysis_metadata_set[:rest]), :finished => false, :ready => false)
         if analysis_metadata_set[:with_options]
           analysis_metadata_set[:with_options].each_with_index do |var, index|
             analytical_offering_variable_descriptor = AnalyticalOfferingVariableDescriptor.first(:position => index, :analytical_offering_id => analytical_offering.id)
             analytical_offering_variable = AnalyticalOfferingVariable.create(:analytical_offering_variable_descriptor_id => analytical_offering_variable_descriptor.id, :analysis_metadata_id => new_analysis_metadata.id, :value => var)
           end
         end
-        new_analysis_metadata.finished = false
+        new_analysis_metadata.ready = true
         new_analysis_metadata.save!
         this_analysis_metadata.unlock!
         return false
