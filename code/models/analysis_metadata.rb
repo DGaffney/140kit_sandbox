@@ -162,7 +162,6 @@ class AnalysisMetadata
     end
     curation = analysis_metadata.curation
     functions = dependencies_to_load.collect{|d| d[:function]}
-    functions = "conversational_network_graph"
     dependent_analysis_metadatas = AnalyticalOffering.all(:function => functions).analysis_metadatas(:curation_id => curation.id, :finished => true)
     dependencies_met = dependent_analysis_metadatas.collect{|dam| {:function => dam.function, :with_options => dam.run_vars}}
     dependencies_needed = dependencies_to_load-dependencies_met
