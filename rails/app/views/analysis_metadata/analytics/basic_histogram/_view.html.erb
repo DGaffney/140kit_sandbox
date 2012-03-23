@@ -27,11 +27,11 @@
   elsif ["tweets_language", "tweets_location", "users_time_zone"].include?(@graph.title)
     @dataset.sort!{|x,y| x[:value].to_i<=>y[:value].to_i}
     @dataset = @dataset.reverse
-    @dataset.collect{|d| d[:label] = "Not Set" if d[:label].empty?}
+    @dataset.collect{|d| d[:label] = "Not Set" if d[:label].nil? || d[:label].empty?}
   elsif ["tweets_source"].include?(@graph.title)
     @dataset.sort!{|x,y| x[:value].to_i<=>y[:value].to_i}
     @dataset = @dataset.reverse
-    @dataset.collect{|d| d[:label] = "Not Set" if d[:label].empty?}
+    @dataset.collect{|d| d[:label] = "Not Set" if d[:label].nil? || d[:label].empty?}
     @dataset.collect{|d| d[:label] = d[:label].gsub("rel=\"nofollow\">", " target=\"_blank\">")}
   end
   def yAxis(title)
