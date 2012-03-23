@@ -95,6 +95,8 @@ class Worker < Instance
         $instance.metadata = metadata
         route(metadata)
       end
+      metadata.unlock
+      metadata.curation.unlock
     end
     puts "No analysis work to do right now."
   end
@@ -108,8 +110,6 @@ class Worker < Instance
       finished = metadata.function.classify.constantize.run(*vars) || false
       metadata.finished = finished
       metadata.save
-      metadata.unlock
-      metadata.curation.unlock
     else 
       raise "Language #{metadata.language} is not currently supported for analytical routing!"
     end
