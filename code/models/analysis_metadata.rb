@@ -155,6 +155,7 @@ class AnalysisMetadata
   # to implement this process, simply put this line where the analysis needs to be required in order to go any further:
   # return nil if !self.requires(self.analysis_metadata(curation), [{:function => "click_counter", :with_options => [curation_id]}], curation)
   def self.requires(analysis_metadata, dependencies_to_load)
+    debugger
     dependencies_to_load = [dependencies_to_load].flatten
     dependencies_to_load.each do |d|
       d[:with_options] = [] if d[:with_options].nil?
