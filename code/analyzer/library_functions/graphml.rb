@@ -1,5 +1,5 @@
 module Graphml
-  def self.header(key)
+  def self.header(key=rand(10000))
     %{<?xml version="1.0" encoding="UTF-8"?>\n<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" \nxsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">\n\t<graph id="#{key}" edgedefault="directed">}
   end
   
@@ -32,13 +32,13 @@ module Graphml
     non_metadata_node = Hash[node.select{|k,v| !metadata_keys.include?(k)}]
     if !node[:label].to_s.blank? && !node[:id].to_s.blank?
       if node[:attributes] && !node[:attributes].empty?
-        node_data << %{\n\t\t<node #{non_metadata_node.collect{|k,v| " #{k}=\"#{v}\""}.to_s}>}
+        node_data << %{\n\t\t<node #{non_metadata_node.collect{|k,v| " #{k}=\"#{v}\""}.join(" ")}>}
         node[:attributes].each do |attribute|
           node_data << self.attribute(attribute)
         end
         node_data << "\n\t\t</node>"
       else
-        node_data << %{\n\t\t<node #{non_metadata_node.collect{|k,v| " #{k}=\"#{v}\""}.to_s}/>}
+        node_data << %{\n\t\t<node #{non_metadata_node.collect{|k,v| " #{k}=\"#{v}\""}.join(" ")}/>}
       end
     end
     node_data
@@ -55,13 +55,13 @@ module Graphml
     non_metadata_edge = Hash[edge.select{|k,v| !metadata_keys.include?(k)}]
     if !edge[:source].to_s.blank? && !edge[:target].to_s.blank?
       if edge[:attributes] && !edge[:attributes].empty?
-        edge_data << %{\n\t\t<edge#{non_metadata_edge.collect{|k,v| " #{k}=\"#{v}\""}.to_s}>}
+        edge_data << %{\n\t\t<edge#{non_metadata_edge.collect{|k,v| " #{k}=\"#{v}\""}.join(" ")}>}
         edge[:attributes].each do |attribute|
           edge_data << self.attribute(attribute)
         end
         edge_data << "\n\t\t</edge>"
       else
-        edge_data << %{\n\t\t<edge#{non_metadata_edge.collect{|k,v| " #{k}=\"#{v}\""}.to_s}/>}
+        edge_data << %{\n\t\t<edge#{non_metadata_edge.collect{|k,v| " #{k}=\"#{v}\""}.join(" ")}/>}
       end
     end
     edge_data
@@ -84,14 +84,14 @@ module Graphml
   
   module Writer
     #where fs is a frequency set as defined in retweet_graphs, graph is a given graph object that data is worked from, and file is the entity being written to.
-    def self.initialize_temp_data(fs, graph, path=ENV['TMP_PATH'])
+    def self.initialize_temp_data(fs, path=ENV['TMP_PATH'])
       File.delete(path+"/temp_node.graphml") if File.exists?(path+"/temp_node.graphml")
       File.delete(path+"/temp_edge.graphml") if File.exists?(path+"/temp_edge.graphml")
       File.delete(path+"/temp_header.graphml") if File.exists?(path+"/temp_header.graphml")
-      self.generate_temp_header(fs, graph, path)
+      self.generate_temp_header(fs, path)
     end
 
-    def self.generate_temp_header(fs, graph, path=ENV['TMP_PATH'])
+    def self.generate_temp_header(fs, path=ENV['TMP_PATH'])
       header_data = File.open(path+"/temp_header.graphml", "a+")
       self.generate_header(fs, header_data)
       self.generate_attribute_declarations(fs, header_data)

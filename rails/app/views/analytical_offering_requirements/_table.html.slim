@@ -1,0 +1,15 @@
+- if !@analytical_offering.dependencies.empty?
+  h2 Dependencies
+  .row
+    .span12
+      table.table.table-striped.table-bordered
+        thead
+          tr
+            th Name
+            th Position
+        tbody
+          - for dependency in @analytical_offering.dependencies
+            tr
+              td = link_to dependency.requirement.title, analytical_offering_path(dependency.requirement)
+              td = dependency.position
+              td = link_to "Remove", analytical_offering_requirement_path(dependency), :method => 'delete'

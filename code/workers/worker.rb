@@ -88,13 +88,15 @@ class Worker < Instance
     puts "do_analysis_jobs..."
     # WARNING: TODO: rest_allowed not implemented yet
     while AnalysisMetadata.unlocked.all(:finished => false, :ready => true).select{|am| ["imported", "live"].include?(am.curation.status)}.length!=0
-      metadata = AnalysisMetadata.unlocked.all(:finished => false, :ready => true).select{|am| ["imported", "live"].include?(am.curation.status)}.first
+      metadata = AnalysisMetadata.unlocked.all(:finished => false, :ready => true).select{|am| ["imported", "live"].include?(am.curation.status)}.shuffle.first
       metadata.lock
-      metadata.curation.lock
+      metadata.curation.lock if metadata.curation
       if !metadata.nil? && metadata.owned_by_me? && !metadata.curation.nil? && metadata.curation.owned_by_me?
         $instance.metadata = metadata
         route(metadata)
       end
+      metadata.unlock
+      metadata.curation.unlock
     end
     puts "No analysis work to do right now."
   end
@@ -105,11 +107,9 @@ class Worker < Instance
       Analysis::Dependencies.send(metadata.function)
       vars = [metadata.id]+metadata.run_vars
       puts "#{metadata.function.classify}.run(#{vars.join(", ")})"
-      metadata.function.classify.constantize.run(*vars)
-      metadata.finished = true
+      finished = metadata.function.classify.constantize.run(*vars) || false
+      metadata.finished = finished
       metadata.save
-      metadata.unlock
-      metadata.curation.unlock
     else 
       raise "Language #{metadata.language} is not currently supported for analytical routing!"
     end

@@ -31,6 +31,7 @@
 // require twitter/bootstrap/typeahead
 // require_tree .
 
+
 $(function () { 
   $('form input#end_time').change( function() {
       $('form span#time_output').contents().replaceWith(exact_time(parseInt($('form input#end_time').attr("value"))));
@@ -51,6 +52,10 @@ function reasonableIncrement(s) {
     return s;
   }
 }
+
+$('form input.range').change( function() {
+    $('form span.range_feedback').contents().replaceWith(this.value)
+})
 
 function exact_time(seconds) {
   var statement = "";

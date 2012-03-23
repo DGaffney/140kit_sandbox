@@ -1,0 +1,59 @@
+<%
+  @dataset = @graph.graph_points.collect{|gp| {:label => gp.label, :value => gp.value}}
+  if @graph.title == "url"
+    @dataset.sort!{|x,y| x[:value].to_i<=>y[:value].to_i}
+    @dataset = @dataset.reverse
+    @dataset.collect{|d| d[:label] = "Not Set" if d[:label].empty?}
+    @dataset.collect{|d| d[:label] = "<a href='#{d[:label]}' target='_blank'>#{d[:label]}</a>"}
+  elsif @graph.title == "mention"
+    @dataset.sort!{|x,y| x[:value].to_i<=>y[:value].to_i}
+    @dataset = @dataset.reverse
+    @dataset.collect{|d| d[:label] = "Not Set" if d[:label].empty?}
+    @dataset.collect{|d| d[:label] = "<a href='http://www.twitter.com/#{d[:label]}' target='_blank'>@#{d[:label]}</a>"}
+  else
+    @dataset.sort!{|x,y| x[:value].to_i<=>y[:value].to_i}
+    @dataset = @dataset.reverse
+    @dataset.collect{|d| d[:label] = "Not Set" if d[:label].empty?}
+    @dataset.collect{|d| d[:label] = "<a href='http://whatthetrend.com/trend/%2523#{d[:label]}' target='_blank'>##{d[:label]}</a>"}
+  end
+
+  def google_number(title)
+    {"hashtag" => "'number', 'Number of Users'",
+    "mention" => "'number', 'Number of Users'",
+    "url" => "'number', 'Number of Users'"}[title]
+  end
+
+  def google_string(title)
+    {"hashtag" => "'string', 'Hashtag'",
+    "mention" => "'string', 'Mentioned User'",
+    "url" => "'string', 'URL tweeted'"}[title]
+  end
+
+  def google_table_type(title)
+    {"hashtag" => "Table",
+    "mention" => "Table",
+    "url" => "Table"}[title]
+  end
+
+  def google_params(title)
+    {"hashtag" => "{showRowNumber: true, page: 'enable', width: 680, height: 800, pageSize: 100, allowHtml: true}",
+    "mention" => "{showRowNumber: true, page: 'enable', width: 680, height: 800, pageSize: 100, allowHtml: true}",
+    "url" => "{showRowNumber: true, page: 'enable', width: 680, height: 800, pageSize: 100, allowHtml: true}"}[title]
+  end
+%>
+  <script type='text/javascript'>
+    var data = new google.visualization.DataTable();
+    data.addColumn(<%= google_string(@graph.title) %>);
+    <% count = 0 %>
+    data.addColumn(<%= google_number(@graph.title) %>);
+    data.addRows(<%= @dataset.length %>);
+    <% @dataset.each do |row| %>
+      data.setCell(<%= count %>, 0, "<%= row[:label].html_safe %>");
+      data.setCell(<%= count %>, 1, <%= row[:value].to_i %>);
+      <% count+=1 %>
+    <% end %>
+    var table = new google.visualization.<%= google_table_type(@graph.title) %>(document.getElementById('container'));
+    table.draw(data, <%= google_params(@graph.title) %>);
+  </script>
+  <h1><%= @graph.pretty_title %></h1>
+<div id="container" style="min-width: 400px; height: 400px; margin: 0 auto"></div>

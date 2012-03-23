@@ -25,7 +25,7 @@ class AnalyticalOfferingVariableDescriptorsController < ApplicationController
   # GET /analytical_offering_variable_descriptors/new.json
   def new
     @analytical_offering_variable_descriptor = AnalyticalOfferingVariableDescriptor.new
-
+    @analytical_offering = AnalyticalOffering.find(params[:id])
     respond_to do |format|
       format.html # new.html.erb
       format.json { render json: @analytical_offering_variable_descriptor }
@@ -44,7 +44,7 @@ class AnalyticalOfferingVariableDescriptorsController < ApplicationController
 
     respond_to do |format|
       if @analytical_offering_variable_descriptor.save
-        format.html { redirect_to @analytical_offering_variable_descriptor, notice: 'Analytical offering variable descriptor was successfully created.' }
+        format.html { redirect_to @analytical_offering_variable_descriptor.analytical_offering, notice: 'Analytical offering variable descriptor was successfully created.' }
         format.json { render json: @analytical_offering_variable_descriptor, status: :created, location: @analytical_offering_variable_descriptor }
       else
         format.html { render action: "new" }

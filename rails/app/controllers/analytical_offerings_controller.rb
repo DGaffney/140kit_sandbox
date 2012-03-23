@@ -7,6 +7,24 @@ class AnalyticalOfferingsController < ApplicationController
     @analytical_offerings = AnalyticalOffering.all
   end
 
+  def new
+    @analytical_offering = AnalyticalOffering.new
+  end
+  
+  def create
+    @analytical_offering = AnalyticalOffering.new(params[:analytical_offering])
+
+    respond_to do |format|
+      if @analytical_offering.save
+        format.html { redirect_to @analytical_offering, notice: 'Analytical Offering was successfully created.' }
+        format.json { render json: @analytical_offering, status: :created, location: @analytical_offering }
+      else
+        format.html { render action: "new" }
+        format.json { render json: @analytical_offering.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
   def edit
     @analytical_offering = AnalyticalOffering.find(params[:id])
   end
@@ -49,13 +67,20 @@ class AnalyticalOfferingsController < ApplicationController
     redirect_url = []
     validation_results = {}
     failed = false
-    @analysis_metadata.set_variables.each do |variable|
-      variable.save!
-      value = params["aov_"+variable.name]
-      result = @analysis_metadata.verify_variable(variable, value )
+    variables = []
+    @analysis_metadata.analytical_offering.variables.each do |variable|
+      aov = AnalyticalOfferingVariable.new
+      aov.analytical_offering_variable_descriptor_id = variable.id
+      aov.analysis_metadata_id = @analysis_metadata.id
+      aov.value = params["aovd"][aov.name]
+      result = @analysis_metadata.verify_variable(variable, aov.value)
       failed = !result[:reason].nil? && !result[:reason].empty?
       params["aov_"+variable.name+"_error"] = result[:reason]
       params["aov_"+variable.name] = result[:variable]
+      variables << aov
+    end
+    variables.each do |variable|
+      variable.save!
     end
     if failed
       @analysis_metadata.variables.each do |var|

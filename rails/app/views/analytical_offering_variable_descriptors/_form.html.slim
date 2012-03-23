@@ -9,4 +9,21 @@
 - else
   label.control-label <b>#{aovd.description}</b>
 .controls
-  = text_field_tag "aov_#{aovd.name}", params["aov_"+aovd.name] || @analysis_metadata.set_variable(aovd), field_options
+  - if aovd.kind == "enum"
+    - select_set = aovd.values.split(",").collect{|x| [x,x]}
+    = select "aovd", aovd.name, select_set, field_options.merge({:value => aovd.default_value(params)})
+  - elsif aovd.kind == "boolean"
+    p BOOLEAN
+  - elsif aovd.kind == "integer"
+    p INTEGER
+  - elsif aovd.kind == "array"
+    p ARRAY
+  - elsif aovd.kind == "hash"
+    p HASH
+  - elsif aovd.kind == "float"
+    = text_field "aovd", aovd.name, field_options.merge({:value => params[aovd.name]})
+  - elsif aovd.kind == "string"
+    = text_field "aovd", aovd.name, field_options.merge({:value => params[aovd.name]})
+  - elsif aovd.kind == "range"
+    = range_field "aovd", aovd.name, field_options.merge({:in => aovd.range, :step => aovd.step, :class => "range"})
+    span.range_feedback 0

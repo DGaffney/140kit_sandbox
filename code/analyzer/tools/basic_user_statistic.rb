@@ -7,6 +7,7 @@ class BasicUserStatistic < AnalysisMetadata
     @analysis_metadata = AnalysisMetadata.first(:id => analysis_metadata_id)
     curation = @analysis_metadata.curation
     self.generate_stats(curation)
+    return true
   end
 
   def self.generate_stats(curation)

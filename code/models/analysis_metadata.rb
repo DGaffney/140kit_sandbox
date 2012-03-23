@@ -154,28 +154,44 @@ class AnalysisMetadata
   
   # to implement this process, simply put this line where the analysis needs to be required in order to go any further:
   # return nil if !self.requires(self.analysis_metadata(curation), [{:function => "click_counter", :with_options => [curation_id]}], curation)
-  def self.requires(this_analysis_metadata, analysis_metadata_information_sets, curation)
-    analysis_metadata_information_sets = [analysis_metadata_information_sets].flatten
-    analysis_metadata_information_sets.each do |analysis_metadata_set|
-      analytical_offering = AnalyticalOffering.first(:function => analysis_metadata_set[:function])
-      analysis_metadata = analytical_offering.analysis_metadatas.all(:curation_id => curation.id).select{|am| am.run_vars == analysis_metadata_set[:with_options]}.first
-      if analysis_metadata.nil?
-        new_analysis_metadata = AnalysisMetadata.create(:curation_id => curation.id, :analytical_offering_id => analytical_offering.id, :rest => (!analysis_metadata_set[:rest].nil? || analysis_metadata_set[:rest]), :finished => true)
-        analysis_metadata_set[:with_options].each_with_index do |var, index|
-          analytical_offering_variable_descriptor = AnalyticalOfferingVariableDescriptor.first(:position => index, :analytical_offering_id => analytical_offering.id)
-          analytical_offering_variable = AnalyticalOfferingVariable.create(:analytical_offering_variable_descriptor_id => analytical_offering_variable_descriptor.id, :analysis_metadata_id => new_analysis_metadata.id, :value => var)
+  def self.requires(analysis_metadata, dependencies_to_load)
+    dependencies_to_load = [dependencies_to_load].flatten
+    dependencies_to_load.each do |d|
+      d[:with_options] = [] if d[:with_options].nil?
+    end
+    curation = analysis_metadata.curation
+    functions = dependencies_to_load.collect{|d| d[:function]}
+    dependent_analysis_metadatas = AnalyticalOffering.all(:function => functions).analysis_metadatas(:curation_id => curation.id, :finished => true)
+    dependencies_met = dependent_analysis_metadatas.collect{|dam| {:function => dam.function, :with_options => dam.run_vars}}
+    dependencies_needed = dependencies_to_load-dependencies_met
+    required = dependencies_needed.empty?
+    if !required
+      dependencies_needed.each do |dependency|
+        analytical_offering = AnalyticalOffering.first(:function => dependency[:function])
+        possibly_unfinished_analysis_metadatas = AnalysisMetadata.all(:curation_id => curation.id, :analytical_offering_id => analytical_offering.id, :finished => false)
+        matches = !possibly_unfinished_analysis_metadatas.select{|puam| puam.run_vars == dependency[:with_options]}.empty?
+        if !matches
+          analysis_metadata = AnalysisMetadata.new(:curation_id => curation.id, :analytical_offering_id => analytical_offering.id, :finished => false, :ready => false)
+          with_options_iterator = 0
+          analytical_offering.analytical_offering_variable_descriptors.each do |descriptor|
+            analytical_offering_variable = AnalyticalOfferingVariable.new
+            analytical_offering_variable.analysis_metadata_id = analysis_metadata.id
+            analytical_offering_variable.analytical_offering_variable_descriptor_id = descriptor.id
+            analytical_offering_variable.value = dependency[:with_options][with_options_iterator]
+            analytical_offering_variable.save!
+            with_options_iterator+=1
+          end
+          analysis_metadata.ready = true
+          analysis_metadata.save!
         end
-        new_analysis_metadata.finished = false
-        new_analysis_metadata.save!
-        this_analysis_metadata.unlock!
-        return false
-      elsif !analysis_metadata.finished
-        puts "Cannot run this analytic ('#{analysis_metadata.function}') yet - required analytic in place to run, but has not finished yet"
-        this_analysis_metadata.unlock!
-        return false
       end
     end
-    return true
+    if required
+      puts "Required #{dependencies_to_load.length} dependent analytical offerings."
+    else
+      puts "Cannot run this analytic ('#{analysis_metadata.function}') yet - required analytics in place to run, but have not finished yet"
+    end
+    return required
   end
   
   def self.validates(conditional_set, this_analysis_metadata)

@@ -199,14 +199,14 @@ module Gexf
   end
   
   module Writer
-    def self.initialize_temp_data(fs, graph, path=ENV['TMP_PATH'])
+    def self.initialize_temp_data(fs, path=ENV['TMP_PATH'])
       File.delete(path+"/temp_node.gexf") if File.exists?(path+"/temp_node.gexf")
       File.delete(path+"/temp_edge.gexf") if File.exists?(path+"/temp_edge.gexf")
       File.delete(path+"/temp_header.gexf") if File.exists?(path+"/temp_header.gexf")
-      self.generate_temp_header(fs, graph, path)
+      self.generate_temp_header(fs, path)
     end
 
-    def self.generate_temp_header(fs, graph, path)
+    def self.generate_temp_header(fs, path)
       header_data = File.open(path+"/temp_header.gexf", "a+")
       self.generate_header(fs, header_data)
       self.generate_attribute_declarations(fs, header_data)

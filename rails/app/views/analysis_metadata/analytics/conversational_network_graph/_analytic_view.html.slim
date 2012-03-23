@@ -1,0 +1,46 @@
+= javascript_include_tag "https://www.google.com/jsapi"
+- value = @analysis_metadata.analytical_offering_variables.first.value
+script type='text/javascript' google.load('visualization', '1', {packages:['table', 'annotatedtimeline']})
+
+h2 Analytical Process: #{link_to @analysis_metadata.title, analytical_offering_path(@analysis_metadata.analytical_offering)}
+.row#graph_view
+  .span3
+    .well
+      h3 Options
+      p This analytic has no more options - click the links to the right to download your files.
+      h3 Details
+
+      ul
+        li 
+          | Access Level: 
+          = @analysis_metadata.analytical_offering.access_level
+        li
+          | Language: 
+          = @analysis_metadata.analytical_offering.language
+        li 
+          | Developer: 
+          = link_to @analysis_metadata.analytical_offering.created_by, @analysis_metadata.analytical_offering.created_by_link
+        li 
+          | Source Code: 
+          = link_to "Github", @analysis_metadata.analytical_offering.source_code_link
+        li 
+          | Requires REST API:
+          = @analysis_metadata.analytical_offering.rest ? "Yes" : "No"
+        li 
+          | Status: 
+          = @analysis_metadata.analytical_offering.enabled ? "Online" : "Offline"
+  .span9
+    div#graph
+      br
+      br
+      p Wonderful! Your network graphs for this dataset are complete. Just to be clear, you selected an analysis of #{value} tweets.
+      - if value == "mention"
+        p Since this was a 'mention' graph, the network graph produced is the complete network of users who mentioned one another within this dataset.
+      - elsif value == "retweet"
+        p Since this was a 'retweet' graph, the network graph produced is the complete network of users who retweeted one another within this dataset.
+      - elsif value == "combined"
+        p Since this was a 'combined' graph, the network graph produced is the complete network of users who retweeted one another within this dataset, as well as users who mentioned on another within this dataset.
+      h3 = link_to "Download GEXF", "/files/gexf/curation_#{@analysis_metadata.curation.id}_#{@analysis_metadata.id}.gexf"
+      h3 = link_to "Download GraphML", "/files/graphml/curation_#{@analysis_metadata.curation.id}_#{@analysis_metadata.id}.graphml"
+      
+      p (Don't know what to do with these files? Download <a href="http://gephi.org" target="_blank">Gephi</a>, the worlds best network visualizer.)

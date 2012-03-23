@@ -3,11 +3,11 @@ WWW140kit::Application.routes.draw do
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
-  resources :analytical_offerings, path: '/analytics', only: [:index, :edit] do
+  resources :analytical_offerings, path: '/analytics', only: [:index, :edit, :new, :create] do
     member do
       put 'details' => :update, as: :update
       get 'details' => :show, as: ''
-      get ':curation_id' => :add, as: :add
+      get ':curation_id/add' => :add, as: :add
       post ':curation_id/validate' => :validate, as: :validate
       get ':curation_id/verify' => :verify, as: :verify
     end
@@ -85,8 +85,10 @@ WWW140kit::Application.routes.draw do
   match '/auth/failure' => 'sessions#fail'
 
   root to: 'home#index'
-
-  get '/highchart/graph/:id' => 'high_chart#graph', as: :high_chart_graph
+  resources :analytical_offering_variable_descriptors, path: '/variables'
+  get '/dependencies/:id/new' => 'analytical_offering_requirements#new', as: :new_dependency
+  resources :analytical_offering_requirements, path: '/dependencies'
+  get '/variables/:id/new' => 'analytical_offering_variable_descriptors#new', as: :new_variable
 
   # Sample of regular route:
   #   match 'products/:id' => 'catalog#view'
