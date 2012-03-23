@@ -40,7 +40,7 @@ class ConversationalNetworkGraph < AnalysisMetadata
       :edge_attributes => [:style],
       :analysis_metadata_id => @analysis_metadata.id, 
       :style => network_type+"_graph", 
-      :title => "curation_#{curation.id}_#{curation.name}",
+      :title => "curation_#{curation.id}_#{@analysis_metadata.id}",
       :edge_conditional => edge_conditional,
       :total_range => Edge.last(:order => :time, :graph_id => graph_ids).time-Edge.first(:order => :time, :graph_id => graph_ids).time
     }
