@@ -33,13 +33,13 @@ module Graphml
     non_metadata_node = Hash[node.select{|k,v| !metadata_keys.include?(k)}]
     if !node[:label].to_s.blank? && !node[:id].to_s.blank?
       if node[:attributes] && !node[:attributes].empty?
-        node_data << %{\n\t\t<node #{non_metadata_node.collect{|k,v| " #{k}=\"#{v}\""}.to_s}>}
+        node_data << %{\n\t\t<node #{non_metadata_node.collect{|k,v| " #{k}=\"#{v}\""}.join(" ")}>}
         node[:attributes].each do |attribute|
           node_data << self.attribute(attribute)
         end
         node_data << "\n\t\t</node>"
       else
-        node_data << %{\n\t\t<node #{non_metadata_node.collect{|k,v| " #{k}=\"#{v}\""}.to_s}/>}
+        node_data << %{\n\t\t<node #{non_metadata_node.collect{|k,v| " #{k}=\"#{v}\""}.join(" ")}/>}
       end
     end
     node_data
@@ -56,13 +56,13 @@ module Graphml
     non_metadata_edge = Hash[edge.select{|k,v| !metadata_keys.include?(k)}]
     if !edge[:source].to_s.blank? && !edge[:target].to_s.blank?
       if edge[:attributes] && !edge[:attributes].empty?
-        edge_data << %{\n\t\t<edge#{non_metadata_edge.collect{|k,v| " #{k}=\"#{v}\""}.to_s}>}
+        edge_data << %{\n\t\t<edge#{non_metadata_edge.collect{|k,v| " #{k}=\"#{v}\""}.join(" ")}>}
         edge[:attributes].each do |attribute|
           edge_data << self.attribute(attribute)
         end
         edge_data << "\n\t\t</edge>"
       else
-        edge_data << %{\n\t\t<edge#{non_metadata_edge.collect{|k,v| " #{k}=\"#{v}\""}.to_s}/>}
+        edge_data << %{\n\t\t<edge#{non_metadata_edge.collect{|k,v| " #{k}=\"#{v}\""}.join(" ")}/>}
       end
     end
     edge_data
