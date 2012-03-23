@@ -6,6 +6,7 @@ class Machine
   property :storage_path, String
   property :working_path, String
   property :can_store, Boolean
+  property :is_filestore, Boolean
   property :image_url, String
 
   def self.determine_storage    

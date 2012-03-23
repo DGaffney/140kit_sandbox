@@ -45,6 +45,9 @@ module Sh
     return result
   end
   
+  def self.filestore_send(path="")
+    machine = Machine.first(:is_filestore => 1)
+  end
   def self.bt(command)
     return `#{command}`
   end
