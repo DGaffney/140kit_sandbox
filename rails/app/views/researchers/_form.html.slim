@@ -4,17 +4,17 @@
     .control-group
       .span5
         .controls
-          = f.label :name, class: 'control-label'
-          = f.text_field :name, class: 'input-xlarge'
+          = f.label :name, 'Name *', class: 'control-label'
+          = f.text_field :name, class: 'input-xlarge required', required: 'required'
         .controls
-          = f.label :email, "E-mail Address", class: 'control-label'
-          = f.text_field :email, class: 'input-xlarge'
+          = f.label :email, "E-mail Address *", class: 'control-label'
+          = f.text_field :email, class: 'input-xlarge required email', required: 'required'
         .controls
-          = f.label :info, class: 'control-label'
+          = f.label :info, 'Bio', class: 'control-label'
           = f.text_area :info, class: 'input-xlarge'
       .span5
         .controls
-          = f.label :website_url, "Website URL", class: 'control-label'
+          = f.label :website_url, "Personal Website", class: 'control-label'
           = f.text_field :website_url, class: 'input-xlarge'
         .controls
           = f.label :affiliation, class: 'control-label'

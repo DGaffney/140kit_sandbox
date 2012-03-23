@@ -67,9 +67,19 @@ html
     /* script src="/js/bootstrap.min.js" type="text/javascript"*/
     //, "https://www.google.com/jsapi", "application"
     = javascript_include_tag 'application'
-    = javascript_include_tag "http://code.highcharts.com/highcharts.js", "http://code.highcharts.com/modules/exporting.js" 
+    = javascript_include_tag "http://code.highcharts.com/highcharts.js", "http://code.highcharts.com/modules/exporting.js"
+    = javascript_include_tag "http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"
     javascript:
       $(function() {
         $('.dropdown-toggle').dropdown();
-        $(".alert").alert();
+        $('.alert').alert();
+        $('form').validate();
+        $('#time-slider').slider({
+            min: 60,
+            max: 604800,
+            slide: function(event, ui) {
+                $('#time_output').html(exact_time(reasonableIncrement(ui.value)));
+              }
+        });
+        // $('.comma-separated-input').tagsInput({ height:'20px', defaultText: 'add a term', placeholderColor: '#999' });
       });

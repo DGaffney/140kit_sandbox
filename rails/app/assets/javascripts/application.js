@@ -12,6 +12,10 @@
 //
 //= require jquery
 //= require jquery_ujs
+//= require jquery.ui.widget.min
+//= require jquery.ui.mouse.min
+//= require jquery.ui.slider.min
+//= require jquery-tags-input
 // require twitter/bootstrap
 //= require twitter/bootstrap/alert
 //= require twitter/bootstrap/button
@@ -31,7 +35,22 @@ $(function () {
   $('form input#end_time').change( function() {
       $('form span#time_output').contents().replaceWith(exact_time(parseInt($('form input#end_time').attr("value"))));
   });
-} );
+});
+
+function reasonableIncrement(s) {
+  s = parseInt(s);
+  if (s >= 60 && s < 60*60) { // minutes
+    return Math.floor(s/60)*60; // by the minute
+  } else if (s >= 60*60 && s < 60*60*24) { // hours
+    return Math.floor(s/60/60)*60*60; // by the hour
+  } else if (s >= 60*60*24 && s < 60*60*24*7) { // days
+    return Math.floor(s/60/60/3)*60*60*3; // every 3 hours
+  } else if (s >= 60*60*24*7) { // weeks
+    return Math.floor(s/60/60/24)*60*60*24; // by the day
+  } else {
+    return s;
+  }
+}
 
 function exact_time(seconds) {
   var statement = "";

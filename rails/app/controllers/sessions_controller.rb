@@ -7,7 +7,7 @@ class SessionsController < ApplicationController
     if researcher.first_time
       redirect_to new_researcher_url(researcher), flash: { success: "Welcome, #{researcher.name}!" }
     else
-      redirect_to dashboard_url, flash: { info: "Hi, #{researcher.name}!" }
+      redirect_to dashboard_url, flash: { success: "Hi, #{researcher.name}!" }
     end
 
   end

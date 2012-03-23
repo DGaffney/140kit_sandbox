@@ -36,10 +36,10 @@ class ResearchersController < ApplicationController
     @researcher = Researcher.find_by_user_name(params[:user_name], select: [:id, :user_name])
     respond_to do |format|
       if @researcher.update_attributes(params[:researcher])
-        format.html { redirect_to @researcher, notice: "Researcher successfully updated." }
+        format.html { redirect_to @researcher, flash: { success: "Researcher successfully updated." } }
         format.js
       else
-        format.html { render action: 'edit' }
+        format.html { render action: 'edit', flash: { error: @reseacher.errors } }
         format.js
       end
     end
