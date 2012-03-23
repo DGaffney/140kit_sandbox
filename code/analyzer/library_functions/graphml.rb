@@ -85,14 +85,14 @@ module Graphml
   
   module Writer
     #where fs is a frequency set as defined in retweet_graphs, graph is a given graph object that data is worked from, and file is the entity being written to.
-    def self.initialize_temp_data(fs, graph, path=ENV['TMP_PATH'])
+    def self.initialize_temp_data(fs, path=ENV['TMP_PATH'])
       File.delete(path+"/temp_node.graphml") if File.exists?(path+"/temp_node.graphml")
       File.delete(path+"/temp_edge.graphml") if File.exists?(path+"/temp_edge.graphml")
       File.delete(path+"/temp_header.graphml") if File.exists?(path+"/temp_header.graphml")
-      self.generate_temp_header(fs, graph, path)
+      self.generate_temp_header(fs, path)
     end
 
-    def self.generate_temp_header(fs, graph, path=ENV['TMP_PATH'])
+    def self.generate_temp_header(fs, path=ENV['TMP_PATH'])
       header_data = File.open(path+"/temp_header.graphml", "a+")
       self.generate_header(fs, header_data)
       self.generate_attribute_declarations(fs, header_data)

@@ -44,8 +44,8 @@ class ConversationalNetworkGraph < AnalysisMetadata
       :edge_conditional => edge_conditional,
       :total_range => Edge.last(:order => :time, :graph_id => graph_ids).time-Edge.first(:order => :time, :graph_id => graph_ids).time
     }
-    Graphml::Writer::initialize_temp_data(options, graph)
-    Gexf::Writer::initialize_temp_data(options, graph)
+    Graphml::Writer::initialize_temp_data(options)
+    Gexf::Writer::initialize_temp_data(options)
     edges = Edge.all(:graph_id => graph_ids, :limit => limit, :offset => offset)
     while !edges.empty?
       Graphml::Writer::generate_temp_data(options, edges)
@@ -55,8 +55,6 @@ class ConversationalNetworkGraph < AnalysisMetadata
     end
     Graphml::Writer::finalize_temp_data(options)
     Gexf::Writer::finalize_temp_data(options)
-    graph.written = true
-    graph.save!
   end
 end
 
