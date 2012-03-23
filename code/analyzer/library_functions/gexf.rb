@@ -327,18 +327,17 @@ module Gexf
     def self.group_edges_by_end_node(fs, start_node_name, edges)
       edge_sets = {}
       if fs[:edge_attributes]&&fs[:edge_attributes].include?(:style)
-        debugger
         styles = ["mention", "retweet", "mention_entity", "retweet_entity"]
         styles.each do |style|
-          edges = edges.select{|edge| edge.start_node==start_node_name && edge.style==style}
-          edges.each do |edge|
+          these_edges = edges.select{|edge| edge.start_node==start_node_name && edge.style==style}
+          these_edges.each do |edge|
             edge_sets[edge.end_node] = [] if edge_sets[edge.end_node].nil?
             edge_sets[edge.end_node] << edge
           end
         end
       else
-        edges = edges.select{|edge| edge.start_node==start_node_name}
-        edges.each do |edge|
+        these_edges = edges.select{|edge| edge.start_node==start_node_name}
+        these_edges.each do |edge|
           edge_sets[edge.end_node] = [] if edge_sets[edge.end_node].nil?
           edge_sets[edge.end_node] << edge
         end
