@@ -4,7 +4,7 @@ module Graphml
   end
   
   def self.attribute_declarations(attribute_declarations)
-    attribute_declarations.collect{|attribute_declaration| self.attribute_declaration(attribute_declaration)}
+    attribute_declarations.collect{|attribute_declaration| self.attribute_declaration(attribute_declaration)}.join("")
   end
   
   #attribute looks like: {:id => name, :for => ["node"||"edge"], :attr_name => name, :attr_type => type}

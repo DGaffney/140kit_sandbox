@@ -1,7 +1,7 @@
 class Pretty
   
   def self.language_map
-    {"en" => "English", "ja" => "Japanese", "it" => "Italian", "de" => "German", "fr" => "French", "kr" => "Korean", "es" => "Spanish", "id" => "Indonesian", "fil" => "Filipino", "nl" => "Dutch", "pt" => "Portuguese", "pl" => "Polish", "sv" => "Swedish", "ru" => "Russian", "ar" => "Arabic", "no" => "Norwegian"}
+    {"en" => "English", "ja" => "Japanese", "it" => "Italian", "de" => "German", "fr" => "French", "kr" => "Korean", "es" => "Spanish", "id" => "Indonesian", "fil" => "Filipino", "nl" => "Dutch", "pt" => "Portuguese", "pl" => "Polish", "sv" => "Swedish", "ru" => "Russian", "ar" => "Arabic", "no" => "Norwegian", "tr" => "Turkish"}
   end
 
   def self.pretty_up_labels(graph, graph_points)
