@@ -45,9 +45,13 @@ module Sh
     return result
   end
   
-  def self.filestore_send(path="")
+  def self.filestore_send(from, to, filename)
     machine = Machine.first(:is_filestore => 1)
+    credentials = machine.machine_storage_details
+    Sh::bt("ssh #{credentials["user"]} 'mkdir -p #{credentials["path"]}/#{to}'")
+    Sh::bt("rsync #{from}/#{filename} #{credentials["user"]}@#{credentials["hostname"]}:#{credentials["path"]}/#{to}/#{filename}")
   end
+
   def self.bt(command)
     return `#{command}`
   end

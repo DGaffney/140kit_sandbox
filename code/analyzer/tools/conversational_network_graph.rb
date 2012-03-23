@@ -55,6 +55,8 @@ class ConversationalNetworkGraph < AnalysisMetadata
     end
     Graphml::Writer::finalize_temp_data(options)
     Gexf::Writer::finalize_temp_data(options)
+    Sh::filestore_send(ENV["TMP_PATH"], "/graphml/", options[:title]+".graphml")
+    Sh::filestore_send(ENV["TMP_PATH"], "/gexf/", options[:title]+".gexf")
   end
 end
 
