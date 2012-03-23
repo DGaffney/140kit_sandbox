@@ -20,7 +20,6 @@ class ConversationalNetworkGraph < AnalysisMetadata
   
   def self.draw_graph(network_type)
     curation = @analysis_metadata.curation
-    debugger
     conditional = Analysis.curation_conditional(curation)
     graph_ids = []
     edge_conditional = []
