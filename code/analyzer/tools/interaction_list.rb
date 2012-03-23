@@ -83,6 +83,7 @@ class InteractionList < AnalysisMetadata
     graph = Graph.first(:title => "retweet_in_degrees", :analysis_metadata_id => @analysis_metadata.id, :curation_id => curation.id)
     overview[:most_retweeted] = DataMapper.repository.adapter.select("select * from graph_points where graph_id = #{graph.id} order by cast(value as signed) desc limit 1;").first.label
     graph = Graph.first(:title => "mention_out_degrees", :analysis_metadata_id => @analysis_metadata.id, :curation_id => curation.id)
+    debugger
     overview[:most_mentioning] = DataMapper.repository.adapter.select("select * from graph_points where graph_id = #{graph.id} order by cast(value as signed) desc limit 1;").first.label
     graph = Graph.first(:title => "mention_in_degrees", :analysis_metadata_id => @analysis_metadata.id, :curation_id => curation.id)
     overview[:most_mentioned] = DataMapper.repository.adapter.select("select * from graph_points where graph_id = #{graph.id} order by cast(value as signed) desc limit 1;").first.label

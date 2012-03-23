@@ -41,7 +41,7 @@ class AnalysisMetadata < ActiveRecord::Base
     elsif !self.finished && self.ready && self.locked?
       links << "Analyzing"
     elsif !self.finished && self.ready && self.curation.status == "imported"
-      links << "Waiting on import"
+      links << "Processing"
     elsif !self.ready && self.curation.status == "imported"
       links << "<a href='/analytics/#{self.id}'>Results</a>"
     elsif self.ready && self.curation.status == "imported"
