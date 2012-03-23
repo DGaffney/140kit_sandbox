@@ -9,8 +9,8 @@ class AnalysisMetadata < ActiveRecord::Base
       return "Finished"
     elsif !self.finished && self.ready && self.locked?
       "Analyzing"
-    elsif !self.finished && self.ready
-      "Waiting on import"
+    elsif !self.finished && self.ready && self.curation.status == "imported"
+      "Processing"
     elsif !self.ready && self.curation.status == "imported"
       return "Verifying"
     elsif self.ready && self.curation.status == "imported"
@@ -40,7 +40,7 @@ class AnalysisMetadata < ActiveRecord::Base
       links << "<a href='/analytics/#{self.id}'>Results</a>"
     elsif !self.finished && self.ready && self.locked?
       links << "Analyzing"
-    elsif !self.finished && self.ready
+    elsif !self.finished && self.ready && self.curation.status == "imported"
       links << "Waiting on import"
     elsif !self.ready && self.curation.status == "imported"
       links << "<a href='/analytics/#{self.id}'>Results</a>"
