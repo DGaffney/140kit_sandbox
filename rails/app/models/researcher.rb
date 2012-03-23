@@ -2,7 +2,12 @@ class Researcher < ActiveRecord::Base
 
   has_many :curations
   has_many :posts
-  
+
+  validates :name, :user_name, presence: true
+  validates :uid, :oauth_token, :oauth_token_secret, presence: true, uniqueness: true,  on: :create
+  validates :user_name, uniqueness: true
+  validates :email, uniqueness: true, email: true, presence: true, on: :update
+
   def self.create_with_omniauth(auth)
     create! do |user|
       user.provider = auth["provider"]
