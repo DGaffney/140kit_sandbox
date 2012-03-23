@@ -155,7 +155,6 @@ class AnalysisMetadata
   # to implement this process, simply put this line where the analysis needs to be required in order to go any further:
   # return nil if !self.requires(self.analysis_metadata(curation), [{:function => "click_counter", :with_options => [curation_id]}], curation)
   def self.requires(analysis_metadata, dependencies_to_load)
-    debugger
     dependencies_to_load = [dependencies_to_load].flatten
     dependencies_to_load.each do |d|
       d[:with_options] = [] if d[:with_options].nil?
@@ -166,23 +165,25 @@ class AnalysisMetadata
     dependencies_met = dependent_analysis_metadatas.collect{|dam| {:function => dam.function, :with_options => dam.run_vars}}
     dependencies_needed = dependencies_to_load-dependencies_met
     required = dependencies_needed.empty?
-    dependencies_needed.each do |dependency|
-      analytical_offering = AnalyticalOffering.first(:function => dependency[:function])
-      possibly_unfinished_analysis_metadatas = AnalysisMetadata.all(:curation_id => curation.id, :analytical_offering_id => analytical_offering.id, :finished => false)
-      matches = !possibly_unfinished_analysis_metadatas.select{|puam| puam.run_vars == dependency[:with_options]}.empty?
-      if !matches
-        analysis_metadata = AnalysisMetadata.new(:curation_id => curation.id, :analytical_offering_id => analytical_offering.id, :finished => false, :ready => false)
-        with_options_iterator = 0
-        analytical_offering.analytical_offering_variable_descriptors.each do |descriptor|
-          analytical_offering_variable = AnalyticalOfferingVariable.new
-          analytical_offering_variable.analysis_metadata_id = analysis_metadata.id
-          analytical_offering_variable.analytical_offering_variable_descriptor_id = descriptor.id
-          analytical_offering_variable.value = dependency[:with_options][with_options_iterator]
-          analytical_offering_variable.save!
-          with_options_iterator+=1
+    if !required
+      dependencies_needed.each do |dependency|
+        analytical_offering = AnalyticalOffering.first(:function => dependency[:function])
+        possibly_unfinished_analysis_metadatas = AnalysisMetadata.all(:curation_id => curation.id, :analytical_offering_id => analytical_offering.id, :finished => false)
+        matches = !possibly_unfinished_analysis_metadatas.select{|puam| puam.run_vars == dependency[:with_options]}.empty?
+        if !matches
+          analysis_metadata = AnalysisMetadata.new(:curation_id => curation.id, :analytical_offering_id => analytical_offering.id, :finished => false, :ready => false)
+          with_options_iterator = 0
+          analytical_offering.analytical_offering_variable_descriptors.each do |descriptor|
+            analytical_offering_variable = AnalyticalOfferingVariable.new
+            analytical_offering_variable.analysis_metadata_id = analysis_metadata.id
+            analytical_offering_variable.analytical_offering_variable_descriptor_id = descriptor.id
+            analytical_offering_variable.value = dependency[:with_options][with_options_iterator]
+            analytical_offering_variable.save!
+            with_options_iterator+=1
+          end
+          analysis_metadata.ready = true
+          analysis_metadata.save!
         end
-        analysis_metadata.ready = true
-        analysis_metadata.save!
       end
     end
     if required
