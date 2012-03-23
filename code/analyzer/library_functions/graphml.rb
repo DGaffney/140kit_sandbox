@@ -28,7 +28,6 @@ module Graphml
   #nodes look like {:id => screen_name}
   def self.node(node)
     node_data = ""
-    debugger
     metadata_keys = [:attributes]
     non_metadata_node = Hash[node.select{|k,v| !metadata_keys.include?(k)}]
     if !node[:label].to_s.blank? && !node[:id].to_s.blank?
