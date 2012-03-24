@@ -18,13 +18,13 @@ class GeoMap < AnalysisMetadata
     city_map = Graph.first_or_create(:title => "city_map", :style => "map", :analysis_metadata_id => @analysis_metadata.id, :curation_id => curation.id)
     offset = 0
     limit = 1000
-    geos = DataMapper.repository.adapter.select("select count(*) as country_count, country from #{Analysis.conditions_to_mysql_query(conditional)} geos group by country limit #{limit} offset #{offset}")
+    geos = DataMapper.repository.adapter.select("select count(*) as country_count, country from geos #{Analysis.conditions_to_mysql_query(conditional)} group by country limit #{limit} offset #{offset}")
     while !geos.empty?
       geos.each do |geo|
         graph_points << {:label => geo.country, :value => geo.country_count, :curation_id => curation.id, :graph_id => country_map.id, :analysis_metadata_id => @analysis_metadata_id}
       end
       offset += limit
-      geos = DataMapper.repository.adapter.select("select count(*) as country_count, country from #{Analysis.conditions_to_mysql_query(conditional)} geos group by country limit #{limit} offset #{offset}")
+      geos = DataMapper.repository.adapter.select("select count(*) as country_count, country from geos #{Analysis.conditions_to_mysql_query(conditional)} group by country limit #{limit} offset #{offset}")
     end
     GraphPoint.save_all(graph_points)
     graph_points = []
