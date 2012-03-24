@@ -1,3 +1,4 @@
+# encoding: utf-8
 class WordFrequency < AnalysisMetadata
 
   def self.run(analysis_metadata_id, percentile)
