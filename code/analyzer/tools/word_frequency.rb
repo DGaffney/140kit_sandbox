@@ -31,7 +31,7 @@ class WordFrequency < AnalysisMetadata
       word_percentile << {:label => k, :value => v}
     end
     word_percentile.sort!{|x,y| x[:value]<=>y[:value]}
-    this_index = word_percentile.index(word_percentile.percentile(percentile))
+    this_index = word_percentile.index(word_percentile.percentile(percentile.to_f))
     highest_words = word_percentile[this_index..word_percentile.length-1]
     GraphPoint.save_all(highest_words.collect{|w| w.merge({:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :graph_id => graph.id})})
     return true
