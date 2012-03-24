@@ -38,5 +38,6 @@ class GeoMap < AnalysisMetadata
       offset += limit
       geos = DataMapper.repository.adapter.select("select count(*) as full_name_count, full_name from geos #{Analysis.conditions_to_mysql_query(conditional)} group by full_name limit #{limit} offset #{offset}")
     end
+    return true
   end
 end
