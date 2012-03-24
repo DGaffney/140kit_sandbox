@@ -1,6 +1,6 @@
 class WordFrequency < AnalysisMetadata
 
-  def self.run(analysis_metadata_id, network_type, percentile)
+  def self.run(analysis_metadata_id, percentile)
     @analysis_metadata = AnalysisMetadata.first(:id => analysis_metadata_id)
     curation = @analysis_metadata.curation
     conditional = Analysis.curation_conditional(curation)

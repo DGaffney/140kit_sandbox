@@ -35,7 +35,7 @@ class InstancesController < ApplicationController
     @machine = Machine.find(params[:id])
     @instances = Instance.find_all_by_hostname(@machine.user)
     @instances.each do |instance|
-      instance.killed = instance.killed
+      instance.killed = !instance.killed
       instance.save!
     end
     redirect_to machines_url, :notice => "Changes saved."

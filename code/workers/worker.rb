@@ -3,7 +3,7 @@ load File.dirname(__FILE__)+'/../analyzer/analysis.rb'
 class Worker < Instance
   
   # attr_accessor :user_account, :username, :password, :start_time, :next_dataset_ends, :queue, :params, :datasets
-  attr_accessor :curation
+  attr_accessor :curation, :last_system_check
   
   @@words = File.open(File.dirname(__FILE__)+"/../analyzer/resources/words.txt", "r").read.split
   @@rest_analytics = ["retweet_graph"]
@@ -12,6 +12,7 @@ class Worker < Instance
     super
     self.instance_type = "worker"
     self.save
+    self.last_system_check = Time.now
     # @datasets = []
     # @queue = []
     at_exit { do_at_exit }
@@ -66,6 +67,7 @@ class Worker < Instance
   end
   
   def clean_orphans
+    return if (Time.now-self.last_system_check) < 3600
     puts "clean_orphans..."
     Instance.all.each do |instance|
       process_report = Sh::bt("ssh #{instance.hostname} 'ps -p #{instance.pid}'").split("\n")
@@ -82,6 +84,7 @@ class Worker < Instance
       end
     end
     Lock.all(:instance_id.not => Instance.all.collect{|instance| instance.instance_id}).destroy
+    self.last_system_check = Time.now
   end
   
   def do_analysis_jobs
