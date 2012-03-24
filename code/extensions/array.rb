@@ -28,7 +28,12 @@ class Array
 	  if percentile == 0.0
 	    return self.sort.first
     else
-      return self ? self.sort[((self.length * percentile).ceil)-1] : nil
+      classes = self.collect(&:class).uniq
+      if ([Hash, Array]-classes==[Hash, Array]) && classes.length == 1
+        return self ? self.sort[((self.length * percentile).ceil)-1] : nil rescue nil
+      else
+        return self[((self.length * percentile).ceil)-1]
+      end
     end
   end
 end
