@@ -1,0 +1,24 @@
+<%
+  @dataset = @graph.graph_points.collect{|gp| {:label => gp.label, :value => gp.value}}
+  @dataset.sort!{|x,y| x[:value].to_i<=>y[:value].to_i}
+  @dataset = @dataset.reverse
+  @dataset.collect{|d| d[:label] = "Not Set" if d[:label].nil? || d[:label].empty?}
+%>
+<script type='text/javascript'>
+  var data = new google.visualization.DataTable();
+  data.addColumn('string', 'Word Used');
+  <% count = 0 %>
+  data.addColumn('number', 'Number of Times Used');
+  data.addRows(<%= @dataset.length %>);
+  <% @dataset.each do |row| %>
+    data.setCell(<%= count %>, 0, '<%= escape_javascript(row[:label]) %>');
+    data.setCell(<%= count %>, 1, <%= row[:value].to_i %>);
+    <% count+=1 %>
+  <% end %>
+  var table = new google.visualization.Table(document.getElementById('container'));
+  table.draw(data, {showRowNumber: true, page: 'enable', width: 680, height: 800, pageSize: 100});
+</script>
+<h1><%= @graph.pretty_title %></h1>
+<div id="container" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+
+<!-- {startOnTick: true, endOnTick: true, showLastLabel: true}, -->

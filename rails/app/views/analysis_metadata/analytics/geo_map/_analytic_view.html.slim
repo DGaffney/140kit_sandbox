@@ -1,0 +1,40 @@
+= javascript_include_tag "https://www.google.com/jsapi"
+
+script type='text/javascript' google.load('visualization', '1', {packages:['geomap']})
+
+h2 Analytical Process: #{link_to @analysis_metadata.title, analytical_offering_path(@analysis_metadata.analytical_offering)}
+.row#graph_view
+  .span3
+    .well
+      h3 Options
+
+      - if @analysis_metadata.graphs.length == 0
+        p Sorry, haven't produced any graphs yet!
+      - else
+        ul
+          - for graph in @analysis_metadata.graphs
+            li = link_to graph.pretty_title, analysis_metadata_partial_graph_path(graph), :remote => true
+
+      h3 Details
+
+      ul
+        li 
+          | Access Level: 
+          = @analysis_metadata.analytical_offering.access_level
+        li
+          | Language: 
+          = @analysis_metadata.analytical_offering.language
+        li 
+          | Developer: 
+          = link_to @analysis_metadata.analytical_offering.created_by, @analysis_metadata.analytical_offering.created_by_link
+        li 
+          | Source Code: 
+          = link_to "Github", @analysis_metadata.analytical_offering.source_code_link
+        li 
+          | Requires REST API:
+          = @analysis_metadata.analytical_offering.rest ? "Yes" : "No"
+        li 
+          | Status: 
+          = @analysis_metadata.analytical_offering.enabled ? "Online" : "Offline"
+  .span9
+    div#graph

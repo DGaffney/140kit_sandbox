@@ -1,0 +1,77 @@
+<%
+  @dataset = @graph.graph_points.collect{|gp| {:label => gp.label, :value => gp.value}}
+  @dataset.sort!{|x,y| x[:value].to_i<=>y[:value].to_i}
+  @dataset = @dataset.reverse
+  @dataset.collect{|d| d[:label] = "Not Set" if d[:label].nil? || d[:label].empty?}
+  @dataset.each do |row|
+    row[:lat] = row[:label].split(" | ").last.split(",").first.to_f
+    row[:lon] = row[:label].split(" | ").last.split(",").last.to_f
+    row[:label] = row[:label].split(" | ").first
+  end
+  def google_number(title)
+    {"country_map" => "'number', 'Number of Users'",
+    "city_map" => "'number', 'Number of Users'"}[title] || "'number', 'Number'"
+  end
+  def google_string(title)
+    {"country_map" => "'string', 'Country'",
+    "city_map" => "'string', 'City'",}[title] || "'string', 'String'"
+  end
+  def google_table_type(title)
+    {"country_map" => 'GeoMap',
+    "city_map" => 'GeoMap'}[title] || "Number"
+  end
+  def google_params(title)
+    {"country_map" => "{height:420, width: 680}",
+    "city_map" => "{dataMode: 'markers'}"}[title] || "{}"
+  end
+%>
+<% if ["country_map"].include?(@graph.title) %>
+  <script type='text/javascript'>
+    var data = new google.visualization.DataTable();
+    
+    data.addColumn(<%= google_string(@graph.title) %>);
+    <% count = 0 %>
+    data.addColumn(<%= google_number(@graph.title) %>);
+    data.addRows(<%= @dataset.length %>);
+    <% @dataset.each do |row| %>
+      data.setCell(<%= count %>, 0, '<%= row[:label] %>');
+      data.setCell(<%= count %>, 1, <%= row[:value].to_i %>);
+      <% count+=1 %>
+    <% end %>
+    var table = new google.visualization.<%= google_table_type(@graph.title) %>(document.getElementById('container'));
+    table.draw(data, <%= google_params(@graph.title) %>);
+  </script>
+  <h1><%= @graph.pretty_title %></h1>
+<% elsif ["city_map"].include?(@graph.title) %>
+  <script type='text/javascript'>
+    var data = new google.visualization.DataTable();
+    data.addColumn('number', 'Latitude', 'Latitude');
+    data.addColumn('number', 'Longitude', 'Longitude');
+    data.addColumn('number', 'Total Tweets', 'Value'); // Won't use this column, but still must define it.
+    data.addColumn('string', 'HOVER', 'Text');
+    <% count = 0 %>
+    data.addRows(<%= @dataset.length %>);
+    <% @dataset.each do |row| %>
+      data.setValue(<%= count %>,0,<%= row[:lat] %>);
+      data.setValue(<%= count %>,1,<%= row[:lon] %>);
+      data.setValue(<%= count %>,2,<%= row[:value].to_i %>);
+      data.setValue(<%= count %>,3,'<%= row[:label] %>');
+      <% count+=1 %>
+    <% end %>
+    var table = new google.visualization.<%= google_table_type(@graph.title) %>(document.getElementById('container'));
+    table.draw(data, <%= google_params(@graph.title) %>);
+  </script>
+  <h1><%= @graph.pretty_title %></h1>
+<% else %>
+  <ul>
+    <% for row in @dataset %>
+      <% if row[:label] == "proportion_geos" || row[:label] == "proportion_coordinates" %>
+        <li><b><%= row[:label].split("_").collect(&:capitalize).join(" ") %>: </b><%= row[:value].to_f.round(3) %>%</li>
+      <% else %>
+        <li><b><%= row[:label].split("_").collect(&:capitalize).join(" ") %>: </b><%= number_with_delimiter(row[:value].to_i) %></li>
+      <% end %>
+    <% end %>
+  </ul>
+<% end %>
+<div id="container" style="min-width: 400px; height: 400px; margin: 20px auto"></div>
+<!-- {startOnTick: true, endOnTick: true, showLastLabel: true}, -->

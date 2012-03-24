@@ -1,0 +1,135 @@
+<style> 
+#map-wrap{
+    position:relative;   
+}
+
+#map-canvas{
+    position: relative;
+    width: 876px;
+    height: 500px; 
+    display: block; 
+}
+</style>
+
+<script type="text/javascript">
+var shiftClicked = false;
+var map;
+var dragging = false;
+var rect;
+var pos1, pos2;
+$(document).ready(function() {
+    initMap();
+});
+function initMap() {
+    var latlng = new google.maps.LatLng(0,0);
+    var settings = {
+        zoom: 2,
+        center: latlng,
+        mapTypeControl: true,
+        navigationControl: true,
+        streetViewControl: false,
+        mapTypeControl: false,
+        scaleControl: false,
+        overviewMapControl: false,
+        disableDefaultUI: true,
+        navigationControlOptions: {
+            style: google.maps.NavigationControlStyle.SMALL
+        },
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+    }
+    var mapElem = $("#map-canvas");
+    map = new google.maps.Map(mapElem[0], settings);
+    rect = new google.maps.Rectangle({
+                map: map,
+                fillColor: '#496BBE',
+                strokeColor: "#496BBE",
+                strokeOpacity: 1.0,
+                strokeWeight: 2,
+                editable: true
+            });
+    google.maps.event.addListener(rect, 'bounds_changed', function(mEvent) {
+      updateLocationVal();
+    })
+    google.maps.event.addListener(map, 'mousedown', function(mEvent) {
+        e = window.event;
+         if (e.shiftKey) {
+           map.draggable = false;
+           latlng1 = mEvent.latLng;
+           dragging = true;
+           pos1 = mEvent.pixel;           
+         };
+    });
+
+    google.maps.event.addListener(map, 'mousemove', function(mEvent) {
+        map.draggable = true;
+        latlng2 = mEvent.latLng;
+        console.log(mEvent);
+        showRect();
+    });
+
+    google.maps.event.addListener(map, 'mouseup', function(mEvent) {
+        map.draggable = true;
+        dragging = false;
+
+    });
+    
+    google.maps.event.addListener(rect, 'mouseup', function(data){
+        map.draggable = true;
+        dragging = false;
+    });
+    
+
+}
+function updateLocationVal(){
+  var minLat = roundTo(rect.getBounds().getNorthEast().lat(), 3);
+  var maxLat = roundTo(rect.getBounds().getSouthWest().lat(), 3);
+  var minLng = roundTo(rect.getBounds().getNorthEast().lng(), 3);
+  var maxLng = roundTo(rect.getBounds().getSouthWest().lng(), 3);
+  $('#latlon').val(minLng+","+minLat+","+maxLng+","+maxLat);
+}
+function roundTo(val, place){
+  return Math.round(val*Math.pow(10,place))/Math.pow(10,place);
+}
+function showRect() {
+  if (dragging){
+    if (rect === undefined) {
+      rect = new google.maps.Rectangle({
+        map: map,
+        fillColor: '#496BBE',
+        strokeColor: "#FF0000",
+        strokeOpacity: 1.0,
+        strokeWeight: 2,
+        editable: true
+      });
+    };
+    var latLngBounds = new google.maps.LatLngBounds(latlng1, latlng2);
+    rect.setBounds(latLngBounds);
+      updateLocationVal();
+  };
+}
+
+</script>
+​
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+<div id="info">Below is a map - pan around to the area of interest, and then, while holding SHIFT, click on the map to begin drawing a rectangle to collect data from. Twitter's API only allows for rectangular boxes, or "bounding boxes", as valid input for data. As such, come up with an approximate "bounding box", and edit as necessary. When you are satisfied, click 'validate' to continue.</div><br/>
+<div class="span12" id="map-wrap">
+    <div id="map-canvas"></div>
+    <%= form_tag(dataset_validate_path, :method => "post") do %>
+      <%= hidden_field_tag :stream_type, params[:stream_type] %>
+      <br/>
+      <br/>
+      <br/>
+      <label class="control-label">Enter a name for this dataset (optional, default will be the terms you selected):</label>
+      <%= text_field_tag :name, params[:name], :class => "input-xlarge comma-separated-input" %>
+      <label class="control-label">Twitter's API input for the Bounding box drawn:</label>
+      <%= text_field_tag :params, params[:params], :class => "input-xlarge comma-separated-input", :id => "latlon" %>
+      <label class="control-label">How long should we collect this data?</label>
+      <div id="time-slider"></div>
+      <br/>
+      <h3 class="align-center" id="time_output"><%= exact_time(Curation.default_time_series) %></h3>
+      <br/>
+      <br/>
+      <br/>
+    <%= submit_tag 'Validate', class: 'btn btn-primary' %>
+    <% end %>
+</div>
