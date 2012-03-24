@@ -29,7 +29,7 @@ class GeoMap < AnalysisMetadata
     GraphPoint.save_all(graph_points)
     graph_points = []
     offset = 0
-    geos = DataMapper.repository.adapter.select("select count(geos.id) as full_name_count, geos.full_name as full_name, geos.country as country, coordinates.lat as lat, coordinates.lon as lon from geos inner join coordinates on geos.geo_id = coordinates.geo_id #{Analysis.conditions_to_mysql_query(conditional).gsub("dataset_id", "geos.dataset_id")} group by full_name limit #{limit} offset #{offset}")
+    geos = DataMapper.repository.adapter.select("select count(distinct(geos.id)) as full_name_count, geos.full_name as full_name, geos.country as country, coordinates.lat as lat, coordinates.lon as lon from geos inner join coordinates on geos.geo_id = coordinates.geo_id #{Analysis.conditions_to_mysql_query(conditional).gsub("dataset_id", "geos.dataset_id")} group by full_name limit #{limit} offset #{offset}")
     while !geos.empty?
       geos.each do |geo|
         graph_points << {:label => "#{geo.full_name}, #{geo.country} | #{geo.lat},#{geo.lon}", :value => geo.full_name_count, :curation_id => curation.id, :graph_id => city_map.id, :analysis_metadata_id => @analysis_metadata.id}
@@ -37,7 +37,7 @@ class GeoMap < AnalysisMetadata
       GraphPoint.save_all(graph_points)
       graph_points = []
       offset += limit
-      geos = DataMapper.repository.adapter.select("select count(geos.id) as full_name_count, geos.full_name as full_name, geos.country as country, coordinates.lat as lat, coordinates.lon as lon from geos inner join coordinates on geos.geo_id = coordinates.geo_id #{Analysis.conditions_to_mysql_query(conditional).gsub("dataset_id", "geos.dataset_id")} group by full_name limit #{limit} offset #{offset}")
+      geos = DataMapper.repository.adapter.select("select count(distinct(geos.id)) as full_name_count, geos.full_name as full_name, geos.country as country, coordinates.lat as lat, coordinates.lon as lon from geos inner join coordinates on geos.geo_id = coordinates.geo_id #{Analysis.conditions_to_mysql_query(conditional).gsub("dataset_id", "geos.dataset_id")} group by full_name limit #{limit} offset #{offset}")
     end
     GraphPoint.save_all(graph_points)
     return true
