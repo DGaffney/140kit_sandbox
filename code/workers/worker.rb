@@ -12,7 +12,6 @@ class Worker < Instance
     super
     self.instance_type = "worker"
     self.save
-    self.last_system_check = Time.now
     # @datasets = []
     # @queue = []
     at_exit { do_at_exit }
@@ -67,7 +66,7 @@ class Worker < Instance
   end
   
   def clean_orphans
-    return if (Time.now-self.last_system_check) < 3600
+    return if !self.last_system_check.nil? && (Time.now-self.last_system_check) < 3600
     puts "clean_orphans..."
     Instance.all.each do |instance|
       process_report = Sh::bt("ssh #{instance.hostname} 'ps -p #{instance.pid}'").split("\n")
