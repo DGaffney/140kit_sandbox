@@ -28,10 +28,11 @@ class GeoMap < AnalysisMetadata
     end
     GraphPoint.save_all(graph_points)
     graph_points = []
+    offset = 0
     geos = DataMapper.repository.adapter.select("select count(*) as full_name_count, full_name from geos #{Analysis.conditions_to_mysql_query(conditional)} group by full_name limit #{limit} offset #{offset}")
     while !geos.empty?
       geos.each do |geo|
-        graph_points << {:label => geo.full_name, :value => geo.full_name_count, :curation_id => curation.id, :graph_id => country_map.id, :analysis_metadata_id => @analysis_metadata.id}
+        graph_points << {:label => geo.full_name, :value => geo.full_name_count, :curation_id => curation.id, :graph_id => city_map.id, :analysis_metadata_id => @analysis_metadata.id}
       end
       GraphPoint.save_all(graph_points)
       graph_points = []
