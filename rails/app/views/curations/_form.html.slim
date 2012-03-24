@@ -3,8 +3,11 @@
     .control-group
       label.control-label Terms To Track (For this field, simply put in all the terms you want to track, separated by commas.
       .controls
+        = text_field_tag :params, params[:params], :class => "input-xlarge comma-separated-input"
+      label.control-label Enter a name for this dataset (optional, default will be the terms you selected)
+      .controls
         = text_field_tag :name, params[:name], :class => "input-xlarge comma-separated-input"
-      label.control-label When do you want to stop collecting data? (Range is from one hour to 4 weeks.)
+      label.control-label How long should we collect this data?
       .controls
         //= range_field_tag :end_time, params[:end_time]||Curation.default_time_series, :in => Curation.default_time_series..Curation.max_time, :step => Curation.default_step, :class => 'input-full'
         #time-slider

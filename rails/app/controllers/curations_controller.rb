@@ -15,6 +15,7 @@ class CurationsController < ApplicationController
 
   def validate
     if !curation_is_same?
+      debugger
       @curation = Curation.new
       @datasets = []
       @curation.created_at = Time.now
@@ -23,14 +24,24 @@ class CurationsController < ApplicationController
       @curation.single_dataset = false
       @curation.name = params[:name]
       @curation.researcher_id = session[:researcher_id]
-      params[:name].split(",").each do |term|
+      if params[:stream_type] == "location"
         d = Dataset.new
-        d.scrape_type = "track"
-        d.params = "#{term},#{params[:end_time]}"
+        d.scrape_type = "location"
+        d.params = "#{params[:params]},#{params[:end_time]}"
         d.status = "tsv_storing"
         d.instance_id = "system"
         d.save!
         @datasets << d
+      elsif params[:stream_type] == "term"
+        params[:name].split(",").each do |term|
+          d = Dataset.new
+          d.scrape_type = "track"
+          d.params = "#{term},#{params[:end_time]}"
+          d.status = "tsv_storing"
+          d.instance_id = "system"
+          d.save!
+          @datasets << d
+        end
       end
       @curation.save!
       @datasets.collect{|d| d.curations << @curation}
@@ -52,7 +63,9 @@ class CurationsController < ApplicationController
     @curation = Curation.find(params[:id])
     dataset = @curation.datasets.first
     params[:name] = @curation.datasets.collect{|x| x.params.split(",").first}.join(",")
-    case dataset.scrape_type
+    case params[:stream_type]
+    when "location"
+      params[:end_time] = dataset.params.split(",").last.to_i
     when "track"
       params[:end_time] = dataset.params.split(",").last.to_i
     end
@@ -91,5 +104,18 @@ class CurationsController < ApplicationController
     @curation.datasets.update_all(:status => "needs_drop")
     @curation.save!
     redirect_to dataset_path(@curation), :notice => "Data has been sent off for a deep freeze."
+  end
+  
+  def new_term
+    respond_to do |format|
+      format.js { render :template => 'term', :layout => false }
+    end
+  end
+  def new_location
+    debugger
+    gg = ""
+    respond_to do |format|
+      format.js { render :template => 'location', :layout => false }
+    end
   end
 end

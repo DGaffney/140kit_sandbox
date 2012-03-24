@@ -7,6 +7,8 @@ class Dataset < ActiveRecord::Base
   
   def friendly_type
     case self.scrape_type
+    when "location"
+      return "Bounding Box"
     when "track"
       return "Streaming Term"
     end
@@ -14,6 +16,10 @@ class Dataset < ActiveRecord::Base
   
   def friendly_parameters
     case self.scrape_type
+    when "location"
+      params = self.params.split(",")
+      timed_seconds = distance_of_time_in_words(self.seconds, 0, true)
+      return "Term: #{params.first}<br /> Length: #{timed_seconds} (#{number_with_delimiter(self.seconds)} seconds)"
     when "track"
       params = self.params.split(",")
       timed_seconds = distance_of_time_in_words(self.seconds, 0, true)
@@ -23,6 +29,8 @@ class Dataset < ActiveRecord::Base
   
   def end_time
     case self.scrape_type
+    when "location"
+      return self.created_at+self.seconds
     when "track"
       return self.created_at+self.seconds
     end
@@ -30,6 +38,8 @@ class Dataset < ActiveRecord::Base
   
   def seconds
     case self.scrape_type
+    when "location"
+      return self.params.split(",").last.to_i
     when "track"
       return self.params.split(",").last.to_i
     end

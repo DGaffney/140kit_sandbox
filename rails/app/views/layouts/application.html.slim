@@ -12,6 +12,27 @@ html
     /* link rel="stylesheet" href="/css/bootstrap-responsive.min.css"*/
     = csrf_meta_tags
     // script type='text/javascript' google.load('visualization', '1', {packages:['table', 'annotatedtimeline']});
+    /* script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"*/
+    /* script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"*/
+    /* script src="/js/bootstrap.min.js" type="text/javascript"*/
+    //, "https://www.google.com/jsapi", "application"
+    = javascript_include_tag 'application'
+    = javascript_include_tag "http://code.highcharts.com/highcharts.js", "http://code.highcharts.com/modules/exporting.js"
+    = javascript_include_tag "http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"
+    javascript:
+      $(function() {
+        $('.dropdown-toggle').dropdown();
+        $('.alert').alert();
+        $('form').validate();
+        $('#time-slider').slider({
+            min: 60,
+            max: 604800,
+            slide: function(event, ui) {
+                $('#time_output').html(exact_time(reasonableIncrement(ui.value)));
+              }
+        });
+        // $('.comma-separated-input').tagsInput({ height:'20px', defaultText: 'add a term', placeholderColor: '#999' });
+      });
   body
 
     .navbar#main-nav
@@ -62,24 +83,3 @@ html
       footer
         p &copy; 140kit 2012
 
-    /* script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"*/
-    /* script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"*/
-    /* script src="/js/bootstrap.min.js" type="text/javascript"*/
-    //, "https://www.google.com/jsapi", "application"
-    = javascript_include_tag 'application'
-    = javascript_include_tag "http://code.highcharts.com/highcharts.js", "http://code.highcharts.com/modules/exporting.js"
-    = javascript_include_tag "http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"
-    javascript:
-      $(function() {
-        $('.dropdown-toggle').dropdown();
-        $('.alert').alert();
-        $('form').validate();
-        $('#time-slider').slider({
-            min: 60,
-            max: 604800,
-            slide: function(event, ui) {
-                $('#time_output').html(exact_time(reasonableIncrement(ui.value)));
-              }
-        });
-        // $('.comma-separated-input').tagsInput({ height:'20px', defaultText: 'add a term', placeholderColor: '#999' });
-      });
