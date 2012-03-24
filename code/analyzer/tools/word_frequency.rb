@@ -5,7 +5,7 @@ class WordFrequency < AnalysisMetadata
     @analysis_metadata = AnalysisMetadata.first(:id => analysis_metadata_id)
     curation = @analysis_metadata.curation
     conditional = Analysis.curation_conditional(curation)
-    graph = Graph.first_or_create(:title => "word_frequencies", :tyle => "table", :analysis_metadata_id => @analysis_metadata.id, :curation_id => curation.id)
+    graph = Graph.first_or_create(:title => "word_frequencies", :style => "table", :analysis_metadata_id => @analysis_metadata.id, :curation_id => curation.id)
     words = {}
     offset = 0
     limit = 1000
