@@ -30,7 +30,7 @@ class CompactLanguageDetection < AnalysisMetadata
   end
   
   def self.detect_language_name(data)
-    value = CLD.detect_language(data)[:name]
+    value = $language_map.invert[CLD.detect_language(data)]
     value = "unknown" if value == "TG_UNKNOWN_LANGUAGE"
     return value.split("_").collect(&:capitalize).join(" ")
   end
