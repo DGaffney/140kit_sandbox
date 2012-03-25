@@ -140,7 +140,7 @@ class Filter < Instance
     need_to_stop = false
     @datasets.each do |dataset|
       time = dataset.params.split(",").last.to_i
-      if time != -1 && Time.now.utc > dataset.created_at+time
+      if time != -1 && Time.now.utc > dataset.created_at.gmt+time
         need_to_stop = true
       end
     end
@@ -338,6 +338,7 @@ class Filter < Instance
   end
 
   def clean_up_datasets
+    debugger
     started_datasets = @datasets.reject {|d| d.created_at.nil? }
     finished_datasets = started_datasets.select{|d| d.params.split(",").last.to_i!=-1}.select {|d| U.times_up?(d.created_at.gmt+d.params.split(",").last.to_i) }
     if !finished_datasets.empty?
