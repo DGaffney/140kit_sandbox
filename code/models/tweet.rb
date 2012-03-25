@@ -11,7 +11,7 @@ class Tweet
   property :in_reply_to_user_id,   Integer, :index => [:in_reply_to_user_id_dataset, :in_reply_to_user_id], :max => 2**64-1
   property :truncated,    Boolean, :index => [:truncated_dataset, :truncated], :default => false
   property :in_reply_to_screen_name, String, :index => [:retweet_id_dataset, :retweet_id]
-  property :created_at,   Time, :index => [:created_at_dataset, :created_at]
+  property :created_at,   ZonedTime, :index => [:created_at_dataset, :created_at]
   property :retweet_count,  Integer, :index => [:retweet_count_dataset, :retweet_count]
   property :lat,          String, :index => [:lat_dataset, :lat]
   property :lon,          String, :index => [:lon_dataset, :lon]

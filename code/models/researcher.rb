@@ -5,14 +5,14 @@ class Researcher
   property :user_name, String, :format => /[A-Za-z0-9_]*/, :length => 3..40
   property :email, Text, :default => "user@localhost.com", :format => :email_address
   property :role, String, :default => "Admin"
-  property :join_date, Time, :default => Time.now
-  property :last_login, Time
-  property :last_access, Time
+  property :join_date, ZonedTime, :default => Time.now
+  property :last_login, ZonedTime
+  property :last_access, ZonedTime
   property :info, Text, :default => "I like to study the internet"
   property :website_url, Text, :default => "http://140kit.com/", :format => :url
   property :location, String, :default => "The Internet"
   property :remember_token, String
-  property :remember_token_expires_at, Time
+  property :remember_token_expires_at, ZonedTime
   property :share_email, Boolean, :default => false
   property :private_data, Boolean, :default => false
   property :hidden_account, Boolean, :default => false

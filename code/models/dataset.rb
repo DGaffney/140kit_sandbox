@@ -2,8 +2,8 @@ class Dataset
   include DataMapper::Resource
   property :id, Serial
   property :scrape_type, String, :index => [:scrape_type]
-  property :created_at, Time
-  property :updated_at, Time
+  property :created_at, ZonedTime
+  property :updated_at, ZonedTime
   property :scrape_finished, Boolean, :default => false
   property :instance_id, String, :index => [:instance_id]
   property :params, String

@@ -8,7 +8,7 @@ class Instance
   property :instance_id,    String, :length => 40
   property :hostname,       String, :unique_index => [:unique_instance], :default => ENV['HOSTNAME']
   property :pid,            Integer, :unique_index => [:unique_instance], :default => ENV['PID']
-  property :updated_at,     Time
+  property :updated_at,     ZonedTime
   property :killed,         Boolean, :default => false
   property :instance_type,  String, :unique_index => [:unique_instance]
   

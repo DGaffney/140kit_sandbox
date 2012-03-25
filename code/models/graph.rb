@@ -8,7 +8,7 @@ class Graph
   property :date, Integer, :unique_index => [:unique_graph], :index => [:date_graph, :year_month_date_hour_graph, :year_month_date_graph, :month_date_hour_graph, :date_hour_graph, :month_date_graph, :year_month_date_hour, :year_month_date, :month_date_hour, :month_date, :date_hour, :date]
   property :hour, Integer, :unique_index => [:unique_graph], :index => [:hour_graph, :year_month_date_hour_graph, :month_date_hour_graph, :date_hour_graph, :year_month_date_hour, :month_date_hour, :date_hour, :hour]
   property :written, Boolean, :default => false
-  property :time_slice, Time, :unique_index => [:unique_graph], :index => [:time_slice_graph]
+  property :time_slice, ZonedTime, :unique_index => [:unique_graph], :index => [:time_slice_graph]
   has n, :graph_points
   has n, :edges
   belongs_to :analysis_metadata, :unique_index => [:unique_edge], :index => [:curation_id_analysis_metadata_id, :analysis_metadata_id]
