@@ -18,7 +18,7 @@ class CurationsController < ApplicationController
       debugger
       @curation = Curation.new
       @datasets = []
-      @curation.created_at = Time.now
+      @curation.created_at = Time.now.utc
       @curation.updated_at = @curation.created_at
       @curation.status = "tsv_storing"
       @curation.single_dataset = false
@@ -30,6 +30,8 @@ class CurationsController < ApplicationController
         d.params = "#{params[:params]},#{params[:end_time]}"
         d.status = "tsv_storing"
         d.instance_id = "system"
+        d.created_at = Time.now.utc
+        d.updated_at = Time.now.utc
         d.save!
         @datasets << d
       elsif params[:stream_type] == "term"
@@ -39,6 +41,8 @@ class CurationsController < ApplicationController
           d.params = "#{term},#{params[:end_time]}"
           d.status = "tsv_storing"
           d.instance_id = "system"
+          d.created_at = Time.now.utc
+          d.updated_at = Time.now.utc
           d.save!
           @datasets << d
         end
@@ -77,10 +81,10 @@ class CurationsController < ApplicationController
     debugger
     @researcher = Researcher.find(session[:researcher_id])
     @curation = Curation.find(params[:id])
-    @curation.created_at = Time.now
+    @curation.created_at = Time.now.utc
     @curation.updated_at = @curation.created_at
     @curation.save!
-    @curation.datasets.update_all(:created_at => Time.now, :updated_at => Time.now, :instance_id => nil)
+    @curation.datasets.update_all(:created_at => Time.now.utc, :updated_at => Time.now.utc, :instance_id => nil)
     redirect_to researcher_url(@researcher), :notice => "We're running your streams!"
   end
   
