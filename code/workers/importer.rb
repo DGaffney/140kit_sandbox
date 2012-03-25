@@ -157,6 +157,7 @@ class Importer < Instance
             # header[header_row] = "@id" if header_row
             mysql_file.write("load data local infile '#{decompressed_file}' ignore into table #{model.storage_name} fields terminated by '\\t' #{optional_enclosed_by} lines terminated by '#{line_separator_escaped}' ignore 1 lines (#{header.join(", ")});\n")
             mysql_file.close
+            debugger
             puts "Executing mysql block..."
             config = DataMapper.repository.adapter.options
             puts "mysql -u #{config["user"]} --password='#{config["password"]}' -P #{config["port"]} -h #{config["host"]} #{config["path"].gsub("/", "")} < #{ENV["TMP_PATH"]}/#{mysql_filename} --local-infile=1"

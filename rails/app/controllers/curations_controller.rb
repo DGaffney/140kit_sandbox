@@ -19,6 +19,7 @@ class CurationsController < ApplicationController
   end
 
   def validate
+        debugger
     if !curation_is_same?
       @curation = Curation.new
       @datasets = []
@@ -26,7 +27,7 @@ class CurationsController < ApplicationController
       @curation.updated_at = @curation.created_at
       @curation.status = "tsv_storing"
       @curation.single_dataset = false
-      @curation.name = params[:name]
+      @curation.name = params[:name] || params[:params]
       @curation.researcher_id = session[:researcher_id]
       if params[:stream_type] == "locations"
         d = Dataset.new
@@ -39,7 +40,7 @@ class CurationsController < ApplicationController
         d.save!
         @datasets << d
       elsif params[:stream_type] == "term"
-        params[:name].split(",").each do |term|
+        params[:params].split(",").each do |term|
           d = Dataset.new
           d.scrape_type = "track"
           d.params = "#{term},#{params[:end_time]}"

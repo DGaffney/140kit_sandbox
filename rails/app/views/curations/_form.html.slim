@@ -1,5 +1,6 @@
 = form_tag(dataset_validate_path, :method => "post") do
   fieldset
+
     .control-group
       label.control-label Terms To Track (For this field, simply put in all the terms you want to track, separated by commas.
       .controls
@@ -11,6 +12,7 @@
       .controls
         //= range_field_tag :end_time, params[:end_time]||Curation.default_time_series, :in => Curation.default_time_series..Curation.max_time, :step => Curation.default_step, :class => 'input-full'
         = hidden_field_tag :end_time, params[:end_time]||Curation.default_time_series
+        = hidden_field_tag :stream_type, params[:stream_type]
         #time-slider
       p
         h3.align-center#time_output #{exact_time(Curation.default_time_series)}
