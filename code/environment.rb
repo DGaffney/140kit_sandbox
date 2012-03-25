@@ -32,7 +32,7 @@ require DIR+'/utils/git'
 require DIR+'/utils/sh'
 require DIR+'/extensions/string'
 require DIR+'/extensions/array'
-
+ENV['TZ'] = "UTC"
 ENV['HOSTNAME'] = Sh::hostname.strip
 ENV['PID'] = Process.pid.to_s #because ENV only allows strings.
 ENV['INSTANCE_ID'] = Digest::SHA1.hexdigest("#{ENV['HOSTNAME']}#{ENV['PID']}")
