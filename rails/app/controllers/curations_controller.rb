@@ -24,9 +24,9 @@ class CurationsController < ApplicationController
       @curation.single_dataset = false
       @curation.name = params[:name]
       @curation.researcher_id = session[:researcher_id]
-      if params[:stream_type] == "location"
+      if params[:stream_type] == "locations"
         d = Dataset.new
-        d.scrape_type = "location"
+        d.scrape_type = "locations"
         d.params = "#{params[:params]},#{params[:end_time]}"
         d.status = "tsv_storing"
         d.instance_id = "system"

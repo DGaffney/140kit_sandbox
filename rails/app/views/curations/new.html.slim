@@ -1,5 +1,5 @@
 h1 = "Add #{params[:stream_type].capitalize} Curation"
 - if params[:stream_type] == "term"
   == render partial: 'form'
-- elsif params[:stream_type] == "location"
+- elsif params[:stream_type] == "locations"
   == render partial: 'location'

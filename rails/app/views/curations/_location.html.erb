@@ -83,8 +83,8 @@ function initMap() {
 function updateLocationVal(){
   var minLat = roundTo(rect.getBounds().getNorthEast().lat(), 3);
   var maxLat = roundTo(rect.getBounds().getSouthWest().lat(), 3);
-  var minLng = roundTo(rect.getBounds().getNorthEast().lng(), 3);
-  var maxLng = roundTo(rect.getBounds().getSouthWest().lng(), 3);
+  var minLng = roundTo(rect.getBounds().getSouthWest().lng(), 3);
+  var maxLng = roundTo(rect.getBounds().getNorthEast().lng(), 3);
   $('#latlon').val(minLng+","+minLat+","+maxLng+","+maxLat);
 }
 function roundTo(val, place){
