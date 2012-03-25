@@ -1,7 +1,7 @@
 module U
   API_RATE_LIMIT_URL = "http://twitter.com/account/rate_limit_status.json"
   def self.times_up?(time)
-    return Time.now.gmt >= time ? true : false
+    return Time.now >= time ? true : false
   end
   
   def self.return_data(url, rate_limiting_request=true, verbose=false)
