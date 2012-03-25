@@ -338,7 +338,6 @@ class Filter < Instance
   end
 
   def clean_up_datasets
-    debugger
     started_datasets = @datasets.reject {|d| d.created_at.nil? }
     finished_datasets = started_datasets.select{|d| d.params.split(",").last.to_i!=-1}.select {|d| U.times_up?(d.created_at.gmt+d.params.split(",").last.to_i) }
     if !finished_datasets.empty?

@@ -19,6 +19,7 @@ class CurationsController < ApplicationController
       @curation = Curation.new
       @datasets = []
       @curation.created_at = Time.now.utc
+      @curation.updated_at = @curation.created_at
       @curation.status = "tsv_storing"
       @curation.single_dataset = false
       @curation.name = params[:name]
@@ -30,6 +31,7 @@ class CurationsController < ApplicationController
         d.status = "tsv_storing"
         d.instance_id = "system"
         d.created_at = Time.now.utc
+        d.updated_at = Time.now.utc
         d.save!
         @datasets << d
       elsif params[:stream_type] == "term"
@@ -40,6 +42,7 @@ class CurationsController < ApplicationController
           d.status = "tsv_storing"
           d.instance_id = "system"
           d.created_at = Time.now.utc
+          d.updated_at = Time.now.utc
           d.save!
           @datasets << d
         end
