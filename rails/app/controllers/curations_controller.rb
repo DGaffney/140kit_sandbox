@@ -18,7 +18,7 @@ class CurationsController < ApplicationController
       debugger
       @curation = Curation.new
       @datasets = []
-      @curation.created_at = Time.now.utc
+      @curation.created_at = Time.now
       @curation.updated_at = @curation.created_at
       @curation.status = "tsv_storing"
       @curation.single_dataset = false
@@ -30,8 +30,8 @@ class CurationsController < ApplicationController
         d.params = "#{params[:params]},#{params[:end_time]}"
         d.status = "tsv_storing"
         d.instance_id = "system"
-        d.created_at = Time.now.utc
-        d.updated_at = Time.now.utc
+        d.created_at = Time.now
+        d.updated_at = Time.now
         d.save!
         @datasets << d
       elsif params[:stream_type] == "term"
@@ -41,8 +41,8 @@ class CurationsController < ApplicationController
           d.params = "#{term},#{params[:end_time]}"
           d.status = "tsv_storing"
           d.instance_id = "system"
-          d.created_at = Time.now.utc
-          d.updated_at = Time.now.utc
+          d.created_at = Time.now
+          d.updated_at = Time.now
           d.save!
           @datasets << d
         end
