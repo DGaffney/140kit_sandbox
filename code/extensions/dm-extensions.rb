@@ -108,6 +108,7 @@ module DataMapper
       end
 
       def load(value)
+        debugger
         value.nil? ? nil : value
       end
 
