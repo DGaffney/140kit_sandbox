@@ -12,7 +12,7 @@ class Filter < Instance
     super
     @datasets = []
     @queue = []
-    @start_time = Time.now
+    @start_time = Time.now.utc
     @scrape_type = ARGV[0] || "track"
     self.instance_type = "filter"
     self.save
@@ -112,7 +112,7 @@ class Filter < Instance
       # Thread.new do
         rsync_previous_files(datasets, time)
       # end
-      @start_time = Time.now
+      @start_time = Time.now.utc
       print "[]"
     }
     client.on_limit { |skip_count| print "*#{skip_count}*" }
@@ -140,7 +140,7 @@ class Filter < Instance
     need_to_stop = false
     @datasets.each do |dataset|
       time = dataset.params.split(",").last.to_i
-      if time != -1 && Time.now > dataset.created_at+time
+      if time != -1 && Time.now.utc > dataset.created_at+time
         need_to_stop = true
       end
     end
@@ -217,7 +217,6 @@ class Filter < Instance
   
   def update_params
     @params = {}
-    debugger
     for d in @datasets
       if @params[d.scrape_type]
         if d.scrape_type == "locations"
@@ -330,7 +329,7 @@ class Filter < Instance
     refresh_datasets
     datasets_to_be_started = @datasets.select {|d| d.created_at.nil? }
     # Dataset.update_all({:created_at => DateTime.now.in_time_zone}, {:id => datasets_to_be_started.collect {|d| d.id}})
-    Dataset.all(:id => datasets_to_be_started.collect {|d| d.id}).update(:created_at => Time.now)
+    Dataset.all(:id => datasets_to_be_started.collect {|d| d.id}).update(:created_at => Time.now.utc)
     refresh_datasets
   end
 
