@@ -1,17 +1,25 @@
-h1 
-  | Dataset ##{@curation.id}: 
-  = @curation.name
-h2
-  | Uploaded by: 
-  a href=researcher_path(@curation.researcher.user_name) = @curation.researcher.user_name
-
-= next_step_badge(@curation)
-
+.span12
+  - if current_user
+    .next_step_badge
+      p Your next step:
+      = next_step_badge(@curation)
+  .header
+    h1 
+      | Dataset ##{@curation.id}: 
+      = @curation.name
+    h2
+      | Uploaded by: 
+      a href=researcher_path(@curation.researcher.user_name) = @curation.researcher.user_name
+br
 p = current_status(@curation)
 h2 Overview:
-== render partial: '/datasets/table', locals: {datasets: @curation.datasets}  
+== render partial: '/datasets/table', locals: {datasets: @curation.datasets.paginate(:page => params[:datasets_page], :per_page => 4)}  
 h2 Analytics:
 - if @curation.analysis_metadatas.empty?
-  p No analytics added yet. #{link_to "Add one?", analyze_dataset_path(@curation)}
+    p No analytics added yet. 
+    - if current_user
+      #{link_to "Add Analytic", analyze_dataset_path(@curation)}
 - else
-  == render partial: 'analytics', locals: {analysis_metadatas: @curation.analysis_metadatas}
+  == render partial: 'analytics', locals: {analysis_metadatas: @curation.analysis_metadatas.paginate(:page => params[:analysis_page], :per_page => 4)}
+- if current_user
+  #{link_to "Add Analytic", analyze_dataset_path(@curation)}

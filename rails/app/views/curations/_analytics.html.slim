@@ -13,3 +13,5 @@ table.table.table-striped.table-bordered
           a href=analytical_offering_path(analysis_metadata.analytical_offering.id) #{analysis_metadata.analytical_offering.title}
         td = analysis_metadata.status
         td = analysis_metadata.links.join(" | ").html_safe
+
+= will_paginate(analysis_metadatas, :param_name => :analysis_page)

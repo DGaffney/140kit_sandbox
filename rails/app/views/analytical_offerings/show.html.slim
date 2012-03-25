@@ -28,11 +28,12 @@ br
 
   .span9
     p = @analytical_offering.description
- 
-== render partial: '/analytical_offering_variable_descriptors/table'
-== render partial: '/analytical_offering_requirements/table'
-      
+
 - if current_user && current_user.admin?
   = link_to "Add a variable", new_variable_path(@analytical_offering)
   span  | 
-  = link_to "Add a dependency", new_dependency_path(@analytical_offering)
+  = link_to "Add a dependency", new_dependency_path(@analytical_offering) 
+== render partial: '/analytical_offering_variable_descriptors/table'
+= will_paginate(@analytical_offering_variables, :param_name => :variable_page)
+== render partial: '/analytical_offering_requirements/table'
+= will_paginate(@dependencies, :param_name => :requirement_page)

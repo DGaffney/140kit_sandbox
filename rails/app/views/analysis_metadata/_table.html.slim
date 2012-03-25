@@ -14,3 +14,5 @@ table.table.table-striped.table-bordered
         td = link_to analysis_metadata.created_by, analysis_metadata.created_by_link
         td = link_to "Github", analysis_metadata.source_code_link
         td = link_to "View Analysis", analysis_metadata_path(analysis_metadata)
+
+= will_paginate(analysis_metadatas, :param_name => :analysis_page)

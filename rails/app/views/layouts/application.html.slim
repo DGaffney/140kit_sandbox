@@ -44,23 +44,19 @@ html
           a.brand href=root_path 140kit
           .nav-collapse
             ul.nav#global-nav
-              li class=('active' if current_route?('home#index'))
-                = link_to 'Home', root_path
               li class=('active' if current_route?('researchers#index'))
                 = link_to 'Researchers', researchers_path
               li class=('active' if current_route?('curations#index'))
                 = link_to 'Datasets', datasets_path
+              li class=('active' if current_route?('analytical_offerings#index'))
+                = link_to 'Analytics', analytical_offerings_path
             ul.nav.pull-right#user-nav
               - if current_user
-                li style=('font-weight: bold;')
-                  = link_to current_user.name, researcher_path(current_user)
+                li class=('active' if current_route?('researchers#dashboard'))
+                  = link_to "Dashboard", dashboard_path
                 - if current_user.admin?
-                  li
+                  li class=('active' if current_route?('admin#panel'))
                     = link_to 'Admin', admin_panel_path
-                li
-                  a href=dashboard_path Dashboard
-                li
-                  a href=researcher_datasets_path(current_user.user_name) My Datasets
                 li
                   = link_to 'Sign out', signout_path
               - else
@@ -84,3 +80,15 @@ html
       footer
         p &copy; 140kit 2012
 
+    javascript:
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-16471158-1']);
+      _gaq.push(['_setDomainName', '140kit.com']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();

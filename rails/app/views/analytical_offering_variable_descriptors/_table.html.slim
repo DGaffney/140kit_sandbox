@@ -11,8 +11,9 @@
             th Kind
             th Description
             th Possible Values
+            th Options
         tbody
-          - for variable in @analytical_offering.variables
+          - for variable in @analytical_offering_variables
             tr
               td = variable.name
               td = variable.user_modifiable ? "Yes" : "No"
@@ -20,3 +21,4 @@
               td = variable.kind
               td = variable.description
               td = variable.values.split(",").collect{|x| "'#{x}'"}.join(", ")
+              td = link_to "Remove", analytical_offering_variable_descriptor_path(variable), :method => 'delete'

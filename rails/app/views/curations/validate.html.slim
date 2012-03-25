@@ -1,9 +1,42 @@
 h1 Adding Curation
 p These are the current settings for your dataset. Please check all of these values very carefully. If you're satisfied, please click verify below; otherwise, click alter to return to the form.
 h2 Settings
-== render partial: 'table', locals: {curations: [@curation], show_options: false}
+table.table.table-striped.table-bordered
+  thead
+    tr
+      th Name
+      th Created
+      th Last Updated
+      th Current Status
+  tbody
+    - for curation in [@curation]
+      tr
+        td = link_to curation.name, dataset_path(curation)
+        td = curation.created_at.strftime("%b %d, %Y at %H:%M:%S (%Z)")
+        td = curation.updated_at.strftime("%b %d, %Y at %H:%M:%S (%Z)")
+        td = curation.current_status
 h2 Streams
-== render partial: '/datasets/table'
+table.table.table-striped.table-bordered
+  thead
+    tr
+      th Type
+      th Parameters
+      th Start Time
+      th End Time
+      th Tweets
+      th Users
+      th Entities
+  tbody
+    - for dataset in @curation.datasets
+      tr
+        td = dataset.friendly_type
+        td = dataset.friendly_parameters.html_safe
+        td = dataset.created_at.strftime("%b %d, %Y at %H:%M:%S (%Z)")
+        td = dataset.end_time.strftime("%b %d, %Y at %H:%M:%S (%Z)")
+        td = number_with_delimiter(dataset.tweets_count)
+        td = number_with_delimiter(dataset.users_count)
+        td = number_with_delimiter(dataset.entities_count)
+
 .row
   .span2.offset1
     a.btn.btn-primary.btn-large href=alter_dataset_path(@curation.id, params[:stream_type]) &laquo; Alter 

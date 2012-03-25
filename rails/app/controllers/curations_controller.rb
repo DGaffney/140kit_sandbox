@@ -1,7 +1,12 @@
 class CurationsController < ApplicationController
   before_filter :login_required, except: [:index, :researcher, :show]
   def index
-    @curations = Curation.all
+    @curations = Curation.paginate(:page => params[:page], :per_page => 20)
+  end
+  
+  def search
+    @curations = Curation.where(:id => AnalysisMetadata.where(:analytical_offering_id => params[:analytic_id]).collect(&:curation_id)).paginate(:page => params[:page], :per_page => 20) if params[:analytic_id]
+    @curations = []
   end
   
   def researcher
@@ -15,7 +20,6 @@ class CurationsController < ApplicationController
 
   def validate
     if !curation_is_same?
-      debugger
       @curation = Curation.new
       @datasets = []
       @curation.created_at = Time.now
@@ -78,7 +82,6 @@ class CurationsController < ApplicationController
   end
   
   def verify
-    debugger
     @researcher = Researcher.find(session[:researcher_id])
     @curation = Curation.find(params[:id])
     @curation.created_at = Time.now.utc
@@ -99,7 +102,7 @@ class CurationsController < ApplicationController
     @curation = Curation.find(params[:id])
     @researcher = Researcher.find(session[:researcher_id])
     @applied_analytical_offerings = AnalyticalOffering.already_applied(@curation)
-    @analysis_metadatas = @curation.analysis_metadatas
+    @analysis_metadatas = @curation.analysis_metadatas.paginate(:page => params[:analysis_page], :per_page => 10)
     @analytical_offerings = AnalyticalOffering.available_to_researcher(@researcher)-@applied_analytical_offerings
   end
     
@@ -117,8 +120,6 @@ class CurationsController < ApplicationController
     end
   end
   def new_location
-    debugger
-    gg = ""
     respond_to do |format|
       format.js { render :template => 'location', :layout => false }
     end

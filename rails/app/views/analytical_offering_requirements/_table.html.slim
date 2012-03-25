@@ -8,8 +8,9 @@
             th Name
             th Position
         tbody
-          - for dependency in @analytical_offering.dependencies
+          - for dependency in @dependencies
             tr
               td = link_to dependency.requirement.title, analytical_offering_path(dependency.requirement)
               td = dependency.position
               td = link_to "Remove", analytical_offering_requirement_path(dependency), :method => 'delete'
+              

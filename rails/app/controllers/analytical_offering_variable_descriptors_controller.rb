@@ -74,9 +74,8 @@ class AnalyticalOfferingVariableDescriptorsController < ApplicationController
   def destroy
     @analytical_offering_variable_descriptor = AnalyticalOfferingVariableDescriptor.find(params[:id])
     @analytical_offering_variable_descriptor.destroy
-
     respond_to do |format|
-      format.html { redirect_to analytical_offering_variable_descriptors_url }
+      format.html { redirect_to request.referer }
       format.json { head :no_content }
     end
   end

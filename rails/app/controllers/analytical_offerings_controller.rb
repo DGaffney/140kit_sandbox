@@ -1,10 +1,12 @@
 class AnalyticalOfferingsController < ApplicationController
   def show
     @analytical_offering = AnalyticalOffering.find(params[:id])
+    @dependencies = AnalyticalOfferingRequirement.where(:analytical_offering_id => @analytical_offering.id).order(:position).paginate(:page => params[:requirement_page], :per_page => 4)
+    @analytical_offering_variables = AnalyticalOfferingVariableDescriptor.where(:analytical_offering_id => @analytical_offering.id).order(:position).paginate(:page => params[:variable_page], :per_page => 1)
   end
   
   def index
-    @analytical_offerings = AnalyticalOffering.all
+    @analytical_offerings = AnalyticalOffering.where(:enabled => true).paginate(:page => params[:page], :per_page => 10)
   end
 
   def new
@@ -92,10 +94,10 @@ class AnalyticalOfferingsController < ApplicationController
     end
     validation_results.merge!(@analysis_metadata.verify_absolute_uniqueness)
     if validation_results[:success]
-      flash[:notice] = "Analytic Added!"
+      flash[:success] = "Analytic Added!"
       @analysis_metadata.ready = true
       @analysis_metadata.save!
-      redirect_to analyze_dataset_path(@curation) and return
+      redirect_to dataset_path(@curation) and return
     else
       @analysis_metadata.variables.each do |var|
         var.destroy

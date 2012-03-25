@@ -44,4 +44,8 @@ class Researcher < ActiveRecord::Base
   def admin?
     return Researcher.find(self.id).role == "Admin"
   end
+  
+  def curations_count
+    return curations.count
+  end
 end

@@ -19,3 +19,5 @@ table.table.table-striped.table-bordered
         td = number_with_delimiter(dataset.tweets_count)
         td = number_with_delimiter(dataset.users_count)
         td = number_with_delimiter(dataset.entities_count)
+
+= will_paginate(datasets, :param_name => :datasets_page)

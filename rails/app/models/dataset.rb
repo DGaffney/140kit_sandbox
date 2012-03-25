@@ -17,9 +17,9 @@ class Dataset < ActiveRecord::Base
   def friendly_parameters
     case self.scrape_type
     when "locations"
-      params = self.params.split(",")
+      params = self.params.split(",")[0..3]
       timed_seconds = distance_of_time_in_words(self.seconds, 0, true)
-      return "Term: #{params.first}<br /> Length: #{timed_seconds} (#{number_with_delimiter(self.seconds)} seconds)"
+      return "Bounding Box Parameters: #{params}<br /> Length: #{timed_seconds} (#{number_with_delimiter(self.seconds)} seconds)"
     when "track"
       params = self.params.split(",")
       timed_seconds = distance_of_time_in_words(self.seconds, 0, true)

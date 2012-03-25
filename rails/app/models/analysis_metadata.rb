@@ -15,7 +15,7 @@ class AnalysisMetadata < ActiveRecord::Base
       return "Verifying"
     elsif self.ready && self.curation.status == "imported"
       return "Processing"
-    elsif self.ready && self.curation.status == "tsv_stored"
+    elsif self.ready && (self.curation.status == "tsv_stored" || self.curation.status == "needs_import")
       return "Waiting on Import"
     else return "Unknown"
     end
@@ -130,7 +130,12 @@ class AnalysisMetadata < ActiveRecord::Base
   end
   
   def function_class
-    return function.classify.constantize
+    begin
+      return function.classify.constantize
+    rescue
+      load File.dirname(__FILE__) + "/../../../code/analyzer/tools/#{function}#{AnalyticalOffering.language_extensions(self.analytical_offering.language)}"
+      retry
+    end
   end
   
   def function_path

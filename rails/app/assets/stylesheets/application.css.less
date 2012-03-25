@@ -187,23 +187,29 @@ li.open > a.dropdown-toggle {
     color: @navbarLinkColorActive;
   }
 }
-
+div .next_step_badge{
+  float:right;
+  margin-right: 20px;
+}
+div .header{
+  float:left;
+}
 #user-nav { margin-right: -30px; }
 
 .navbar #user-nav.nav > li > a {
   font-size: @navbarLinkSize;
   line-height: @navbarLinkSize;
-  padding: floor((@navbarHeight - @navbarLinkSize) / 2) 10px ;
+  padding: floor((@navbarHeight - @navbarLinkSize) / 2) 20px ;
   // margin: 0 0 0 1px;
   text-shadow: 0 1px 0 @white;
   &:hover {
     background: transparent;
     color: @navbarLinkColorHover;
-    // #gradient > .vertical(darken(@navbarBackground, 5%), @navbarBackground);
+    #gradient > .vertical(darken(@navbarBackground, 5%), @navbarBackground);
   }
   &:active {
     color: @navbarLinkColorActive;
-    // #gradient > .vertical(darken(@navbarBackground, 5%), @navbarBackground);
+    #gradient > .vertical(darken(@navbarBackground, 5%), @navbarBackground);
   }
 }
 

@@ -1,5 +1,6 @@
 h1 Analytical Offerings
-= link_to "Add analytical offering", new_analytical_offering_path
+- if current_user && current_user.admin?
+  = link_to "Add analytical offering", new_analytical_offering_path
 table.table.table-striped.table-bordered
   thead
     tr
@@ -16,7 +17,9 @@ table.table.table-striped.table-bordered
         td = link_to analytical_offering.created_by, analytical_offering.created_by_link
         td = link_to "Github", analytical_offering.source_code_link
         td 
-          = link_to "See Datasets", search_datasets_path
-          = " | "
-          - if current_user.admin?
+          = link_to "See Datasets", search_datasets_path(:analytic_id => analytical_offering.id)
+          - if current_user && current_user.admin?
+            = " | "
             = link_to "Edit", edit_analytical_offering_path(analytical_offering)
+            
+= will_paginate(@analytical_offerings)
