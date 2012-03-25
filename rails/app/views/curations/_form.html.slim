@@ -10,6 +10,7 @@
       label.control-label How long should we collect this data?
       .controls
         //= range_field_tag :end_time, params[:end_time]||Curation.default_time_series, :in => Curation.default_time_series..Curation.max_time, :step => Curation.default_step, :class => 'input-full'
+        = hidden_field_tag :end_time, params[:end_time]||Curation.default_time_series
         #time-slider
       p
         h3.align-center#time_output #{exact_time(Curation.default_time_series)}

@@ -5,9 +5,8 @@ h2 Settings
 h2 Streams
 == render partial: '/datasets/table'
 .row
-
   .span2.offset1
-    a.btn.btn-primary.btn-large href=alter_dataset_path(@curation.id, @curation.scrape_type) &laquo; Alter 
+    a.btn.btn-primary.btn-large href=alter_dataset_path(@curation.id, params[:stream_type]) &laquo; Alter 
 
   .span2.offset7
     a.btn.btn-primary.btn-large href=verify_dataset_path(@curation.id) Verify &raquo;

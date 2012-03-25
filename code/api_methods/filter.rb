@@ -219,13 +219,13 @@ class Filter < Instance
     @params = {}
     for d in @datasets
       if @params[d.scrape_type]
-        if d.scrape_type == "locations"
+        if d.scrape_type == "location"
           @params[d.scrape_type] << {:params => d.params.split(",")[0..d.params.split(",").length-2].join(","), :dataset_id => d.id}
         else
           @params[d.scrape_type] << {:params => d.params.split(",").first, :dataset_id => d.id}
         end
       else
-        if d.scrape_type == "locations"
+        if d.scrape_type == "location"
           @params[d.scrape_type] = [{:params => d.params.split(",")[0..d.params.split(",").length-2].join(","), :dataset_id => d.id}]
         else
           @params[d.scrape_type] = [{:params => d.params.split(",").first, :dataset_id => d.id}]

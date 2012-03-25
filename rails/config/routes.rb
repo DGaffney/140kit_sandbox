@@ -41,7 +41,7 @@ WWW140kit::Application.routes.draw do
   end
 
   get '/datasets/new/:stream_type' => 'curations#new', as: :new_dataset
-  get '/datasets/:id/alter/:stream_type' => 'curations#new', as: :new_dataset
+  get '/datasets/:id/alter/:stream_type' => 'curations#new', as: :alter_dataset
   resources :curations, only: [:index, :show, :validate, :analyze, :alter, :import, :verify], path: '/datasets', as: :datasets do
     member do
       get 'verify'

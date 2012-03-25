@@ -29,6 +29,7 @@ html
             max: 604800,
             slide: function(event, ui) {
                 $('#time_output').html(exact_time(reasonableIncrement(ui.value)));
+                $('#end_time').val(ui.value);
               }
         });
         // $('.comma-separated-input').tagsInput({ height:'20px', defaultText: 'add a term', placeholderColor: '#999' });

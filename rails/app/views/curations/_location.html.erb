@@ -124,6 +124,7 @@ function showRect() {
       <label class="control-label">Twitter's API input for the Bounding box drawn:</label>
       <%= text_field_tag :params, params[:params], :class => "input-xlarge comma-separated-input", :id => "latlon" %>
       <label class="control-label">How long should we collect this data?</label>
+      <%= hidden_field_tag :end_time, params[:end_time]||Curation.default_time_series %>
       <div id="time-slider"></div>
       <br/>
       <h3 class="align-center" id="time_output"><%= exact_time(Curation.default_time_series) %></h3>

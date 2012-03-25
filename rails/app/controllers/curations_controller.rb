@@ -74,6 +74,7 @@ class CurationsController < ApplicationController
   end
   
   def verify
+    debugger
     @researcher = Researcher.find(session[:researcher_id])
     @curation = Curation.find(params[:id])
     @curation.created_at = Time.now
