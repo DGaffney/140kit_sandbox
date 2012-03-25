@@ -12,7 +12,7 @@ class Filter < Instance
     super
     @datasets = []
     @queue = []
-    @start_time = Time.now.utc
+    @start_time = Time.now
     @scrape_type = ARGV[0] || "track"
     self.instance_type = "filter"
     self.save
@@ -112,7 +112,7 @@ class Filter < Instance
       # Thread.new do
         rsync_previous_files(datasets, time)
       # end
-      @start_time = Time.now.utc
+      @start_time = Time.now
       print "[]"
     }
     client.on_limit { |skip_count| print "*#{skip_count}*" }
@@ -140,7 +140,7 @@ class Filter < Instance
     need_to_stop = false
     @datasets.each do |dataset|
       time = dataset.params.split(",").last.to_i
-      if time != -1 && Time.now.utc > dataset.created_at.gmt+time
+      if time != -1 && Time.now > dataset.created_at+time
         need_to_stop = true
       end
     end
@@ -321,15 +321,15 @@ class Filter < Instance
   def update_next_dataset_ends
     update_start_times
     # refresh_datasets # this is absolutely necessary even while it's called in update_start_times above. huh!
-    soonest_ending_dataset = @datasets.select{|d| d.params.split(",").last.to_i!=-1}.sort {|x,y| (x.created_at.to_time.gmt + x.params.split(",").last.to_i - DateTime.now.to_time.gmt) <=> (y.created_at.to_time.gmt + y.params.split(",").last.to_i - DateTime.now.to_time.gmt) }.first
-    @next_dataset_ends = soonest_ending_dataset.created_at.to_time.gmt + soonest_ending_dataset.params.split(",").last.to_i rescue nil
+    soonest_ending_dataset = @datasets.select{|d| d.params.split(",").last.to_i!=-1}.sort {|x,y| (x.created_at.to_time + x.params.split(",").last.to_i - DateTime.now.to_time) <=> (y.created_at.to_time + y.params.split(",").last.to_i - DateTime.now.to_time) }.first
+    @next_dataset_ends = soonest_ending_dataset.created_at.to_time + soonest_ending_dataset.params.split(",").last.to_i rescue nil
   end
 
   def update_start_times
     refresh_datasets
     datasets_to_be_started = @datasets.select {|d| d.created_at.nil? }
     # Dataset.update_all({:created_at => DateTime.now.in_time_zone}, {:id => datasets_to_be_started.collect {|d| d.id}})
-    Dataset.all(:id => datasets_to_be_started.collect {|d| d.id}).update(:created_at => Time.now.utc)
+    Dataset.all(:id => datasets_to_be_started.collect {|d| d.id}).update(:created_at => Time.now)
     refresh_datasets
   end
 
@@ -340,7 +340,7 @@ class Filter < Instance
   def clean_up_datasets
     started_datasets = @datasets.reject {|d| d.created_at.nil? }
     debugger
-    finished_datasets = started_datasets.select{|d| d.params.split(",").last.to_i!=-1}.select {|d| U.times_up?(d.created_at.gmt+d.params.split(",").last.to_i) }
+    finished_datasets = started_datasets.select{|d| d.params.split(",").last.to_i!=-1}.select {|d| U.times_up?(d.created_at+d.params.split(",").last.to_i) }
     if !finished_datasets.empty?
       puts "\nFinished collecting "+finished_datasets.collect {|d| "#{d.scrape_type}:\"#{d.internal_params_label}\"" }.join(", ")
       # Dataset.update_all({:scrape_finished => true}, {:id => finished_datasets.collect {|d| d.id}})
