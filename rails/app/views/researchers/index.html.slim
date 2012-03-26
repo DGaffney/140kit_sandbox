@@ -23,7 +23,7 @@
 - @researchers.each_slice(4) do |slice|
   .row
     - for researcher in slice
-      .span3
+      .span3.researcher
         .well
           img.pull-left.twitter-pic src=researcher.twitter_pic(:normal)
           h4 = link_to researcher.name, researcher
