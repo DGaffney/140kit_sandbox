@@ -31,7 +31,7 @@ class CurationsController < ApplicationController
       if params[:stream_type] == "locations"
         d = Dataset.new
         d.scrape_type = "locations"
-        coords = params.split(",").collect(&:to_f)
+        coords = params[:params].split(",").collect(&:to_f)
         north = coords[1] > coords[3] ? coords[1] : coords[3]
         south = coords[1] > coords[3] ? coords[3] : coords[1]
         east = coords[0] > coords[2] ? coords[0] : coords[2]
