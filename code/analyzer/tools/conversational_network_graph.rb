@@ -24,7 +24,7 @@ class ConversationalNetworkGraph < AnalysisMetadata
     graph_ids = []
     edge_conditional = []
     if network_type == "combined"
-      graph_ids = Graph.all(:title => ["retweet_network", "mention_network"], :style => "network", :curation => curation.id).collect(&:id)
+      graph_ids = Graph.all(:title => ["retweet_network", "mention_network"], :style => "network", :curation_id => curation.id).collect(&:id)
       edge_conditional << ["mention", "retweet"]
     else
       edge_conditional << network_type

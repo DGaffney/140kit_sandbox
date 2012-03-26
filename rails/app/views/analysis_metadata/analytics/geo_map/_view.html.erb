@@ -22,7 +22,7 @@
   end
   def google_params(title)
     {"country_map" => "{height:420, width: 680}",
-    "city_map" => "{dataMode: 'markers'}"}[title] || "{}"
+    "city_map" => "{dataMode: 'markers', colors: [0xFF8747, 0xFFB581, 0xc06000], height:420, width: 680}"}[title] || "{}"
   end
 %>
 <% if ["country_map"].include?(@graph.title) %>
@@ -55,7 +55,7 @@
       data.setValue(<%= count %>,0,<%= row[:lat] %>);
       data.setValue(<%= count %>,1,<%= row[:lon] %>);
       data.setValue(<%= count %>,2,<%= row[:value].to_i %>);
-      data.setValue(<%= count %>,3,'<%= row[:label] %>');
+      data.setValue(<%= count %>,3,'<%= escape_javascript(row[:label]) %>');
       <% count+=1 %>
     <% end %>
     var table = new google.visualization.<%= google_table_type(@graph.title) %>(document.getElementById('container'));
