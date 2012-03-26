@@ -31,7 +31,12 @@ class CurationsController < ApplicationController
       if params[:stream_type] == "locations"
         d = Dataset.new
         d.scrape_type = "locations"
-        d.params = "#{params[:params]},#{params[:end_time]}"
+        coords = params.split(",").collect(&:to_f)
+        north = coords[1] > coords[3] ? coords[1] : coords[3]
+        south = coords[1] > coords[3] ? coords[3] : coords[1]
+        east = coords[0] > coords[2] ? coords[0] : coords[2]
+        west = coords[0] > coords[2] ? coords[2] : coords[0]
+        d.params = "#{west},#{south},#{east},#{north},#{params[:end_time]}"
         d.status = "tsv_storing"
         d.instance_id = "system"
         d.created_at = Time.now
