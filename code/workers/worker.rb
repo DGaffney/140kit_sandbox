@@ -109,7 +109,11 @@ class Worker < Instance
       Analysis::Dependencies.send(metadata.function)
       vars = [metadata.id]+metadata.run_vars
       puts "#{metadata.function.classify}.run(#{vars.join(", ")})"
-      finished = metadata.function.classify.constantize.run(*vars) || false
+      if metadata.curation.tweets_count > 0 && metadata.curation.users_count > 0 && metadata.curation.entities_count > 0  
+        finished = metadata.function.classify.constantize.run(*vars) || false
+      else
+        finished = true
+      end
       metadata.finished = finished
       metadata.save
     else 
