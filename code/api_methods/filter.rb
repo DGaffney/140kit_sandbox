@@ -6,7 +6,7 @@ class Filter < Instance
   STREAM_API_URL = "http://stream.twitter.com"
   CHECK_FOR_NEW_DATASETS_INTERVAL = 30
   CHECK_INTERVAL = 30
-  MAXIMUM_TWEETS = 1000000
+  MAXIMUM_TWEETS = 1000000/2
   attr_accessor :user_account, :username, :password, :next_dataset_ends, :queue, :params, :datasets, :start_time, :last_start_time, :scrape_type
 
   def initialize
