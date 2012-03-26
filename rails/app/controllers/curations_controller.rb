@@ -19,7 +19,6 @@ class CurationsController < ApplicationController
   end
 
   def validate
-        debugger
     if !curation_is_same?
       @curation = Curation.new
       @datasets = []
