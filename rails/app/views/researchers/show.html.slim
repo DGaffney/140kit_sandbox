@@ -33,3 +33,8 @@
     == render partial: 'curations/table'
   /* .span4*/
     == render partial: 'curations/table'
+  .span4
+    - if current_user
+      = link_to "Add Location Dataset", new_dataset_path('locations')
+      = " | "
+      = link_to "Add Term Dataset", new_dataset_path('term')

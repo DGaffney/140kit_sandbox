@@ -21,5 +21,6 @@ h2 Analytics:
       #{link_to "Add Analytic", analyze_dataset_path(@curation)}
 - else
   == render partial: 'analytics', locals: {analysis_metadatas: @curation.analysis_metadatas.paginate(:page => params[:analysis_page], :per_page => 4)}
-- if current_user
-  #{link_to "Add Analytic", analyze_dataset_path(@curation)}
+  - if current_user
+    #{link_to "Add Analytic", analyze_dataset_path(@curation)}
+  
