@@ -339,7 +339,7 @@ class Filter < Instance
 
   def clean_up_datasets
     started_datasets = @datasets.reject {|d| d.created_at.nil? }
-    finished_datasets = started_datasets.select{|d| d.params.split(",").last.to_i!=-1}.select {|d| (U.times_up?(d.created_at+d.params.split(",").last.to_i) || d.tweets_count > MAXIMUM_TWEETS) }
+    finished_datasets = started_datasets.select{|d| d.params.split(",").last.to_i!=-1}.select {|d| (U.times_up?(d.created_at+d.params.split(",").last.to_i) || d.curations.first.tweets_count > MAXIMUM_TWEETS) }
     if !finished_datasets.empty?
       puts "\nFinished collecting "+finished_datasets.collect {|d| "#{d.scrape_type}:\"#{d.internal_params_label}\"" }.join(", ")
       # Dataset.update_all({:scrape_finished => true}, {:id => finished_datasets.collect {|d| d.id}})
