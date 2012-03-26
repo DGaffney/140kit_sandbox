@@ -6,6 +6,7 @@ class Filter < Instance
   STREAM_API_URL = "http://stream.twitter.com"
   CHECK_FOR_NEW_DATASETS_INTERVAL = 30
   CHECK_INTERVAL = 30
+  MAXIMUM_TWEETS = 1000000
   attr_accessor :user_account, :username, :password, :next_dataset_ends, :queue, :params, :datasets, :start_time, :last_start_time, :scrape_type
 
   def initialize
@@ -132,15 +133,13 @@ class Filter < Instance
   end
   
   def touch_and_check_for_finished
-    Thread.new do
-      @datasets.each do |dataset|
-        dataset.touch
-      end
+    @datasets.each do |dataset|
+      dataset.touch
     end
     need_to_stop = false
     @datasets.each do |dataset|
       time = dataset.params.split(",").last.to_i
-      if time != -1 && Time.now > dataset.created_at+time
+      if (time != -1 && Time.now > dataset.created_at+time) || dataset.tweets_count > MAXIMUM_TWEETS
         need_to_stop = true
       end
     end
@@ -339,7 +338,7 @@ class Filter < Instance
 
   def clean_up_datasets
     started_datasets = @datasets.reject {|d| d.created_at.nil? }
-    finished_datasets = started_datasets.select{|d| d.params.split(",").last.to_i!=-1}.select {|d| U.times_up?(d.created_at+d.params.split(",").last.to_i) }
+    finished_datasets = started_datasets.select{|d| d.params.split(",").last.to_i!=-1}.select {|d| (U.times_up?(d.created_at+d.params.split(",").last.to_i) || d.tweets_count > MAXIMUM_TWEETS) }
     if !finished_datasets.empty?
       puts "\nFinished collecting "+finished_datasets.collect {|d| "#{d.scrape_type}:\"#{d.internal_params_label}\"" }.join(", ")
       # Dataset.update_all({:scrape_finished => true}, {:id => finished_datasets.collect {|d| d.id}})
