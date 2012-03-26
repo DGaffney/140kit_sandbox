@@ -32,6 +32,7 @@ class ConversationalNetworkGraph < AnalysisMetadata
     end
     offset = 0
     limit = 20000
+    debugger
     options = {
       :dynamic => true, 
       :formats => ["gexf", "graphml"], 
