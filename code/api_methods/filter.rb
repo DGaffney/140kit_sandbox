@@ -134,7 +134,8 @@ class Filter < Instance
   
   def touch_and_check_for_finished
     @datasets.each do |dataset|
-      dataset.touch
+      dataset.updated_at = Time.now
+      dataset.save!
     end
     need_to_stop = false
     @datasets.each do |dataset|
