@@ -347,6 +347,7 @@ class Filter < Instance
     if !finished_datasets.empty?
       puts "\nFinished collecting "+finished_datasets.collect {|d| "#{d.scrape_type}:\"#{d.internal_params_label}\"" }.join(", ")
       # Dataset.update_all({:scrape_finished => true}, {:id => finished_datasets.collect {|d| d.id}})
+      rsync_previous_files(finished_datasets, @start_time)
       Dataset.all(:id => finished_datasets.collect {|d| d.id}).update(:scrape_finished => true, :status => "tsv_stored")
       @datasets -= finished_datasets
       finished_datasets.collect{|dataset| dataset.unlock}

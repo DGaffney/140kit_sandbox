@@ -6,11 +6,11 @@ class GeoMap < AnalysisMetadata
     conditional = Analysis.curation_conditional(curation)
     location_overview = Graph.first_or_create(:title => "location_overview", :style => "table", :analysis_metadata_id => @analysis_metadata.id, :curation_id => curation.id)
     graph_points = []
-    tweet_count = Tweet.count(conditional)
+    coordinate_count = DataMapper.repository.adapter.select("select count(distinct(twitter_id)) from tweets #{Analysis.conditions_to_mysql_query(conditional)}")
     graph_points << {:label => "total_tweets", :value => tweet_count, :curation_id => curation.id, :graph_id => location_overview.id, :analysis_metadata_id => @analysis_metadata.id}
-    geo_count = Geo.count(conditional)
+    coordinate_count = DataMapper.repository.adapter.select("select count(distinct(twitter_id)) from geos #{Analysis.conditions_to_mysql_query(conditional)}")
     graph_points << {:label => "total_geos", :value => geo_count, :curation_id => curation.id, :graph_id => location_overview.id, :analysis_metadata_id => @analysis_metadata.id}
-    coordinate_count = Coordinate.count(conditional)
+    coordinate_count = DataMapper.repository.adapter.select("select count(distinct(twitter_id)) from coordinates #{Analysis.conditions_to_mysql_query(conditional)}")
     graph_points << {:label => "total_coordinates", :value => coordinate_count, :curation_id => curation.id, :graph_id => location_overview.id, :analysis_metadata_id => @analysis_metadata.id}
     graph_points << {:label => "proportion_geos", :value => geo_count/tweet_count.to_f, :curation_id => curation.id, :graph_id => location_overview.id, :analysis_metadata_id => @analysis_metadata.id}
     graph_points << {:label => "proportion_coordinates", :value => coordinate_count/tweet_count.to_f, :curation_id => curation.id, :graph_id => location_overview.id, :analysis_metadata_id => @analysis_metadata.id}
