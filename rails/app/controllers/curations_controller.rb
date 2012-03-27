@@ -1,7 +1,7 @@
 class CurationsController < ApplicationController
   before_filter :login_required, except: [:index, :researcher, :show]
   def index
-    @curations = Curation.paginate(:page => params[:page], :per_page => 20)
+    @curations = Curation.paginate(:page => params[:page], :per_page => 20, :order => "id desc")
   end
   
   def search
