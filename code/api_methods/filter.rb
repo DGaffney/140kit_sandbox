@@ -4,8 +4,7 @@ class Filter < Instance
   MAX_TRACK_IDS = 10000
   BATCH_SIZE = 100
   STREAM_API_URL = "http://stream.twitter.com"
-  CHECK_FOR_NEW_DATASETS_INTERVAL = 30
-  CHECK_INTERVAL = 30
+  CHECK_FOR_NEW_DATASETS_INTERVAL = 300
   MAXIMUM_TWEETS = 1000000
   attr_accessor :user_account, :username, :password, :next_dataset_ends, :queue, :params, :datasets, :start_time, :last_start_time, :scrape_type
 
@@ -183,6 +182,7 @@ class Filter < Instance
     [Tweet, User, Entity, Geo, Coordinate].each do |model|
       datasets.each do |dataset| 
         Sh::mkdir("#{STORAGE["path"]}/raw_catalog/#{model}")
+        debugger
         if File.exists?("#{dir(model, dataset.id, time)}.tsv")
           Sh::compress("#{dir(model, dataset.id, time)}.tsv")
           Sh::store_to_disk("#{dir(model, dataset.id, time)}.tsv.zip", "raw_catalog/#{model}/#{dataset.id}_#{time.strftime("%Y-%m-%d_%H-%M-%S")}.tsv.zip")
