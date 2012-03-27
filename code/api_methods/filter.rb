@@ -4,7 +4,8 @@ class Filter < Instance
   MAX_TRACK_IDS = 10000
   BATCH_SIZE = 100
   STREAM_API_URL = "http://stream.twitter.com"
-  CHECK_FOR_NEW_DATASETS_INTERVAL = 300
+  CHECK_FOR_NEW_DATASETS_INTERVAL = 30
+  RSYNC_INTERVAL = 1800
   MAXIMUM_TWEETS = 1000000
   attr_accessor :user_account, :username, :password, :next_dataset_ends, :queue, :params, :datasets, :start_time, :last_start_time, :scrape_type
 
@@ -109,11 +110,14 @@ class Filter < Instance
       client.stop if add_datasets || need_to_stop
       time = @start_time
       datasets = @datasets
-      # Thread.new do
-        rsync_previous_files(datasets, time)
-      # end
+      print "^"
+      Thread.new do
+        if time+RSYNC_INTERVAL < Time.now
+          print "[]"
+          rsync_previous_files(datasets, time)
+        end
+      end
       @start_time = Time.now
-      print "[]"
     }
     client.on_limit { |skip_count| print "*#{skip_count}*" }
     client.on_error { |message| puts "\nError: #{message}\n";client.stop }
