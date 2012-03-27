@@ -19,15 +19,15 @@ class Curation < ActiveRecord::Base
   def current_status
     case self.status
     when "tsv_storing"
-      return "Currently Streaming"
+      return "Collecting"
     when "tsv_stored"
-      return "Stream Complete"
+      return "Finishing collection"
     when "needs_import"
-      return "Ready to Analyze"
+      return "Ready for analysis"
     when "imported"
       return "Analyzing"
     when "needs_drop"
-      return "Finished Analysis"
+      return "Finished analysis"
     when "dropped"
       return "Archived"
     else

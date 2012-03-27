@@ -1,0 +1,12 @@
+$('#terms-or-location').slideUp();
+$('#curation-form').html("<%=j render 'curations/form', stream_type: 'location' %>").slideDown();
+$('#time-slider').slider({
+    min: 60,
+    max: 604800,
+    slide: function(event, ui) {
+        $('#time_output').html(exact_time(reasonableIncrement(ui.value)));
+        $('#end_time').val(ui.value);
+      }
+});
+initMap('#map-canvas');
+$('#new-curation-form').validate();

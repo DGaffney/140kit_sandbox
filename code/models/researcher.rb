@@ -25,6 +25,7 @@ class Researcher
   property :first_time, Boolean
   property :affiliation, String
   property :affiliation_url, String, :format => :url
+  property :time_zone, String
   has n, :curations
   has n, :datasets, :through => :curations
   attr_accessor :password

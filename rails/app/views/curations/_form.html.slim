@@ -1,20 +1,22 @@
-= form_tag(dataset_validate_path, :method => "post") do
-  fieldset
+.row
+  .span12
+    = form_tag(datasets_path, id: 'new-curation-form') do
+      fieldset
 
-    .control-group
-      label.control-label Terms To Track (For this field, simply put in all the terms you want to track, separated by commas.
-      .controls
-        = text_field_tag :params, params[:params], :class => "input-xlarge comma-separated-input"
-      label.control-label Enter a name for this dataset (optional, default will be the terms you selected)
-      .controls
-        = text_field_tag :name, params[:name], :class => "input-xlarge comma-separated-input"
-      label.control-label How long should we collect this data?
-      .controls
-        //= range_field_tag :end_time, params[:end_time]||Curation.default_time_series, :in => Curation.default_time_series..Curation.max_time, :step => Curation.default_step, :class => 'input-full'
-        = hidden_field_tag :end_time, params[:end_time]||Curation.default_time_series
-        = hidden_field_tag :stream_type, params[:stream_type]
-        #time-slider
-      p
-        h3.align-center#time_output #{exact_time(Curation.default_time_series)}
-      .form-actions
-        = submit_tag 'Validate', class: 'btn btn-primary'
+        .control-group
+          == render "curations/#{stream_type}_field"
+          .controls
+            label.control-label Enter a name for this dataset (optional, default will be the terms you selected)
+            = text_field_tag :name, params[:name], :class => "input-xlarge"
+          .controls
+            label.control-label How long should we collect this data?
+            //= range_field_tag :end_time, params[:end_time]||Curation.default_time_series, :in => Curation.default_time_series..Curation.max_time, :step => Curation.default_step, :class => 'input-full'
+            = hidden_field_tag :end_time, params[:end_time] || Curation.default_time_series
+            = hidden_field_tag :stream_type, stream_type
+            #time-slider
+          p
+            h3.align-center#time_output #{exact_time(Curation.default_time_series)}
+          .form-actions.align-center
+            p
+              a.btn.btn-primary.btn-large#review-curation-params Submit
+            p = link_to 'Back', '#', id: 'back-to-new-curation', class: 'btn'

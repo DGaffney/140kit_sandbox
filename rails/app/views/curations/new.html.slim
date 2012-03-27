@@ -1,5 +1,20 @@
-h1 = "Add #{params[:stream_type].capitalize} Curation"
-- if params[:stream_type] == "term"
-  == render partial: 'form'
-- elsif params[:stream_type] == "locations"
-  == render partial: 'location'
+.row
+  .span12
+    .page-header
+      h1 New Dataset
+
+#curation-form.hide
+#terms-or-location
+  .row
+    .span5.offset1
+      .well
+        h2 Track terms
+        p Collect all tweets that contain a given word or words.
+        p.align-center
+          = link_to 'Select', new_term_dataset_path, class: 'btn btn-large btn-primary', remote: true
+    .span5
+      .well
+        h2 Track location
+        p Collect all geotagged tweets originating from a given location.
+        p.align-center
+          = link_to 'Select', new_location_dataset_path, class: 'btn btn-large btn-primary', remote: true

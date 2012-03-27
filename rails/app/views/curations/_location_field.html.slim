@@ -1,0 +1,12 @@
+p.controls
+  | Below is a map - pan around to the area of interest, and then, 
+  | while holding SHIFT, click on the map to begin drawing a rectangle 
+  | to collect data from. Twitter's API only allows for rectangular 
+  | boxes, or "bounding boxes", as valid input for data. As such, come 
+  | up with an approximate "bounding box", and edit as necessary. When 
+  | you are satisfied, click 'validate' to continue.
+
+#map-canvas
+.controls
+  label.control-label Twitter's API input for the Bounding box drawn:
+  = text_field_tag :params, params[:params], :class => "input-xlarge required", :id => "latlon", :required => true

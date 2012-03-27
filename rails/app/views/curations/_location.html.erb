@@ -1,16 +1,3 @@
-<style> 
-#map-wrap{
-    position:relative;   
-}
-
-#map-canvas{
-    position: relative;
-    width: 876px;
-    height: 500px; 
-    display: block; 
-}
-</style>
-
 <script type="text/javascript">
 var shiftClicked = false;
 var map;
@@ -109,7 +96,6 @@ function showRect() {
 }
 
 </script>
-​
 <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 <div id="info">Below is a map - pan around to the area of interest, and then, while holding SHIFT, click on the map to begin drawing a rectangle to collect data from. Twitter's API only allows for rectangular boxes, or "bounding boxes", as valid input for data. As such, come up with an approximate "bounding box", and edit as necessary. When you are satisfied, click 'validate' to continue.</div><br/>
 <div class="span12" id="map-wrap">
