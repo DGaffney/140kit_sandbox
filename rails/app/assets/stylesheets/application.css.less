@@ -45,7 +45,7 @@
 // @import "twitter/bootstrap/pagination";
 // @import "twitter/bootstrap/pager";
 // Components: Popovers
-// @import "twitter/bootstrap/modals";
+@import "twitter/bootstrap/modals";
 // @import "twitter/bootstrap/tooltip";
 // @import "twitter/bootstrap/popovers";
 // Components: Misc
@@ -252,3 +252,17 @@ div.tagsinput div { display:block; float: left; }
 .align-center { text-align: center; }
 .gray9 { color: #999; }
 .gray6 { color: #666; }
+
+.well { .border-radius(6px); .box-shadow(none); border: none; }
+
+#map-wrap { position:relative; }
+
+#map-canvas {
+    position: relative;
+    width: 876px;
+    height: 500px; 
+    display: block; 
+    margin: 40px auto;
+}
+#time-slider { margin: 14px 0; background: #f5f5f5; }
+#time-slider .ui-slider-handle { background: @stripeColor; }// .rotate(45deg) }

@@ -18,6 +18,10 @@ class CurationsController < ApplicationController
     @curation = Curation.find_by_id(params[:id])
   end
 
+  def new
+    @curation = Curation.new
+  end
+
   def validate
     if !curation_is_same?
       @curation = Curation.new
@@ -61,14 +65,6 @@ class CurationsController < ApplicationController
     else
       @datasets = @curation.datasets
     end
-  end
-  
-  def curation_is_same?
-    @curation = Curation.find_by_name_and_researcher_id(params[:name], session[:researcher_id])
-    result = @curation && 
-             @curation.datasets.collect{|d| d.params.split(",").first}.sort == params[:name].split(",").sort && 
-             @curation.datasets.first.params.split(",").last.to_i == params[:end_time].to_i
-    return result
   end
   
   def alter
@@ -121,12 +117,23 @@ class CurationsController < ApplicationController
   
   def new_term
     respond_to do |format|
-      format.js { render :template => 'term', :layout => false }
+      format.js# { render :template => 'curations/form', :layout => false, :stream_type => 'terms' }
     end
   end
   def new_location
     respond_to do |format|
-      format.js { render :template => 'location', :layout => false }
+      format.js# { render :template => 'curations/form', :layout => false, :stream_type => 'location' }
     end
   end
+
+  private
+
+  def curation_is_same?
+    @curation = Curation.find_by_name_and_researcher_id(params[:name], session[:researcher_id])
+    result = @curation && 
+             @curation.datasets.collect{|d| d.params.split(",").first}.sort == params[:name].split(",").sort && 
+             @curation.datasets.first.params.split(",").last.to_i == params[:end_time].to_i
+    return result
+  end
+  
 end

@@ -40,9 +40,10 @@ WWW140kit::Application.routes.draw do
     end
   end
 
-  get '/datasets/new/:stream_type' => 'curations#new', as: :new_dataset
+  get '/datasets/new/location' => 'curations#new_location', as: :new_location_dataset
+  get '/datasets/new/term' => 'curations#new_term', as: :new_term_dataset
   get '/datasets/:id/alter/:stream_type' => 'curations#new', as: :alter_dataset
-  resources :curations, only: [:index, :show, :validate, :analyze, :alter, :import, :verify], path: '/datasets', as: :datasets do
+  resources :curations, only: [:index, :new, :show, :validate, :analyze, :alter, :import, :verify], path: '/datasets', as: :datasets do
     member do
       get 'verify'
       get 'analyze'

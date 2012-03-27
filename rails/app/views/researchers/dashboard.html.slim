@@ -1,8 +1,13 @@
 .row
   .span12
-    // h2 My Datasets
-    == render partial: '/curations/table', locals: {curations: @curations.paginate(:page => params[:page], :per_page => 20)}
-  .span4
-    = link_to "Add Location Dataset", new_dataset_path('locations')
-    = " | "
-    = link_to "Add Term Dataset", new_dataset_path('term')
+    h2 My Datasets
+    == render partial: '/curations/table', locals: {curations: @curations}
+.row
+  .span12
+    p.align-center
+      = link_to new_dataset_path, class: 'btn btn-large btn-primary' do
+        i.icon-plus.icon-white
+        |  New Dataset
+  // .span5
+    p.align-center
+      = link_to "Add Term Dataset", new_dataset_path('term'), class: 'btn btn-large btn-primary'
