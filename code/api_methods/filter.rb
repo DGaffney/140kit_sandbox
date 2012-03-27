@@ -169,6 +169,7 @@ class Filter < Instance
         Geo.store_to_flat_file(geos.select{|g| g[:dataset_id] == dataset_id}, dir(Geo, dataset_id, @start_time))
         Coordinate.store_to_flat_file(coordinates.select{|c| c[:dataset_id] == dataset_id}, dir(Coordinate, dataset_id, @start_time))
         dataset.save
+        debugger
       end
     end
   end
