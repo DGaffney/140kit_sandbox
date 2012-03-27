@@ -9,4 +9,4 @@ p.controls
 #map-canvas
 .controls
   label.control-label Twitter's API input for the Bounding box drawn:
-  = text_field_tag :params, params[:params], :class => "input-xlarge comma-separated-input", :id => "latlon"
+  = text_field_tag :params, params[:params], :class => "input-xlarge required", :id => "latlon", :required => true

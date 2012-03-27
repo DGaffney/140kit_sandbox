@@ -7,7 +7,7 @@
           == render "curations/#{stream_type}_field"
           .controls
             label.control-label Enter a name for this dataset (optional, default will be the terms you selected)
-            = text_field_tag :name, params[:name], :class => "input-xlarge comma-separated-input"
+            = text_field_tag :name, params[:name], :class => "input-xlarge"
           .controls
             label.control-label How long should we collect this data?
             //= range_field_tag :end_time, params[:end_time]||Curation.default_time_series, :in => Curation.default_time_series..Curation.max_time, :step => Curation.default_step, :class => 'input-full'
@@ -17,5 +17,6 @@
           p
             h3.align-center#time_output #{exact_time(Curation.default_time_series)}
           .form-actions.align-center
-            p = submit_tag 'Submit', class: 'btn btn-primary btn-large'
+            p
+              a.btn.btn-primary.btn-large#review-curation-params Submit
             p = link_to 'Back', '#', id: 'back-to-new-curation', class: 'btn'
