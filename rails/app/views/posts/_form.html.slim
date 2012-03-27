@@ -1,0 +1,25 @@
+= form_for(@post) do |f|
+  fieldset
+    .span4    
+      label.control-label Title
+      .controls
+        = f.text_field :title, class: 'input-xlarge'
+      label.control-label Function
+      .controls
+        = f.text_field :slug, class: 'input-xlarge'
+      label.control-label Created By
+      .controls
+        = f.text_field :slug, class: 'input-xlarge'
+      label.control-label Created By Link
+      .controls
+        = f.text_field :text, class: 'input-xlarge'
+      label.control-label REST only?
+      .controls
+        = f.text_area :text, class: 'input-xlarge'
+      label.control-label Status
+      .controls
+        = f.text_field :status, class: 'input-xlarge'
+      = f.hidden_field :researcher_id, :value => current_user.id
+    .span12
+      .form-actions
+        = submit_tag 'Submit', class: 'btn btn-primary'
