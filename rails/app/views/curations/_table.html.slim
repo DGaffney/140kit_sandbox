@@ -8,18 +8,20 @@
     thead
       tr
         th Name
-        th Created
-        // th Last Updated
+        th Age
         th Status
+        th Tweets
+        th Users
         - if show_options && current_user
           th Options
     tbody
       - for curation in curations
         tr
           td = link_to curation.name, dataset_path(curation)
-          td = curation.created_at.strftime("%b %d, %Y at %H:%M (%Z)")
-          // td = curation.updated_at.strftime("%b %d, %Y at %H:%M (%Z)")
+          td = time_ago_in_words(curation.created_at)
           td = curation.current_status
+          td = number_with_delimiter(curation.tweets_count)
+          td = number_with_delimiter(curation.users_count)
           - if show_options && current_user
             td = curation.current_options.html_safe
 
