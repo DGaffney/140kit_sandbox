@@ -172,6 +172,11 @@ module Locking
       end
     end
     
+    def lock!
+      lock = Lock.new(:classname => self.class.to_s, :with_id => self.id, :instance_id => "system")
+      lock.save!
+    end
+
     def unlock
       lock = Lock.first(:classname => self.class.to_s, :with_id => self.id, :instance_id => ENV['INSTANCE_ID'])
       if lock

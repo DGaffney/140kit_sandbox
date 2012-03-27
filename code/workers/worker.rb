@@ -98,7 +98,9 @@ class Worker < Instance
         route(metadata)
       end
       metadata.unlock if metadata
-      metadata.curation.unlock if metadata && metadata.curation.owned_by_me?
+      if metadata && metadata.curation.owned? && !AnalysisMetadata.all(:curation_id => metadata.curation.id).collect(&:finished).include?(false)
+        metadata.curation.unlock!
+      end
     end
     puts "No analysis work to do right now."
   end
