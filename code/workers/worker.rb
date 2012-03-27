@@ -93,12 +93,12 @@ class Worker < Instance
       metadata = AnalysisMetadata.unlocked.all(:finished => false, :ready => true).select{|am| ["imported", "live"].include?(am.curation.status)}.shuffle.first
       metadata.lock if metadata
       metadata.curation.lock if metadata && metadata.curation
-      if !metadata.nil? && metadata.owned_by_me? && !metadata.curation.nil? && metadata.curation.owned_by_me?
+      if !metadata.nil? && metadata.owned_by_me? && !metadata.curation.nil? && metadata.curation.owned?
         $instance.metadata = metadata
         route(metadata)
       end
       metadata.unlock if metadata
-      metadata.curation.unlock if metadata && metadata.curation
+      metadata.curation.unlock if metadata && metadata.curation.owned_by_me?
     end
     puts "No analysis work to do right now."
   end
