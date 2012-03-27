@@ -2,4 +2,7 @@ h1 = @post.title
 p.byline 
   a href=researcher_path(@post.researcher.user_name) #{@post.researcher.user_name}
   = " at #{@post.created_at}"
-p.post = @post.text.html_safe
+= RedCloth.new(@post.text).to_html.html_safe
+
+- if current_user && current_user.admin?
+  = link_to "Edit", edit_post_path(@post)
