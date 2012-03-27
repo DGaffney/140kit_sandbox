@@ -10,7 +10,8 @@ class ResearchersController < ApplicationController
 
   def dashboard
     @researcher = Researcher.find(current_user.id)
-    @curations = @researcher.curations.order(:created_at)#.paginate(:page => params[:page], :per_page => 16)
+    @curations = @researcher.curations.paginate(:page => params[:page], :per_page => 16)
+    # @curations = @researcher.curations.order(:created_at)
   end
 
   def show

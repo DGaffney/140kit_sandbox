@@ -84,9 +84,10 @@ html
         $('#main').on('click', '#back-to-new-curation', function() { $('#curation-form').slideUp(); $('#terms-or-location').slideDown(); });
         // $('.comma-separated-input').tagsInput({ height:'20px', defaultText: 'add a term', placeholderColor: '#999' });
         $('#main').on('click', '#review-curation-params', function() {
-          if ( !$('form').valid() ) return false;
+          if ( !$('#new-curation-form').valid() ) return false;
           var params = $('#params').val()
-            , name = $('#name').val() || params
+            , latlon = $('#latlon').val()
+            , name = $('#name').val()
             , humanTime = $('#time_output').text()
             , endTime = $('#end_time').val()
             , streamType = $('#stream_type').val()
@@ -94,27 +95,29 @@ html
           modal += '<div class="modal hide" id="review-curation-modal">';
           modal += '<div class="modal-header">';
           modal += '<a class="close" data-dismiss="modal">×</a>';
-          modal += '<h3>Review dataset...</h3>';
+          modal += '<h3>Review dataset</h3>';
           modal += '</div>';
           modal += '<div class="modal-body">';
           modal += '<ul>';
-          modal += '<li>Name: ' + name + '</li>';
-          if (streamType == 'term') {
+          if (streamType == 'terms') {
+            modal += '<li>Name: ' + (name || params) + '</li>';
             modal += '<li>Tracking tweets matching terms: ' + params + '</li>';
           } else {
-            modal += '<li>Tracking geotagged tweets matching coordinates in: ' + params + '</li>';
+            modal += '<li>Name: ' + (name || latlon) + '</li>';
+            modal += '<li>Tracking geotagged tweets matching coordinates in: ' + latlon + '</li>';
           }
           modal += '<li>Collect for: ' + humanTime + '</li>';
           modal += '</ul>';
           modal += '</div>';
           modal += '<div class="modal-footer">';
-          modal += '<a href="/datasets" id="submit-curation-btn" class="btn btn-success">Start collecting!</a>';
-          modal += '<a data-dismiss="modal" class="btn">Make changes</a>';
+          modal += '<a id="submit-curation-button" class="btn btn-success btn-large">Start collecting!</a>';
+          modal += '<a data-dismiss="modal" class="btn btn-large">Make changes</a>';
           modal += '</div>';
           modal += '</div>';
 
           $('#review-curation-modal').remove();
           $('body').append(modal);
+          $('#submit-curation-button').click(function() { $('#new-curation-form').submit(); });
           $('#review-curation-modal').modal();
         });
 

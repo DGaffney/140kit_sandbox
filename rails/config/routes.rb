@@ -43,7 +43,7 @@ WWW140kit::Application.routes.draw do
   get '/datasets/new/location' => 'curations#new_location', as: :new_location_dataset
   get '/datasets/new/term' => 'curations#new_term', as: :new_term_dataset
   get '/datasets/:id/alter/:stream_type' => 'curations#new', as: :alter_dataset
-  resources :curations, only: [:index, :new, :show, :validate, :analyze, :alter, :import, :verify], path: '/datasets', as: :datasets do
+  resources :curations, only: [:index, :create, :new, :show, :validate, :analyze, :alter, :import, :verify], path: '/datasets', as: :datasets do
     member do
       get 'verify'
       get 'analyze'
