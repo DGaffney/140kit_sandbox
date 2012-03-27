@@ -66,7 +66,7 @@ class Worker < Instance
   end
   
   def clean_orphans
-    return if !self.last_system_check.nil? && (Time.now-self.last_system_check) < 3600
+    return if !self.last_system_check.nil? && (Time.now-self.last_system_check) < 900
     puts "clean_orphans..."
     Instance.all.each do |instance|
       process_report = Sh::bt("ssh #{instance.hostname} 'ps -p #{instance.pid}'").split("\n")
@@ -91,14 +91,14 @@ class Worker < Instance
     # WARNING: TODO: rest_allowed not implemented yet
     while AnalysisMetadata.unlocked.all(:finished => false, :ready => true).select{|am| ["imported", "live"].include?(am.curation.status)}.length!=0
       metadata = AnalysisMetadata.unlocked.all(:finished => false, :ready => true).select{|am| ["imported", "live"].include?(am.curation.status)}.shuffle.first
-      metadata.lock
+      metadata.lock if metadata
       metadata.curation.lock if metadata.curation
       if !metadata.nil? && metadata.owned_by_me? && !metadata.curation.nil? && metadata.curation.owned_by_me?
         $instance.metadata = metadata
         route(metadata)
       end
-      metadata.unlock
-      metadata.curation.unlock
+      metadata.unlock if metadata
+      metadata.curation.unlock if metadata.curation
     end
     puts "No analysis work to do right now."
   end
