@@ -34,7 +34,7 @@ class GeoMap < AnalysisMetadata
       #this looks worse, but is probably better.
       geos.each do |geo|
         coordinate = Coordinate.first(conditional.merge({:geo_id => geo.geo_id}))
-        graph_points << {:label => "#{geo.full_name}, #{geo.country} | #{coordinate.lat},#{coordinate.lon}", :value => geo.full_name_count, :curation_id => curation.id, :graph_id => city_map.id, :analysis_metadata_id => @analysis_metadata.id}
+        graph_points << {:label => "#{geo.full_name}, #{geo.country} | #{coordinate.lat},#{coordinate.lon}", :value => geo.full_name_count, :curation_id => curation.id, :graph_id => city_map.id, :analysis_metadata_id => @analysis_metadata.id} if coordinate
       end
       GraphPoint.save_all(graph_points)
       graph_points = []
