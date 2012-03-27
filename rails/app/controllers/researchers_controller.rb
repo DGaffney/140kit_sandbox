@@ -10,6 +10,7 @@ class ResearchersController < ApplicationController
 
   def dashboard
     @researcher = Researcher.find(current_user.id)
+    @curations = @researcher#.curations.paginate(:page => params[:page], :per_page => 16)
   end
 
   def show
@@ -30,7 +31,7 @@ class ResearchersController < ApplicationController
     @researcher = Researcher.find_by_user_name(params[:user_name], select: [:id, :user_name])
     respond_to do |format|
       if @researcher.update_attributes(params[:researcher])
-        format.html { redirect_to @researcher, flash: { success: "Researcher successfully updated." } }
+        format.html { redirect_to @researcher, flash: { success: "Your info has been updated." } }
         format.js
       else
         format.html { render action: 'edit', flash: { error: @reseacher.errors } }

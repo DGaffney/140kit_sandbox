@@ -1,36 +1,7 @@
 .row
-  .span4
-    .well
-      .page-header
-        img.pull-left.twitter-pic src=@researcher.twitter_pic(:bigger)
-        h1 = @researcher.name
-        h3 = link_to_twitter(@researcher)
-      = p @researcher.info if @researcher.info
-      ul
-        - if @researcher.website_url
-          li 
-            a href=@researcher.website_url Website
-        - if @researcher.affiliation
-          li
-            - if @researcher.affiliation_url
-              | Affiliation: 
-              a href=@researcher.affiliation_url = @researcher.affiliation
-            - else
-              | Affiliation: 
-              = @researcher.affiliation
-        - if @researcher.location
-          li 
-            | Hailing from: 
-            = @researcher.location
-        - if @researcher.join_date
-          li 
-            | Member since: 
-            = @researcher.human_join_date
-      - if @researcher == @researcher
-        a href=edit_researcher_path(@researcher) Edit
-  .span8
-    h3 Current Datasets
-    == render partial: '/curations/table', locals: {curations: @researcher.curations.paginate(:page => params[:page], :per_page => 20)}
+  .span12
+    // h2 My Datasets
+    == render partial: '/curations/table', locals: {curations: @curations.paginate(:page => params[:page], :per_page => 20)}
   .span4
     = link_to "Add Location Dataset", new_dataset_path('locations')
     = " | "
