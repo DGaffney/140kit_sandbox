@@ -115,8 +115,8 @@ class Filter < Instance
         Thread.new do
           print "[]"
           rsync_previous_files(datasets, time)
-        en
-        @start_time = Time.nowd
+        end
+        @start_time = Time.now
       end
     }
     client.on_limit { |skip_count| print "*#{skip_count}*" }
