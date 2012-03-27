@@ -169,7 +169,6 @@ class Filter < Instance
         Geo.store_to_flat_file(geos.select{|g| g[:dataset_id] == dataset_id}, dir(Geo, dataset_id, @start_time))
         Coordinate.store_to_flat_file(coordinates.select{|c| c[:dataset_id] == dataset_id}, dir(Coordinate, dataset_id, @start_time))
         dataset.save
-        debugger
       end
     end
   end
@@ -183,10 +182,10 @@ class Filter < Instance
     [Tweet, User, Entity, Geo, Coordinate].each do |model|
       datasets.each do |dataset| 
         Sh::mkdir("#{STORAGE["path"]}/raw_catalog/#{model}")
-        debugger
         if File.exists?("#{dir(model, dataset.id, time)}.tsv")
           Sh::compress("#{dir(model, dataset.id, time)}.tsv")
-          Sh::store_to_disk("#{dir(model, dataset.id, time)}.tsv.zip", "raw_catalog/#{model}/#{dataset.id}_#{time.strftime("%Y-%m-%d_%H-%M-%S")}.tsv.zip")
+          machine = Machine.first(:id => dataset.storage_machine_id).machine_storage_details
+          Sh::store_to_disk("#{dir(model, dataset.id, time)}.tsv.zip", "raw_catalog/#{model}/#{dataset.id}_#{time.strftime("%Y-%m-%d_%H-%M-%S")}.tsv.zip", machine)
   	      files << dir(model, dataset.id, time)+".tsv"
   	      files << dir(model, dataset.id, time)+".tsv.zip"
         end
