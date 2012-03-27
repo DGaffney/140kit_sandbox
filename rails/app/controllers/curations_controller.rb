@@ -33,7 +33,7 @@ class CurationsController < ApplicationController
       name = params[:name].empty? ? params[:params] : params[:name]
       @curation.name = name || params[:params]
       @curation.researcher_id = session[:researcher_id]
-      if params[:stream_type] == "locations"
+      if params[:stream_type] =~ /^locations?/i
         d = Dataset.new
         d.scrape_type = "locations"
         coords = params[:params].split(",").collect(&:to_f)
@@ -48,7 +48,7 @@ class CurationsController < ApplicationController
         d.updated_at = Time.now
         d.save!
         @datasets << d
-      elsif params[:stream_type] == "term"
+      elsif params[:stream_type] =~ /^terms?/i
         params[:params].split(",").each do |term|
           d = Dataset.new
           d.scrape_type = "track"
