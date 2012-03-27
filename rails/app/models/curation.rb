@@ -4,6 +4,18 @@ class Curation < ActiveRecord::Base
   has_many :analysis_metadatas
   has_many :graphs
   
+  def tweets_count
+    return datasets.collect{|d| d.tweets_count}.sum
+  end
+  
+  def entities_count
+    return datasets.collect{|d| d.entities_count}.sum
+  end
+
+  def users_count
+    return datasets.collect{|d| d.users_count}.sum
+  end
+  
   def self.max_time
     return 1.week
   end
