@@ -111,13 +111,13 @@ class Filter < Instance
       time = @start_time
       datasets = @datasets
       print "^"
-      Thread.new do
-        if time+RSYNC_INTERVAL < Time.now
+      if time+RSYNC_INTERVAL < Time.now
+        Thread.new do
           print "[]"
           rsync_previous_files(datasets, time)
-        end
+        en
+        @start_time = Time.nowd
       end
-      @start_time = Time.now
     }
     client.on_limit { |skip_count| print "*#{skip_count}*" }
     client.on_error { |message| puts "\nError: #{message}\n";client.stop }
