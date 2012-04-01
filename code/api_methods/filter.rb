@@ -112,10 +112,10 @@ class Filter < Instance
       datasets = @datasets
       print "^"
       if time+RSYNC_INTERVAL < Time.now
-        Thread.new do
+        # Thread.new do
           print "[]"
           rsync_previous_files(datasets, time)
-        end
+        # end
         @start_time = Time.now
       end
     }
@@ -162,6 +162,7 @@ class Filter < Instance
       tweets, users, entities, geos, coordinates = data_from_queue(tmp_queue)
       dataset_ids = tweets.collect{|t| t[:dataset_id]}.uniq
       dataset_ids.each do |dataset_id|
+        debugger
         dataset = Dataset.first(:id => dataset_id)
         Tweet.store_to_flat_file(tweets.select{|t| t[:dataset_id] == dataset_id}, dir(Tweet, dataset_id, @start_time))
         dataset.tweets_count+=tweets.select{|t| t[:dataset_id]==dataset_id}.count
