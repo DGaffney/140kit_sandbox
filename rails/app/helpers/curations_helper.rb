@@ -59,7 +59,7 @@ module CurationsHelper
     when "imported"
       if current_user
         if current_user.id == curation.researcher_id
-          return "Your dataset is live! You can add, edit, and alter any and all analytics you want, and we'll keep this dataset online so long as people actively use it."
+          return "Your dataset is live! You can add, edit, and alter any and all analytics you want, and we'll keep this dataset online so long as people actively use it (If this dataset goes one week without any activity, including someone looking at it, we will archive it automatically)."
         else
           return "This dataset is live! We'll keep this dataset online so long as people actively use it."
         end
@@ -108,7 +108,7 @@ module CurationsHelper
     when "needs_import"
       return "Select Analytics"
     when "imported"
-      return "Archive Dataset"
+      return "Have Fun!"
     when "needs_drop"
       return "Hold on"
     when "dropped"
@@ -127,7 +127,7 @@ module CurationsHelper
     when "needs_import"
       return link_to next_step_badge_text(curation), analyze_dataset_url(curation), {:class => "btn btn-primary btn-large"}
     when "imported"
-      return link_to next_step_badge_text(curation), archive_dataset_url(curation), {:class => "btn btn-primary btn-large"}
+      return link_to next_step_badge_text(curation), "#", {:class => "btn btn-primary btn-large"}
     when "needs_drop"
       return link_to next_step_badge_text(curation), "#", {:class => "btn btn-primary btn-large"}
     when "dropped"

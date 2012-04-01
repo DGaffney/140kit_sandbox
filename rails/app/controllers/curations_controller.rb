@@ -16,6 +16,7 @@ class CurationsController < ApplicationController
   
   def show
     @curation = Curation.find_by_id(params[:id])
+    @curation.touch
   end
 
   def new
