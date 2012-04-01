@@ -45,10 +45,17 @@ class Worker < Instance
   end
   
   def switch_curation_statuses
-    statuses = ["tsv_storing", "tsv_stored", "needs_import", "imported", "live", "needs_drop", "dropped"]
-    Curation.all(:status.not => ["imported", "tsv_stored", "dropped"]).unlocked.each do |curation|
+    statuses = ["tsv_storing", "tsv_stored", "needs_import", "imported", "live", "needs_drop", "dropped", "zero_data"]
+    Curation.all(:status.not => ["zero_data", "imported", "tsv_stored", "dropped"]).unlocked.each do |curation|
       datasets = curation.datasets
-      if datasets.length == datasets.collect{|x| x.status if x.status == statuses[statuses.index(curation.status)+1]}.compact.length
+      if curation.tweets_count == 0 && curation.status == "tsv_storing"
+        datasets.each do |dataset|
+          dataset.status = "zero_data"
+          dataset.save!
+        end
+        curation.status = "zero_data"
+        curation.save!
+      elsif datasets.length == datasets.collect{|x| x.status if x.status == statuses[statuses.index(curation.status)+1]}.compact.length
         curation.status = statuses[statuses.index(curation.status)+1] 
         curation.save!
       end
