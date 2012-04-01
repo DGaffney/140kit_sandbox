@@ -7,12 +7,12 @@
         h3 = link_to_twitter(@researcher)
       = p @researcher.info if @researcher.info
       ul
-        - if @researcher.website_url
+        - if @researcher.website_url && !@researcher.website_url.empty?
           li 
-            a href=@researcher.website_url Website
+            a href=@researcher.safe_website_url Website
         - if @researcher.affiliation
           li
-            - if @researcher.affiliation_url
+            - if @researcher.affiliation_url && !@researcher.affiliation_url.empty?
               | Affiliation: 
               a href=@researcher.affiliation_url = @researcher.affiliation
             - else
@@ -29,12 +29,7 @@
       - if @researcher == current_user
         a href=edit_researcher_path(@researcher) Edit
   .span8
-    /* h3 Current Datasets*/
+    h3 Most Recent Datasets
     == render partial: 'curations/table'
   /* .span4*/
     == render partial: 'curations/table'
-  .span4
-    - if current_user
-      = link_to "Add Location Dataset", new_dataset_path('locations')
-      = " | "
-      = link_to "Add Term Dataset", new_dataset_path('term')

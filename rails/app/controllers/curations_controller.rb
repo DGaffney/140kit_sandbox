@@ -1,5 +1,5 @@
 class CurationsController < ApplicationController
-  before_filter :login_required, except: [:index, :researcher, :show]
+  before_filter :login_required, except: [:index, :researcher, :show, :search]
   def index
     @curations = Curation.paginate(:page => params[:page], :per_page => 20, :order => "id desc")
   end
@@ -171,6 +171,20 @@ class CurationsController < ApplicationController
   def new_location
     respond_to do |format|
       format.js# { render :template => 'curations/form', :layout => false, :stream_type => 'location' }
+    end
+  end
+  def destroy
+    @curation = Curation.find(params[:id])
+    if @curation && current_user && (@curation.researcher_id == current_user.id || current_user.admin?)
+      @curation.datasets.each do |dataset|
+        dataset.destroy
+      end
+      @curation.destroy
+      redirect_to dashboard_path(current_user), :success => "All good!"
+    elsif @curation.nil?
+      redirect_to datasets_path, :notice => "Hrm... You tried to delete a curation we couldn't find. Weirdness."
+    else
+      redirect_to datasets_path, :notice => "Hrm... You tried to delete a curation but don't have the permission to delete it."
     end
   end
 

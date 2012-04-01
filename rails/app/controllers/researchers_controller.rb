@@ -16,7 +16,7 @@ class ResearchersController < ApplicationController
 
   def show
     @researcher = Researcher.where(user_name: params[:user_name]).first
-    @curations = @researcher.curations.paginate(:page => params[:page], :per_page => 10, :order => "id desc")
+    @curations = @researcher.curations.paginate(:page => params[:page], :per_page => 20, :order => "id desc", :limit => 10)
   end
 
   def edit

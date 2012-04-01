@@ -23,6 +23,6 @@
           td = number_with_delimiter(curation.tweets_count)
           td = number_with_delimiter(curation.users_count)
           - if show_options && current_user
-            td = curation.current_options.html_safe
+            td = curation.current_options(current_user).html_safe
 
   = will_paginate(curations)

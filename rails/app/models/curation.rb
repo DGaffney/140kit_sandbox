@@ -28,7 +28,7 @@ class Curation < ActiveRecord::Base
     return 10.minutes
   end
   
-  def current_status
+  def current_status(current_user=nil)
     case self.status
     when "tsv_storing"
       return "Collecting"
@@ -37,17 +37,19 @@ class Curation < ActiveRecord::Base
     when "needs_import"
       return "Ready for analysis"
     when "imported"
-      return "Analyzing"
+      return "Live"
     when "needs_drop"
-      return "Finished analysis"
+      return "Dropping"
     when "dropped"
       return "Archived"
+    when "zero_data"
+      return "No Tweets Found!"
     else
       return "Unknown"
     end
   end
   
-  def current_options
+  def current_options(current_user=nil)
     #this is bad design, I know. It's just the first thing I thought of that could do this - problem is I'm not sure you can access a specific object from within model?
     case self.status
     when "tsv_storing"
@@ -57,11 +59,17 @@ class Curation < ActiveRecord::Base
     when "needs_import"
       return "Sit tight..."
     when "imported"
-      return "<a href='/datasets/#{self.id}/analyze'>Set Analytics</a> | <a href='/datasets/#{self.id}/archive'>Archive</a>"
+      return "<a href='/datasets/#{self.id}/analyze'>Set Analytics</a>"
     when "needs_drop"
       return "Sit tight..."
     when "dropped"
       return "<a href='/datasets/#{self.id}/analyze'>Set Analytics</a> | <a href='/datasets/#{self.id}/import'>Restore</a>"
+    when "zero_data"
+      if self.researcher_id == current_user.id
+        return "No Tweets Found! <a href='/datasets/#{self.id}/destroy'>Remove</a>"
+      else
+        return "No Tweets Found!"
+      end
     else
       return "Sit tight..."
     end

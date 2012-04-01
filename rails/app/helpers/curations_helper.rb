@@ -27,17 +27,75 @@ module CurationsHelper
   def current_status(curation)
     case curation.status
     when "tsv_storing"
-      return "Your dataset is currently streaming. Take this opportunity to review available analytics, and add the ones you think may be useful for your research. When the data stream is complete, you will be able to import the dataset, at which point analysis can be run."
+      if current_user
+        if current_user.id == curation.researcher_id
+          return "Your dataset is currently streaming. Take this opportunity to review available analytics, and add the ones you think may be useful for your research. When the data stream is complete, you will be able to import the dataset, at which point analysis can be run."
+        else
+          return "This dataset is currently streaming. Take this opportunity to review available analytics, and add the ones you think may be useful for your research. When the data stream is complete, you will be able to import the dataset, at which point analysis can be run."
+        end
+      else
+        return "This dataset is currently streaming."
+      end
     when "tsv_stored"
-      return "Your dataset has now been stored! At this point, you may add any analytical process you want. After you're done, go ahead and import the dataset, and we will begin processing analytics."
+      if current_user
+        if current_user.id == curation.researcher_id
+          return "Your dataset has now been stored! At this point, you may add any analytical process you want. After you're done, go ahead and import the dataset, and we will begin processing analytics."
+        else
+          return "This dataset has now been stored! At this point, you may add any analytical process you want. After you're done, go ahead and import the dataset, and we will begin processing analytics."
+        end
+      else
+        return "This dataset has now been stored! At this point, you can add any analytical process you want if you log in."
+      end
     when "needs_import"
-      return "Your dataset has been queued for import. Please come back when the data import is complete."
+      if current_user
+        if current_user.id == curation.researcher_id
+          return "Your dataset has been queued for import. Please come back when the data import is complete."
+        else
+          return "This dataset has been queued for import. Please come back when the data import is complete."
+        end
+      else
+        return "This dataset has been queued for import. Please come back when the data import is complete."
+      end
     when "imported"
-      return "Your dataset is live! You can add, edit, and alter any and all analytics you want, and we'll keep this dataset online so long as people actively use it."
+      if current_user
+        if current_user.id == curation.researcher_id
+          return "Your dataset is live! You can add, edit, and alter any and all analytics you want, and we'll keep this dataset online so long as people actively use it."
+        else
+          return "This dataset is live! We'll keep this dataset online so long as people actively use it."
+        end
+      else
+        return ""
+      end
     when "needs_drop"
-      return "Your dataset is in the process of being archived. At this point, you can't take any actions. To re-import the dataset and bring it live again, just select that option."
+      if current_user
+        if current_user.id == curation.researcher_id
+          return "Your dataset is in the process of being archived. At this point, you can't take any actions. To re-import the dataset and bring it live again, just select that option."
+        else
+          return "This dataset is in the process of being archived. At this point, you can't take any actions. To re-import the dataset and bring it live again, just select that option."
+        end
+      else
+        return "This dataset is in the process of being archived. At this point, you can't take any actions. To re-import the dataset and bring it live again, just select that option."
+      end      
     when "dropped"
-      return "Your dataset has been archived. At this point, you can't take any actions. To re-import the dataset and bring it live again, just select that option."
+      if current_user
+        if current_user.id == curation.researcher_id
+          return "Your dataset has been archived. At this point, you can't take any actions. To re-import the dataset and bring it live again, just select that option."
+        else
+          return "This dataset has been archived. At this point, you can't take any actions. To re-import the dataset and bring it live again, just select that option."
+        end
+      else
+        return "This dataset has been archived. At this point, you can't take any actions. To re-import the dataset and bring it live again, just select that option."
+      end      
+    when "zero_data"
+      if current_user
+        if current_user.id == curation.researcher_id
+          return "Unfortunately, no tweets were found for the time period you selected."
+        else
+          return "Unfortunately, no tweets were found for the time period the researcher selected."
+        end
+      else
+        return "Unfortunately, no tweets were found for the time period the researcher selected."
+      end
     end
   end
   
@@ -55,31 +113,27 @@ module CurationsHelper
       return "Hold on"
     when "dropped"
       return "Bring it live"
+    when "zero_data"
+      return "Remove"
     end
   end
 
-  def next_step_badge_link(curation)
+  def next_step_badge(curation)
     case curation.status
     when "tsv_storing"
-      return analyze_dataset_url(curation)
+      return link_to next_step_badge_text(curation), analyze_dataset_url(curation), {:class => "btn btn-primary btn-large"}
     when "tsv_stored"
-      return import_dataset_url(curation)
+      return link_to next_step_badge_text(curation), import_dataset_url(curation), {:class => "btn btn-primary btn-large"}
     when "needs_import"
-      return analyze_dataset_url(curation)
+      return link_to next_step_badge_text(curation), analyze_dataset_url(curation), {:class => "btn btn-primary btn-large"}
     when "imported"
-      return archive_dataset_url(curation)
+      return link_to next_step_badge_text(curation), archive_dataset_url(curation), {:class => "btn btn-primary btn-large"}
     when "needs_drop"
-      return "#"
+      return link_to next_step_badge_text(curation), "#", {:class => "btn btn-primary btn-large"}
     when "dropped"
-      return import_dataset_url(curation)
+      return link_to next_step_badge_text(curation), import_dataset_url(curation), {:class => "btn btn-primary btn-large"}
+    when "zero_data"
+      return link_to next_step_badge_text(curation), dataset_path(curation), {:method => :delete, :class => "btn btn-primary btn-large"}
     end
-  end
-  
-  def next_step_badge(curation)
-    tag = "a"
-    if ["needs_drop"].include?(curation.status)
-      tag = "span"
-    end
-    return "<#{tag} class='btn btn-primary btn-large' href='#{next_step_badge_link(curation)}'>#{next_step_badge_text(curation)}</#{tag}>".html_safe
   end
 end

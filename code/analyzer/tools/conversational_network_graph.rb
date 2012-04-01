@@ -43,6 +43,7 @@ class ConversationalNetworkGraph < AnalysisMetadata
       :edge_conditional => edge_conditional,
       :total_range => Edge.last(:order => :time, :graph_id => graph_ids).time-Edge.first(:order => :time, :graph_id => graph_ids).time
     }
+    debugger
     Graphml::Writer::initialize_temp_data(options)
     Gexf::Writer::initialize_temp_data(options)
     edges = Edge.all(:graph_id => graph_ids, :limit => limit, :offset => offset)

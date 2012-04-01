@@ -97,7 +97,7 @@ class AnalyticalOfferingsController < ApplicationController
       flash[:success] = "Analytic Added!"
       @analysis_metadata.ready = true
       @analysis_metadata.save!
-      redirect_to dataset_path(@curation) and return
+      redirect_to analyze_dataset_path(@curation) and return
     else
       @analysis_metadata.variables.each do |var|
         var.destroy

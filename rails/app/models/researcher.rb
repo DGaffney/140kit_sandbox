@@ -18,6 +18,8 @@ class Researcher < ActiveRecord::Base
       user.user_name = auth["info"]["nickname"]
       user.name = auth["info"]["name"]
       user.role = "User"
+      user.created_at = Time.now
+      user.updated_at = Time.now
       user.first_time = true
     end
   end
@@ -49,5 +51,13 @@ class Researcher < ActiveRecord::Base
   
   def curations_count
     return curations.count
+  end
+  
+  def safe_website_url
+    if self.website_url[0..6] != "http://"
+      "http://"+self.website_url
+    else 
+      return self.website_url
+    end
   end
 end

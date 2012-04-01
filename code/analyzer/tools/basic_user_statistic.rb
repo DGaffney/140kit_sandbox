@@ -29,16 +29,16 @@ class BasicUserStatistic < AnalysisMetadata
     end
     results = []
     datapoints.each_pair do |variable, values|
-      results << {:label => "#{variable.to_s}_standard_deviation", :value => values.standard_deviation, :graph_id => graph.id, :curation_id => graph.curation_id}
-      results << {:label => "#{variable.to_s}_average", :value => values.average, :graph_id => graph.id, :curation_id => graph.curation_id}
-      results << {:label => "#{variable.to_s}_sum", :value => values.sum, :graph_id => graph.id, :curation_id => graph.curation_id}
-      results << {:label => "#{variable.to_s}_n", :value => values.length, :graph_id => graph.id, :curation_id => graph.curation_id}
-      results << {:label => "#{variable.to_s}_sample_variance", :value => values.sample_variance, :graph_id => graph.id, :curation_id => graph.curation_id}
-      results << {:label => "#{variable.to_s}_0_percentile", :value => values.percentile(0.0), :graph_id => graph.id, :curation_id => graph.curation_id}
-      results << {:label => "#{variable.to_s}_25_percentile", :value => values.percentile(0.25), :graph_id => graph.id, :curation_id => graph.curation_id}
-      results << {:label => "#{variable.to_s}_50_percentile", :value => values.percentile(0.50), :graph_id => graph.id, :curation_id => graph.curation_id}
-      results << {:label => "#{variable.to_s}_75_percentile", :value => values.percentile(0.75), :graph_id => graph.id, :curation_id => graph.curation_id}
-      results << {:label => "#{variable.to_s}_100_percentile", :value => values.percentile(1.0), :graph_id => graph.id, :curation_id => graph.curation_id}
+      results << {:label => "#{variable.to_s}_standard_deviation", :value => values.standard_deviation, :graph_id => graph.id, :curation_id => graph.curation_id, :analysis_metadata_id => @analysis_metadata.id}
+      results << {:label => "#{variable.to_s}_average", :value => values.average, :graph_id => graph.id, :curation_id => graph.curation_id, :analysis_metadata_id => @analysis_metadata.id}
+      results << {:label => "#{variable.to_s}_sum", :value => values.sum, :graph_id => graph.id, :curation_id => graph.curation_id, :analysis_metadata_id => @analysis_metadata.id}
+      results << {:label => "#{variable.to_s}_n", :value => values.length, :graph_id => graph.id, :curation_id => graph.curation_id, :analysis_metadata_id => @analysis_metadata.id}
+      results << {:label => "#{variable.to_s}_sample_variance", :value => values.sample_variance, :graph_id => graph.id, :curation_id => graph.curation_id, :analysis_metadata_id => @analysis_metadata.id}
+      results << {:label => "#{variable.to_s}_0_percentile", :value => values.percentile(0.0), :graph_id => graph.id, :curation_id => graph.curation_id, :analysis_metadata_id => @analysis_metadata.id}
+      results << {:label => "#{variable.to_s}_25_percentile", :value => values.percentile(0.25), :graph_id => graph.id, :curation_id => graph.curation_id, :analysis_metadata_id => @analysis_metadata.id}
+      results << {:label => "#{variable.to_s}_50_percentile", :value => values.percentile(0.50), :graph_id => graph.id, :curation_id => graph.curation_id, :analysis_metadata_id => @analysis_metadata.id}
+      results << {:label => "#{variable.to_s}_75_percentile", :value => values.percentile(0.75), :graph_id => graph.id, :curation_id => graph.curation_id, :analysis_metadata_id => @analysis_metadata.id}
+      results << {:label => "#{variable.to_s}_100_percentile", :value => values.percentile(1.0), :graph_id => graph.id, :curation_id => graph.curation_id, :analysis_metadata_id => @analysis_metadata.id}
     end
     GraphPoint.save_all(results)
   end
