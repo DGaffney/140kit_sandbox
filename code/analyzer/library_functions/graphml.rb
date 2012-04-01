@@ -156,16 +156,6 @@ module Graphml
     #This will make REALLY LONG generation times for large graphs, but may be unavoidable.
     def self.generate_node_metadata(fs, node_name)
       attributes = {:attributes => []}
-      fs[:node_attributes].each do |node_attribute|
-        case node_attribute
-        when :statuses_count
-          attributes[:attributes] << {:statuses_count => User.first(:screen_name => node_name)&&User.first(:screen_name => node_name).statuses_count||nil}
-        when :followers_count
-          attributes[:attributes] << {:followers_count => User.first(:screen_name => node_name)&&User.first(:screen_name => node_name).followers_count||nil}
-        when :friends_count
-          attributes[:attributes] << {:friends_count => User.first(:screen_name => node_name)&&User.first(:screen_name => node_name).friends_count||nil}
-        end
-      end
       attributes
     end
 

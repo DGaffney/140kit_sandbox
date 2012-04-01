@@ -6,7 +6,6 @@ class BasicHistogram < AnalysisMetadata
   def self.run(analysis_metadata_id)
     @analysis_metadata = AnalysisMetadata.first(:id => analysis_metadata_id)
     curation = @analysis_metadata.curation
-    FilePathing.tmp_folder(curation, self.underscore)
     self.generate_graphs([
       {:model => Tweet, :attribute => :language},
       {:model => Tweet, :attribute => :created_at},
