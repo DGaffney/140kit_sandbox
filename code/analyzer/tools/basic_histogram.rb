@@ -84,7 +84,8 @@ class BasicHistogram < AnalysisMetadata
       else
         results = records.call(limit, offset)
         while !results.empty?
-          graph_points = results.collect{|record| {:label => record.first, :value => record.last, :graph_id => graph.id, :curation_id => graph.curation_id}}
+          debugger if graph.id == 35
+          graph_points = results.collect{|record| {:label => record.first, :value => record.last, :graph_id => graph.id, :curation_id => graph.curation_id, :analysis_metadata_id => @analysis_metadata.id}}
           graph_points = graph.sanitize_points(graph_points)
           GraphPoint.save_all(graph_points) if fs[:generate_graph_points]
           offset+=limit
