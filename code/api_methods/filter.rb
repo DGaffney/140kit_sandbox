@@ -106,16 +106,16 @@ class Filter < Instance
     puts "Collecting: #{params_for_stream.inspect}"
     client = TweetStream::Client.new
     client.on_interval(CHECK_FOR_NEW_DATASETS_INTERVAL) { 
+      datasets = @datasets
+      time = @start_time
       need_to_stop = touch_and_check_for_finished
       client.stop if add_datasets || need_to_stop
-      time = @start_time
-      datasets = @datasets
       print "^"
       if time+RSYNC_INTERVAL < Time.now
-        # Thread.new do
+        Thread.new do
           print "[]"
           rsync_previous_files(datasets, time)
-        # end
+        end
         @start_time = Time.now
       end
     }
@@ -240,9 +240,8 @@ class Filter < Instance
   end
   
   def determine_datasets(tweet)
-    return [@datasets.first.id] if @datasets.length == 1
     valid_datasets = []
-    params.each_pair do |method, values|
+    @params.each_pair do |method, values|
       if method == "locations"
         values.each do |value|
           valid_datasets << value[:dataset_id] if any_in_location?(value[:params], tweet)
