@@ -53,17 +53,33 @@ class Curation < ActiveRecord::Base
     #this is bad design, I know. It's just the first thing I thought of that could do this - problem is I'm not sure you can access a specific object from within model?
     case self.status
     when "tsv_storing"
-      return "<a href='/datasets/#{self.id}/analyze'>Set Analytics</a>"
+      if self.tweets_count == 0
+        return "No Tweets Yet"
+      else
+        return "<a href='/datasets/#{self.id}/analyze'>Set Analytics</a>"
+      end
     when "tsv_stored"
-      return "<a href='/datasets/#{self.id}/analyze'>Set Analytics</a> | <a href='/datasets/#{self.id}/import'>Bring it live</a>"
+      if self.tweets_count == 0
+        return "No Tweets"
+      else
+        return "<a href='/datasets/#{self.id}/analyze'>Set Analytics</a> | <a href='/datasets/#{self.id}/import'>Bring it live</a>"
+      end
     when "needs_import"
       return "Sit tight..."
     when "imported"
-      return "<a href='/datasets/#{self.id}/analyze'>Set Analytics</a>"
+      if self.tweets_count == 0
+        return "No Tweets"
+      else
+        return "<a href='/datasets/#{self.id}/analyze'>Set Analytics</a>"
+      end
     when "needs_drop"
       return "Sit tight..."
     when "dropped"
-      return "<a href='/datasets/#{self.id}/analyze'>Set Analytics</a> | <a href='/datasets/#{self.id}/import'>Restore</a>"
+      if self.tweets_count == 0
+        return "No Tweets"
+      else
+        return "<a href='/datasets/#{self.id}/analyze'>Set Analytics</a> | <a href='/datasets/#{self.id}/import'>Restore</a>"
+      end
     when "zero_data"
       if self.researcher_id == current_user.id
         return "No Tweets Found! <a href='/datasets/#{self.id}/destroy'>Remove</a>"

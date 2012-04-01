@@ -1,12 +1,16 @@
 h1 Analysis for #{link_to @curation.name, dataset_path(@curation)}
-h2 Already Applied
-- if @analysis_metadatas.length == 0
-  p No analytical offerings currently applied!
-- else
-  == render partial: '/analysis_metadata/table', :locals => {:analysis_metadatas => @analysis_metadatas}
+- if @curation.tweets_count >= 1
+  h2 Already Applied
+  - if @analysis_metadatas.length == 0
+    p No analytical offerings currently applied!
+  - else
+    == render partial: '/analysis_metadata/table', :locals => {:analysis_metadatas => @analysis_metadatas}
 
-h2 Available
-- if @analytical_offerings.length == 0
-  p No more analytical offerings currently available!
+  h2 Available
+  - if @analytical_offerings.length == 0
+    p No more analytical offerings currently available!
+  - else
+    == render partial: '/analytical_offerings/table', :locals => {:analytical_offerings => @analytical_offerings}
+
 - else
-  == render partial: '/analytical_offerings/table', :locals => {:analytical_offerings => @analytical_offerings}
+  p You can't add any analytics until we have received at least one tweet.

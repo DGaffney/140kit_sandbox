@@ -47,7 +47,6 @@ class Worker < Instance
   def switch_curation_statuses
     statuses = ["tsv_storing", "tsv_stored", "needs_import", "imported", "live", "needs_drop", "dropped", "zero_data"]
     Curation.all(:status.not => ["zero_data", "imported", "tsv_stored", "dropped"]).unlocked.each do |curation|
-      debugger
       datasets = curation.datasets
       if curation.tweets_count == 0 && curation.status == "tsv_storing"
         datasets.each do |dataset|
