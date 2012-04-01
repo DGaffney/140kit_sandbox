@@ -283,16 +283,6 @@ module Gexf
     #attribute looks like => {:for => attribute_name, :value => value, :start => start_time, :end => end_time}
     def self.generate_node_metadata(fs, node_name)
       attributes = {:attributes => []}
-      fs[:node_attributes].each do |node_attribute|
-        case node_attribute
-        when :statuses_count
-          attributes[:attributes] << {:for => :statuses_count, :value => User.first(:screen_name => node_name)&&User.first(:screen_name => node_name).statuses_count||nil}
-        when :followers_count
-          attributes[:attributes] << {:for => :followers_count, :value => User.first(:screen_name => node_name)&&User.first(:screen_name => node_name).followers_count||nil}
-        when :friends_count
-          attributes[:attributes] << {:for => :friends_count, :value => User.first(:screen_name => node_name)&&User.first(:screen_name => node_name).friends_count||nil}
-        end
-      end
       attributes
     end
 
