@@ -195,9 +195,9 @@ class Filter < Instance
         end
       end
     end
-    files.each do |file|
-      `rm #{file}`
-    end
+    # files.each do |file|
+    #   `rm #{file}`
+    # end
   end
 
   def data_from_queue(tmp_queue)
