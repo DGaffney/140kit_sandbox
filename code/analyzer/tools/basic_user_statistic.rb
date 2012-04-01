@@ -18,11 +18,11 @@ class BasicUserStatistic < AnalysisMetadata
     users = User.all(:limit => limit, :offset => offset, :dataset_id => curation.datasets.collect{|d| d.id})
     while !users.empty?
       users.each do |user|
-        datapoints[:followers_count] << user.followers_count
-        datapoints[:friends_count] << user.friends_count
-        datapoints[:statuses_count] << user.statuses_count
-        datapoints[:listed_count] << user.listed_count
-        datapoints[:favourites_count] << user.favourites_count
+        datapoints[:followers_count] << user.followers_count || 0
+        datapoints[:friends_count] << user.friends_count || 0
+        datapoints[:statuses_count] << user.statuses_count || 0
+        datapoints[:listed_count] << user.listed_count || 0
+        datapoints[:favourites_count] << user.favourites_count || 0
       end
       offset+=limit
       users = User.all(:limit => limit, :offset => offset, :dataset_id => curation.datasets.collect{|d| d.id})
