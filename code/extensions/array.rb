@@ -14,6 +14,7 @@ class Array
   end
 
   def standard_deviation
+    return 0 if self.empty?
     return Math.sqrt(self.sample_variance)
   end
   
