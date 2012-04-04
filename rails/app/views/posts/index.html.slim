@@ -1,0 +1,8 @@
+- if @posts.empty?
+  p No Posts Found.
+- else
+  - for post in @posts
+    h2 = link_to post.title, post_path(post.id, post.slug)
+    p = post.created_at.strftime('%B %d, %Y at %l:%M:%S %P')
+    p = post.teaser
+  = will_paginate(@posts)
