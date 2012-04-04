@@ -30,6 +30,7 @@ class CurationsController < ApplicationController
       @datasets = []
       @curation.created_at = Time.now
       @curation.updated_at = @curation.created_at
+      @curation.privatized = !params[:privatized].nil?
       @curation.status = "tsv_storing"
       @curation.single_dataset = false
       name = params[:name].empty? ? params[:params] : params[:name]
@@ -77,7 +78,7 @@ class CurationsController < ApplicationController
       @datasets = []
       @curation.created_at = Time.now
       @curation.updated_at = @curation.created_at
-      @curation.privatized = params[:privatized]
+      @curation.privatized = !params[:privatized].nil?
       @curation.status = "tsv_storing"
       @curation.single_dataset = false
       name = params[:name].empty? ? params[:params] : params[:name]

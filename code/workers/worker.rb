@@ -48,7 +48,7 @@ class Worker < Instance
     statuses = ["tsv_storing", "tsv_stored", "needs_import", "imported", "live", "needs_drop", "dropped", "zero_data"]
     Curation.all(:status.not => ["zero_data", "imported", "tsv_stored", "dropped"]).unlocked.each do |curation|
       datasets = curation.datasets
-      if curation.tweets_count == 0 && curation.status == "tsv_storing" && curation.finished?
+      if curation.tweets_count == 0 && curation.status == "tsv_storing" && curation.finished? && curation.status != "tsv_storing"
         datasets.each do |dataset|
           dataset.status = "zero_data"
           dataset.save!

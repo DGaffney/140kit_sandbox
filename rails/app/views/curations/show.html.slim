@@ -12,8 +12,10 @@
       a href=researcher_path(@curation.researcher.user_name) = @curation.researcher.user_name
 br
 p = current_status(@curation)
+hr
 h2 Overview:
 == render partial: '/datasets/table', locals: {datasets: @curation.datasets.paginate(:page => params[:datasets_page], :per_page => 4)}  
+hr
 h2 Analytics:
 - if @curation.analysis_metadatas.empty? && @curation.tweets_count != 0
     p No analytics added yet. 
@@ -25,5 +27,6 @@ h2 Analytics:
   == render partial: 'analytics', locals: {analysis_metadatas: @curation.analysis_metadatas.paginate(:page => params[:analysis_page], :per_page => 4)}
   - if current_user
     #{link_to "Add Analytic", analyze_dataset_path(@curation)}
+hr
 h2 Dataset Discussion
 == render partial: '/partials/disqus'

@@ -7,4 +7,6 @@
     == render partial: 'table', locals: {curations: @curations}
 - if current_user
   p.align-center
-    = link_to "Add a Dataset", new_dataset_path, class: 'btn btn-large btn-primary'
+    = link_to new_dataset_path, class: 'btn btn-large btn-primary' do
+      i.icon-plus.icon-white
+      |  New Dataset
