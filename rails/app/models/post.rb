@@ -6,7 +6,7 @@ class Post < ActiveRecord::Base
   end
   
   def teaser(length=250)
-    words = self.text[0..length].split(" ")
+    words = self.text.gsub(/<.*>/, "")[0..length].split(" ")
     words[0..words.length-2].join(" ")+"..."
   end
 end

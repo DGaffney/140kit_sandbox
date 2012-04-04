@@ -9,6 +9,7 @@ class Curation
   property :updated_at, Time, :default => Time.now
   property :archived, ParanoidBoolean, :default => false
   property :status, String, :default => "tsv_storing"
+  property :private, Boolean
   property :researcher_id, Integer, :index => [:curation_researcher_id, :researcher_id, :researcher_id_previously_imported, :researcher_id_single_dataset]
   belongs_to :researcher, :child_key => :researcher_id
   has n, :datasets, :through => Resource

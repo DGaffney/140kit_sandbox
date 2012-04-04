@@ -35,6 +35,8 @@ html
                 = link_to 'Datasets', datasets_path
               li class=('active' if current_route?('analytical_offerings#index'))
                 = link_to 'Analytics', analytical_offerings_path
+              li class=('active' if current_route?('posts#index'))
+                = link_to 'News', posts_path
             ul.nav.pull-right#user-nav
               - if current_user
                 li class=('active' if current_route?('researchers#dashboard'))

@@ -1,11 +1,11 @@
 class CurationsController < ApplicationController
   before_filter :login_required, except: [:index, :researcher, :show, :search]
   def index
-    @curations = Curation.paginate(:page => params[:page], :per_page => 20, :order => "id desc")
+    @curations = Curation.where(:privatized => false).paginate(:page => params[:page], :per_page => 20, :order => "id desc")
   end
   
   def search
-    @curations = Curation.where(:id => AnalysisMetadata.where(:analytical_offering_id => params[:analytic_id]).collect(&:curation_id)).paginate(:page => params[:page], :per_page => 20) if params[:analytic_id]
+    @curations = Curation.where(:privatized => false, :id => AnalysisMetadata.where(:analytical_offering_id => params[:analytic_id]).collect(&:curation_id)).paginate(:page => params[:page], :per_page => 20) if params[:analytic_id]
     @curations = []
   end
   
@@ -21,6 +21,7 @@ class CurationsController < ApplicationController
 
   def new
     @curation = Curation.new
+    @researcher = Researcher.find(current_user.id)
   end
 
   def create
@@ -76,6 +77,7 @@ class CurationsController < ApplicationController
       @datasets = []
       @curation.created_at = Time.now
       @curation.updated_at = @curation.created_at
+      @curation.privatized = params[:privatized]
       @curation.status = "tsv_storing"
       @curation.single_dataset = false
       name = params[:name].empty? ? params[:params] : params[:name]

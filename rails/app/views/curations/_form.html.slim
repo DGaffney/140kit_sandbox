@@ -1,3 +1,4 @@
+- @researcher = Researcher.find(current_user.id)
 .row
   .span12
     = form_tag(datasets_path, id: 'new-curation-form') do
@@ -8,6 +9,9 @@
           .controls
             label.control-label Enter a name for this dataset (optional, default will be the terms you selected)
             = text_field_tag :name, params[:name], :class => "input-xlarge"
+          .controls
+            label.control-label Is this Dataset Private?
+            = check_box_tag :privatized, (params[:privatized]||@researcher.private_data), (params[:privatized]||@researcher.private_data), :class => "input-xlarge"
           .controls
             label.control-label How long should we collect this data?
             //= range_field_tag :end_time, params[:end_time]||Curation.default_time_series, :in => Curation.default_time_series..Curation.max_time, :step => Curation.default_step, :class => 'input-full'
