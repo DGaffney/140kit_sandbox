@@ -81,6 +81,10 @@ class Researcher
     return self.role == "Admin"
   end
   
+  def tweet_limit
+    Setting.first(:name => "user_role_tweet_limit", :var_type => self.role).value
+  end
+
   protected
   # before filter 
   def encrypt_password

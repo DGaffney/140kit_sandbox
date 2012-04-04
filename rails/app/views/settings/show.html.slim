@@ -1,0 +1,15 @@
+b Name:
+p = @setting.name 
+
+b Value:
+p = @setting.actual_value
+
+b Var Type:
+p = @setting.var_type 
+
+b Var Class:
+p = @setting.var_class
+
+= link_to 'Edit', edit_setting_path(@setting)
+span  | 
+= link_to 'Back', settings_path 

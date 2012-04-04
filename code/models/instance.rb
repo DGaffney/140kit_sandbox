@@ -18,7 +18,7 @@ class Instance
   
   attr_accessor :metadata, :rest_allowed, :last_count_check, :tmp_path, :tmp_data, :check_in_thread
   
-  SLEEP_CONSTANT = 20
+  @sleep_constant = lambda{Setting.first(:name => "sleep_constant", :var_type => "Instance Settings").value} rescue 30
   
   def initialize
     super

@@ -3,6 +3,7 @@ class Setting
   property :id, Serial, :serial => true
   property :name, String
   property :var_type, String
+  property :var_class, String
   property :value, Object
   
   def self.grab(var_type)

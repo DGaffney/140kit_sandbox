@@ -22,6 +22,10 @@ class Dataset
     curations.first(:single_dataset => true)
   end
   
+  def researcher
+    curations.first(:order => "created_at").researcher
+  end
+  
   def self.scrape_types
     ['track', 'follow', 'locations', 'import', 'audience_profile']
   end

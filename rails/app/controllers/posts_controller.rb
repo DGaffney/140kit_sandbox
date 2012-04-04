@@ -1,4 +1,6 @@
 class PostsController < ApplicationController
+  before_filter :login_required, except: [:index, :show]
+  before_filter :admin_required, only: [:update, :create, :edit, :destroy, :panel]
   def index
     @posts = Post.where(:status => "regular").paginate(:page => params[:page], :per_page => 10, :order => "created_at desc")
 
@@ -10,11 +12,6 @@ class PostsController < ApplicationController
 
   def show
     @post = Post.find_by_id_and_slug(params[:id], params[:slug])
-  end
-  
-  def about
-    @post = Post.find_by_slug("about") || Post.first #remove or when we have the page.
-    render action: "show"
   end
   
   def new

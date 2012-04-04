@@ -1,7 +1,7 @@
 class InstancesController < ApplicationController
-  before_filter :login_required
+  before_filter :admin_required
   def index_instance
-    @instances = Instance.all
+    @instances = Instance.paginate(:page => params[:page], :per_page => 16)
   end
 
   def index_machine

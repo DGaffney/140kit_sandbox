@@ -1,4 +1,5 @@
 class AnalyticalOfferingVariableDescriptorsController < ApplicationController
+  before_filter :admin_required, except: [:show, :index]
   # GET /analytical_offering_variable_descriptors
   # GET /analytical_offering_variable_descriptors.json
   def index

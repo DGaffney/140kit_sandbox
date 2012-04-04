@@ -5,9 +5,6 @@ class Importer < Instance
   # attr_accessor :user_account, :username, :password, :start_time, :next_dataset_ends, :queue, :params, :datasets
   attr_accessor :curation
   
-  @@words = File.open(File.dirname(__FILE__)+"/../analyzer/resources/words.txt", "r").read.split
-  @@rest_analytics = ["retweet_graph"]
-  
   def initialize
     super
     self.instance_type = "importer"
@@ -31,7 +28,7 @@ class Importer < Instance
         work_routine
       else
         puts "Just nappin'."
-        sleep(SLEEP_CONSTANT)
+        sleep(@sleep_constant.call)
       end
     end
   end

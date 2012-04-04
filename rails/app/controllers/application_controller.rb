@@ -15,7 +15,7 @@ class ApplicationController < ActionController::Base
 
   def admin_required
     if current_user.nil? || (Researcher.find(current_user.id) && !Researcher.find(current_user.id).admin?)
-      redirect_to root_path, alert: "You must be logged in to view this page."
+      redirect_to root_path, alert: "You must be an admin in to view this page."
     end
   end
 

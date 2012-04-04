@@ -1,4 +1,6 @@
 class AnalyticalOfferingsController < ApplicationController
+  before_filter :admin_required, except: [:show, :index, :add, :validate]
+  before_filter :login_required, only: [:add, :validate]
   def show
     @analytical_offering = AnalyticalOffering.find(params[:id])
     @dependencies = AnalyticalOfferingRequirement.where(:analytical_offering_id => @analytical_offering.id).order(:position).paginate(:page => params[:requirement_page], :per_page => 4)

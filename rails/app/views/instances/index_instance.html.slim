@@ -8,9 +8,6 @@ p
           span.over_image = instance.id
           .well
             img.pull-left.twitter-pic src=instance.machine_image
-                a href=edit_machine_path(instance.machine) Edit Machine
-                br 
-                a href=kill_machine_path(instance.machine) Kill Machine
                 - if !instance.killed
                   br 
                   a href=kill_instance_path(instance) Kill Instance
@@ -22,3 +19,4 @@ p
                 br 
                 a href=instance_path(instance) Instance Stats
 
+== will_paginate(@instances)

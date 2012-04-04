@@ -1,5 +1,6 @@
 class AnalyticalOfferingVariablesController < ApplicationController
-  # GET /analytical_offering_variables
+  before_filter :admin_required, except: [:show, :index]
+    # GET /analytical_offering_variables
   # GET /analytical_offering_variables.json
   def index
     @analytical_offering_variables = AnalyticalOfferingVariable.all

@@ -66,7 +66,7 @@
   <ul>
     <% for row in @dataset %>
       <% if row[:label] == "proportion_geos" || row[:label] == "proportion_coordinates" %>
-        <li><b><%= row[:label].split("_").collect(&:capitalize).join(" ") %>: </b><%= row[:value].to_f.round(3) %>%</li>
+        <li><b><%= row[:label].split("_").collect(&:capitalize).join(" ") %>: </b><%= (row[:value].to_f*100).round(3) %>%</li>
       <% else %>
         <li><b><%= row[:label].split("_").collect(&:capitalize).join(" ") %>: </b><%= number_with_delimiter(row[:value].to_i) %></li>
       <% end %>

@@ -1,6 +1,5 @@
 class AnalyticalOfferingRequirementsController < ApplicationController
-  # GET /analytical_offering_requirements
-  # GET /analytical_offering_requirements.json
+  before_filter :admin_required, except: [:show, :index]
   def index
     @analytical_offering_requirements = AnalyticalOfferingRequirement.all
 

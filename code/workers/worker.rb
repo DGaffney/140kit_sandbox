@@ -33,7 +33,7 @@ class Worker < Instance
         work_routine
       else
         puts "Just nappin'."
-        sleep(SLEEP_CONSTANT)
+        sleep(@sleep_constant.call)
       end
     end
   end
@@ -45,8 +45,9 @@ class Worker < Instance
   end
   
   def switch_curation_statuses
-    statuses = ["tsv_storing", "tsv_stored", "needs_import", "imported", "live", "needs_drop", "dropped", "zero_data"]
-    Curation.all(:status.not => ["zero_data", "imported", "tsv_stored", "dropped"]).unlocked.each do |curation|
+    statuses = Setting.first(:name => "statuses", :var_type => "Dataset Settings").value
+    unflippable_statuses = Setting.first(:name => "unflippable_statuses", :var_type => "Dataset Settings").value
+    Curation.all(:status.not => unflippable_statuses).unlocked.each do |curation|
       datasets = curation.datasets
       if curation.tweets_count == 0 && curation.status == "tsv_storing" && curation.finished? && curation.status != "tsv_storing"
         datasets.each do |dataset|

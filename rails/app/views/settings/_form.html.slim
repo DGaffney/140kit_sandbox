@@ -1,0 +1,17 @@
+= form_for(@setting) do |f|
+  fieldset
+    .span12
+      label.control-label Name
+      .controls
+        = f.text_field :name, class: 'input-xlarge'
+      label.control-label Var Type
+      .controls
+        = f.text_field :var_type, class: 'input-xlarge'
+      label.control-label Value
+      .controls
+        = f.text_field :value, class: 'input-xlarge', value: @setting.value.nil? ? nil : @setting.actual_value
+      label.control-label Var Class
+      .controls
+        = f.select :var_class, [["String", "string"], ["Integer", "integer"], ["Array", "array"], ["Float", "float"]], class: 'input-xlarge'
+      .form-actions
+        = submit_tag 'Submit', class: 'btn btn-primary'

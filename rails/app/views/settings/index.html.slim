@@ -1,0 +1,20 @@
+h1 Settings
+table.table.table-striped.table-bordered
+  thead
+    tr
+      th Name
+      th Var Type
+      th Var Class
+      th Value
+      th Options
+  tbody
+    - for setting in @settings
+      tr
+        td = setting.name
+        td = setting.var_type
+        td = setting.var_class
+        td = setting.actual_value.to_s.length > 50 ? setting.actual_value.to_s[0..50]+"..." : setting.actual_value.to_s
+        td = "#{link_to 'Edit', edit_setting_path(setting)} | #{link_to 'Destroy', setting, confirm: 'Are you sure?', method: :delete}".html_safe
+
+= will_paginate(@settings)
+= link_to "Add Setting", new_setting_path

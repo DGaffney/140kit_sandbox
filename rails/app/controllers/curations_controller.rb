@@ -25,6 +25,7 @@ class CurationsController < ApplicationController
   end
 
   def create
+    success = ""
     if !curation_is_same?
       @curation = Curation.new
       @datasets = []
@@ -66,10 +67,12 @@ class CurationsController < ApplicationController
       end
       @curation.save!
       @datasets.collect{|d| d.curations << @curation}
+      success = "Dataset successfully created. We're collecting your tweets!"
     else
       @datasets = @curation.datasets
+      success = "Sorry, You can't actually add a new dataset until your identical one is finished streaming."
     end
-    redirect_to dataset_url(@curation), flash: { success: "Dataset successfully created. We're collecting your tweets!" }
+    redirect_to dataset_url(@curation), flash: { success:  success}
   end
 
   def validate
@@ -195,7 +198,7 @@ class CurationsController < ApplicationController
   private
 
   def curation_is_same?
-    @curation = Curation.find_by_name_and_researcher_id(params[:name], session[:researcher_id])
+    @curation = Curation.find_by_name_and_researcher_id_and_status(params[:name], session[:researcher_id], "tsv_storing")
     result = @curation && 
              @curation.datasets.collect{|d| d.params.split(",").first}.sort == params[:name].split(",").sort && 
              @curation.datasets.first.params.split(",").last.to_i == params[:end_time].to_i
