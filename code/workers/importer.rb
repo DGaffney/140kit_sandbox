@@ -110,8 +110,8 @@ class Importer < Instance
     end
     secondary_models = [Graph, GraphPoint, Edge]
     secondary_models.each do |a_model|
-      threads = []
-      threads << Thread.new(a_model) do |model|
+      # threads = []
+      # threads << Thread.new(a_model) do |model|
         debugger
         offset = 0
         limit = 10000
@@ -138,7 +138,7 @@ class Importer < Instance
           offset += limit
           finished = true if remaining != 0
         end
-      end
+      # end
       threads.collect{|t| t.join}
     end
     @curation.status = "dropped"
