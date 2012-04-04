@@ -41,15 +41,19 @@ class Importer < Instance
   
   def select_curation(curations_type)
     #we can't import/archive until all workers have let go of the dataset, so we need to check for unlocked status of all analysis metadatas... I think. something is occuring where graphs are getting deleted/not getting re-imported.
-    puts "select_curation..."
     curations = self.send(curations_type+"_curations")
     for curation in curations
       curation.lock if curation.all_analysis_metadatas_clear?
       return curation if curation.owned_by_me?
     end
+    clean_locks
     return nil
   end
   
+  def clean_locks
+    Lock.all(:instance_id => ENV['INSTANCE_ID']).destroy
+  end
+
   def importable_curations
     Curation.unlocked.all(:status => "needs_import", :previously_imported => false).reject {|c| c.datasets.collect {|d| d.scrape_finished }.include?(false) }.shuffle
   end
@@ -65,6 +69,7 @@ class Importer < Instance
   def archive_datasets
     @curation = select_curation("archivable")
     return nil if @curation.nil?
+    puts "Archiving curation #{@curation.id}..."
     primary_models = [Tweet, User, Entity, Geo, Coordinate, Location, TrendingTopic, Friendship]
     storage = Machine.first(:id => @curation.datasets.first.storage_machine_id).machine_storage_details
     config = DataMapper.repository.adapter.options
@@ -143,6 +148,7 @@ class Importer < Instance
   def import_datasets(import_type)
     @curation = select_curation(import_type)
     return nil if @curation.nil?
+    puts "Archiving curation #{@curation.id}..."
     models = [Tweet, User, Entity, Geo, Coordinate, Location, TrendingTopic, Friendship]
     optional_enclosed_by = import_type == "importable" ? "optionally enclosed by '\"'" : ""
     line_separator_escaped = import_type == "importable" ? "\\0" : "\\n"

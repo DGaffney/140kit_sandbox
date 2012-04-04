@@ -214,8 +214,7 @@ module Locking
     def locked?
       return self.owned?
     end
-  end
-  
+  end  
 end
 
 DataMapper::Model.append_extensions(Locking::ClassMethods)
