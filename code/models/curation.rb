@@ -78,6 +78,14 @@ class Curation
     return still_collecting
   end
   
+  def finished?
+    finished = false
+    self.datasets.each do |dataset|
+      finished = true if dataset.scrape_finished
+    end
+    return finished
+  end
+
   def all_analysis_metadatas_clear?
     all_free = self.analysis_metadatas.empty? || !self.analysis_metadatas.collect{|am| am.owned?}.include?(true)
     all_finished = self.analysis_metadatas.empty? || (!self.analysis_metadatas.collect{|am| !am.finished}.include?(true) || ["tsv_storing", "tsv_stored", "needs_import"].include?(self.status))

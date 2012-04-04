@@ -7,18 +7,12 @@
       label.control-label Function
       .controls
         = f.text_field :slug, class: 'input-xlarge'
-      label.control-label Created By
+      label.control-label Text
       .controls
-        = f.text_field :slug, class: 'input-xlarge'
-      label.control-label Created By Link
-      .controls
-        = f.text_field :text, class: 'input-xlarge'
-      label.control-label REST only?
-      .controls
-        = f.text_area :text, class: 'input-xlarge'
+        = f.text_area :text, class: 'input-xxlarge'
       label.control-label Status
       .controls
-        = f.text_field :status, class: 'input-xlarge'
+        = f.select(:status, [['Regular', 'regular'],['Featured', 'featured'],['Hidden', 'hidden']], class: 'input-xlarge')
       = f.hidden_field :researcher_id, :value => current_user.id
     .span12
       .form-actions

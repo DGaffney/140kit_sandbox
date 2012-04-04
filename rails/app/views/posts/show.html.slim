@@ -6,3 +6,4 @@ p.byline
 
 - if current_user && current_user.admin?
   = link_to "Edit", edit_post_path(@post)
+== render partial: '/partials/disqus'

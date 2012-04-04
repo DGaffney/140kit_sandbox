@@ -105,7 +105,41 @@ class Filter < Instance
   def collect
     puts "Collecting: #{params_for_stream.inspect}"
     client = TweetStream::Client.new
-    client.on_interval(CHECK_FOR_NEW_DATASETS_INTERVAL) { 
+    begin
+      client.on_interval(CHECK_FOR_NEW_DATASETS_INTERVAL) { 
+        datasets = @datasets
+        time = @start_time
+        need_to_stop = touch_and_check_for_finished
+        client.stop if add_datasets || need_to_stop
+        print "^"
+        if time+RSYNC_INTERVAL < Time.now
+          Thread.new do
+            print "[]"
+            rsync_previous_files(datasets, time)
+          end
+          @start_time = Time.now
+        end
+      }
+      client.on_limit { |skip_count| print "*#{skip_count}*" }
+      client.on_error { |message| puts "\nError: #{message}\n";client.stop }
+      client.filter(params_for_stream) do |tweet|
+        # puts "[tweet] #{tweet[:user][:screen_name]}: #{tweet[:text]}"
+        print "."
+        @queue << tweet
+        if @queue.length >= BATCH_SIZE
+          tmp_queue = @queue
+          @queue = []
+          Thread.new do
+            save_queue(tmp_queue)
+          end
+        end
+      end
+    rescue  Exception => e
+      f = File.open("error.log", "a+")
+      f.write(Time.now)
+      f.write(e.message+"\n")
+      f.write(e.backgrace.inspect+"\n")
+      puts "Filter encountered an error - it has been written to file."
       datasets = @datasets
       time = @start_time
       need_to_stop = touch_and_check_for_finished
@@ -117,20 +151,6 @@ class Filter < Instance
           rsync_previous_files(datasets, time)
         end
         @start_time = Time.now
-      end
-    }
-    client.on_limit { |skip_count| print "*#{skip_count}*" }
-    client.on_error { |message| puts "\nError: #{message}\n";client.stop }
-    client.filter(params_for_stream) do |tweet|
-      # puts "[tweet] #{tweet[:user][:screen_name]}: #{tweet[:text]}"
-      print "."
-      @queue << tweet
-      if @queue.length >= BATCH_SIZE
-        tmp_queue = @queue
-        @queue = []
-        Thread.new do
-          save_queue(tmp_queue)
-        end
       end
     end
   end
