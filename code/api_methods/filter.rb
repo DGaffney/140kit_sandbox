@@ -136,7 +136,7 @@ class Filter < Instance
       f = File.open("error.log", "a+")
       f.write(Time.now)
       f.write(e.message+"\n")
-      f.write(e.backgrace.inspect+"\n")
+      f.write(e.backtrace.inspect+"\n")
       puts "Filter encountered an error - it has been written to file."
       datasets = @datasets
       time = @start_time
