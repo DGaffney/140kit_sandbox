@@ -84,7 +84,6 @@ class Importer < Instance
           while !finished
             next_set = remaining>limit ? limit : remaining
             remaining = (remaining-limit)>0 ? remaining-limit : 0
-            debugger
             puts "Archiving #{offset} - #{offset+next_set} (#{model})"
             path = ENV["TMP_PATH"]
             Sh::mkdir(path)
