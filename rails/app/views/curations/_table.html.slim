@@ -12,8 +12,6 @@
         th Status
         th Tweets
         th Users
-        - if show_options && current_user
-          th Options
     tbody
       - for curation in curations
         tr
@@ -22,7 +20,5 @@
           td = curation.current_status
           td = number_with_delimiter(curation.tweets_count)
           td = number_with_delimiter(curation.users_count)
-          - if show_options && current_user
-            td = curation.current_options(current_user).html_safe
 
   = will_paginate(curations)

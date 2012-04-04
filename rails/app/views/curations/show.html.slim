@@ -25,4 +25,5 @@ h2 Analytics:
   == render partial: 'analytics', locals: {analysis_metadatas: @curation.analysis_metadatas.paginate(:page => params[:analysis_page], :per_page => 4)}
   - if current_user
     #{link_to "Add Analytic", analyze_dataset_path(@curation)}
-  
+h2 Dataset Discussion
+== render partial: '/partials/disqus'

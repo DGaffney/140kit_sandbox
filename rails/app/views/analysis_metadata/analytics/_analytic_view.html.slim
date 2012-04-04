@@ -34,3 +34,6 @@ h2 Analytical Process: #{link_to @analysis_metadata.title, analytical_offering_p
           = @analysis_metadata.analytical_offering.enabled ? "Online" : "Offline"
   .span9
     div#graph
+
+h2 Analytic Discussion
+== render partial: '/partials/disqus'
