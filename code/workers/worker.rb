@@ -72,7 +72,6 @@ class Worker < Instance
   end
   
   def select_curation
-    puts "select_curation..."
     curations = Curation.unlocked.all(:status.not => ["tsv_storing"]).reject {|c| c.datasets.collect {|d| d.scrape_finished }.include?(false) }.shuffle
     for curation in curations
       curation.lock
@@ -83,10 +82,10 @@ class Worker < Instance
   
   def clean_orphans
     return if !self.last_system_check.nil? && (Time.now-self.last_system_check) < 900
-    puts "clean_orphans..."
     Instance.all.each do |instance|
       process_report = Sh::bt("ssh #{instance.hostname} 'ps -p #{instance.pid}'").split("\n")
       if process_report.length == 1 || process_report.last && process_report.last.scan(/(.*#{instance.pid}.*pts\/.*\d\d:\d\d:\d\d (ruby|rdebug))/).flatten.first != process_report.last
+        puts "Cleaning Orphan..."
         Sh::bt("ssh #{instance.hostname} 'rm -r 140kit_sandbox/code/tmp_files/#{instance.instance_id}'")
         Lock.all(:instance_id => instance.instance_id).destroy
         instance.destroy
@@ -103,7 +102,6 @@ class Worker < Instance
   end
   
   def do_analysis_jobs
-    puts "do_analysis_jobs..."
     # WARNING: TODO: rest_allowed not implemented yet
     while AnalysisMetadata.unlocked.all(:finished => false, :ready => true).select{|am| ["imported", "live"].include?(am.curation.status)}.length!=0
       metadata = AnalysisMetadata.unlocked.all(:finished => false, :ready => true).select{|am| ["imported", "live"].include?(am.curation.status)}.shuffle.first
@@ -122,6 +120,7 @@ class Worker < Instance
   end
   
   def route(metadata)
+    puts "Routing Analysis..."
     case metadata.language
     when "ruby"
       Analysis::Dependencies.send(metadata.function)
