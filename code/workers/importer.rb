@@ -116,7 +116,7 @@ class Importer < Instance
         limit = 10000
         remaining = model.count(:curation_id => @curation.id)
         finished = false
-        while remaining != 0
+        while !finished
           next_set = remaining>limit ? limit : remaining
           remaining = (remaining-limit)>0 ? remaining-limit : 0        
           puts "Archiving #{offset} - #{offset+next_set} (#{model})"
