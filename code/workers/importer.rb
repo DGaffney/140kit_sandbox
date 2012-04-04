@@ -112,13 +112,14 @@ class Importer < Instance
     secondary_models.each do |a_model|
       threads = []
       threads << Thread.new(a_model) do |model|
+        debugger
         offset = 0
         limit = 10000
         remaining = model.count(:curation_id => @curation.id)
         finished = false
         while !finished
           next_set = remaining>limit ? limit : remaining
-          remaining = (remaining-limit)>0 ? remaining-limit : 0        
+          remaining = (remaining-limit)>0 ? remaining-limit : 0
           puts "Archiving #{offset} - #{offset+next_set} (#{model})"
           path = ENV["TMP_PATH"]
           Sh::mkdir(path)
