@@ -16,7 +16,7 @@ class CurationsController < ApplicationController
   
   def show
     @curation = Curation.find_by_id(params[:id])
-    @curation.touch
+    @curation.touch if !["needs_drop", "dropped"].include?(@curation.status)
   end
 
   def new
