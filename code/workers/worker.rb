@@ -62,12 +62,15 @@ class Worker < Instance
       end
     end
     Curation.all(:updated_at.lte => Time.now-60*60*24, :status => "imported").each do |curation|
-      curation.status = "needs_drop"
-      curation.datasets.each do |dataset|
-        dataset.status = "needs_drop"
-        dataset.save!
+      analysis_metadatas = curation.analysis_metadatas
+      if AnalysisMetadata.all(:id => analysis_metadatas.collect(&:id)).unlocked.length == analysis_metadatas.length
+        curation.status = "needs_drop"
+        curation.datasets.each do |dataset|
+          dataset.status = "needs_drop"
+          dataset.save!
+        end
+        curation.save!
       end
-      curation.save!
     end
   end
   
