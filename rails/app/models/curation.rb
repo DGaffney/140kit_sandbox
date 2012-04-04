@@ -82,7 +82,7 @@ class Curation < ActiveRecord::Base
       end
     when "zero_data"
       if self.researcher_id == current_user.id
-        return "No Tweets Found! <a href='/datasets/#{self.id}/destroy'>Remove</a>"
+        return "No Tweets Found!"
       else
         return "No Tweets Found!"
       end
