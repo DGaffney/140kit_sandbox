@@ -1,10 +1,10 @@
 load File.dirname(__FILE__)+'/../environment.rb'
 class Filter < Instance
 
-  @max_track_ids = lambda{Setting.first(:name => "max_track_ids").value} rescue 10000
-  @batch_size = lambda{Setting.first(:name => "batch_size").value} rescue 100
-  @check_for_new_datasets_interval = lambda{Setting.first(:name => "check_for_new_datasets_interval").value} rescue 30
-  @rsync_interval = lambda{Setting.first(:name => "rsync_interval").value} rescue 1800
+  $max_track_ids = lambda{Setting.first(:name => "max_track_ids").value} rescue 10000
+  $batch_size = lambda{Setting.first(:name => "batch_size").value} rescue 100
+  $check_for_new_datasets_interval = lambda{Setting.first(:name => "check_for_new_datasets_interval").value} rescue 30
+  $rsync_interval = lambda{Setting.first(:name => "rsync_interval").value} rescue 1800
   attr_accessor :user_account, :username, :password, :next_dataset_ends, :queue, :params, :datasets, :start_time, :last_start_time, :scrape_type
 
   def initialize
@@ -104,13 +104,13 @@ class Filter < Instance
     puts "Collecting: #{params_for_stream.inspect}"
     client = TweetStream::Client.new
     begin
-      client.on_interval(@check_for_new_datasets_interval.call) { 
+      client.on_interval($check_for_new_datasets_interval.call) { 
         datasets = @datasets
         time = @start_time
         need_to_stop = touch_and_check_for_finished
         client.stop if add_datasets || need_to_stop
         print "^"
-        if time+@rsync_interval.call < Time.now
+        if time+$rsync_interval.call < Time.now
           Thread.new do
             print "[]"
             rsync_previous_files(datasets, time)
@@ -124,7 +124,7 @@ class Filter < Instance
         # puts "[tweet] #{tweet[:user][:screen_name]}: #{tweet[:text]}"
         print "."
         @queue << tweet
-        if @queue.length >= @batch_size.call
+        if @queue.length >= $batch_size.call
           tmp_queue = @queue
           @queue = []
           Thread.new do
@@ -143,7 +143,7 @@ class Filter < Instance
       need_to_stop = touch_and_check_for_finished
       client.stop if add_datasets || need_to_stop
       print "^"
-      if time+@rsync_interval.call < Time.now
+      if time+$rsync_interval.call < Time.now
         Thread.new do
           print "[]"
           rsync_previous_files(datasets, time)
@@ -332,9 +332,9 @@ class Filter < Instance
    
   def update_datasets(datasets)
     @datasets = @datasets|datasets
-    if @datasets.length > @max_track_ids.call
+    if @datasets.length > $max_track_ids.call
       denied_datasets = []
-      @datasets -= (denied_datasets = @datasets[@max_track_ids.call-1..datasets.length])
+      @datasets -= (denied_datasets = @datasets[$max_track_ids.call-1..datasets.length])
       unlock(denied_datasets)
     end
   end
