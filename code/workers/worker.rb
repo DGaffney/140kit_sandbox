@@ -61,7 +61,7 @@ class Worker < Instance
         curation.save!
       end
     end
-    Curation.all(:updated_at.lte => Time.now-60*60*24*7).each do |curation|
+    Curation.all(:updated_at.lte => Time.now-60*60*24).each do |curation|
       curation.status = "needs_drop"
       curation.datasets.each do |dataset|
         dataset.status = "needs_drop"
