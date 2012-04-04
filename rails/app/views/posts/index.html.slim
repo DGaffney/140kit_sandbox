@@ -1,3 +1,5 @@
+h1 News
+hr 
 - if @posts.empty?
   p No Posts Found.
 - else
@@ -6,3 +8,6 @@
     p = post.created_at.strftime('%B %d, %Y at %l:%M:%S %P')
     p = post.teaser
   = will_paginate(@posts)
+
+- if current_user && current_user.admin?
+  = link_to "Add Post", new_post_path

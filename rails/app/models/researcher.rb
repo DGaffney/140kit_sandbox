@@ -15,11 +15,14 @@ class Researcher < ActiveRecord::Base
       user.uid = auth["uid"]
       user.oauth_token = auth["credentials"]["token"]
       user.oauth_token_secret = auth["credentials"]["secret"]
-      user.user_name = auth["info"]["nickname"]
-      user.name = auth["info"]["name"]
+      user.user_name = auth.extra.raw_info.screen_name
+      user.name = auth.extra.raw_info.name
+      user.location = auth.extra.raw_info.location
+      user.website_url = auth.extra.raw_info.url
+      user.info = auth.extra.raw_info.description
+      user.affiliation_url = "http://140kit.com"
       user.role = "User"
-      user.created_at = Time.now
-      user.updated_at = Time.now
+      user.join_date = Time.now
       user.first_time = true
     end
   end

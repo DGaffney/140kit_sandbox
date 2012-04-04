@@ -18,6 +18,11 @@
             - else
               | Affiliation: 
               = @researcher.affiliation
+        - if @researcher == current_user
+          li
+            | Access Level: 
+            = @researcher.role+" "
+            a href="mailto:140kit@gmail.com?subject=Upgrade my account! (#{@researcher.user_name})" (Request Upgrade)
         - if @researcher.location
           li 
             | Hailing from: 

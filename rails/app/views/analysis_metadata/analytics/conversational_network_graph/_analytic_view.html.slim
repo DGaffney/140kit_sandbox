@@ -3,6 +3,7 @@
 script type='text/javascript' google.load('visualization', '1', {packages:['table', 'annotatedtimeline']})
 
 h2 Analytical Process: #{link_to @analysis_metadata.title, analytical_offering_path(@analysis_metadata.analytical_offering)}
+hr
 .row#graph_view
   .span3
     .well
@@ -44,5 +45,6 @@ h2 Analytical Process: #{link_to @analysis_metadata.title, analytical_offering_p
       h3 = link_to "Download GraphML", "/files/graphml/curation_#{@analysis_metadata.curation.id}_#{@analysis_metadata.id}.graphml"
       
       p (Don't know what to do with these files? Download <a href="http://gephi.org" target="_blank">Gephi</a>, the worlds best network visualizer.)
-      
+
+hr
 == render partial: '/partials/disqus'

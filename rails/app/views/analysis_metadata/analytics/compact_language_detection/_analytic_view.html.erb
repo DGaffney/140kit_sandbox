@@ -1,4 +1,5 @@
 <h2>Google Compact Language Detection (CLD) Results</h2>
+<hr>
 <div class="row">
   <div id="container" class="span12"></div>
 </div>
@@ -27,6 +28,7 @@
   var table = new google.visualization.Table(document.getElementById('container'));
   table.draw(data, {showRowNumber: true, page: 'enable', pageSize: 100});
 </script>
+<hr />
 <%= render partial: '/partials/disqus' %>
 
 <!-- {startOnTick: true, endOnTick: true, showLastLabel: true}, -->

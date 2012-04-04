@@ -3,6 +3,7 @@
 script type='text/javascript' google.load('visualization', '1', {packages:['table', 'annotatedtimeline']})
 
 h2 Analytical Process: #{link_to @analysis_metadata.title, analytical_offering_path(@analysis_metadata.analytical_offering)}
+hr
 .row#graph_view
   .span3
     .well
@@ -39,4 +40,5 @@ h2 Analytical Process: #{link_to @analysis_metadata.title, analytical_offering_p
   .span9
     div#graph
     
+hr
 == render partial: '/partials/disqus'
