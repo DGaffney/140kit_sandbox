@@ -65,6 +65,7 @@ class Worker < Instance
       curation.status = "needs_drop"
       curation.datasets.each do |dataset|
         dataset.status = "needs_drop"
+        dataset.save!
       end
       curation.save!
     end
