@@ -16,6 +16,7 @@ class AnalysisMetadataController < ApplicationController
   end
   
   def graph
+    debugger
     @analysis_metadata = AnalysisMetadata.find(params[:id])
     @graph = Graph.find(params[:graph_id])
     flash[:notice] = "Be aware - the results shown here are partial and may not function properly, as the analysis is still running." if !@analysis_metadata.finished
@@ -34,9 +35,9 @@ class AnalysisMetadataController < ApplicationController
 
   def show_cache_path
     if request.accepts[0].to_sym == :html
-      "#{request.host_with_port + request.request_uri}.html"
+      "#{request.host_with_port + request.path}.html"
     else
-      "#{request.host_with_port + request.request_uri}.js"
+      "#{request.host_with_port + request.path}.js"
     end
   end
 end
