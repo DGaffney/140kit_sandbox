@@ -17,17 +17,9 @@ class AnalysisMetadataController < ApplicationController
   def graph
     @analysis_metadata = AnalysisMetadata.find(params[:id])
     @graph = Graph.find(params[:graph_id])
-    if @analysis_metadata.finished
-      Rails.cache.fetch("am_#{@analysis_metadata.id}_graph_#{@graph.id}", :expires_in => 10.year) do
-        respond_to do |format|
-          format.js { render :template => analysis_metadata_partial_path(@analysis_metadata), :layout => false }
-        end
-      end
-    else
-      flash[:notice] = "Be aware - the results shown here are partial and may not function properly, as the analysis is still running."
-      respond_to do |format|
-        format.js { render :template => analysis_metadata_partial_path(@analysis_metadata), :layout => false }
-      end
+    flash[:notice] = "Be aware - the results shown here are partial and may not function properly, as the analysis is still running." !if @analysis_metadata.finished
+    respond_to do |format|
+      format.js { render :template => analysis_metadata_partial_path(@analysis_metadata), :layout => false }
     end
   end
 
