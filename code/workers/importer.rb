@@ -109,7 +109,7 @@ class Importer < Instance
       dataset.save!
     end
     secondary_models = [Graph, GraphPoint, Edge]
-    secondary_models.each do |a_model|
+    secondary_models.each do |model|
       # threads = []
       # threads << Thread.new(a_model) do |model|
         debugger
