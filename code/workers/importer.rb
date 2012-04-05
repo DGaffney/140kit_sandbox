@@ -109,16 +109,14 @@ class Importer < Instance
       dataset.save!
     end
     secondary_models = [Graph, GraphPoint, Edge]
-    secondary_models.each do |model|
-      # threads = []
-      # threads << Thread.new(a_model) do |model|
-        debugger
+    secondary_models.each do |a_model|
+      threads = []
+      threads << Thread.new(a_model) do |model|
         offset = 0
         limit = 10000
         remaining = model.count(:curation_id => @curation.id)
         finished = false
         while !finished
-          debugger if model == GraphPoint
           next_set = remaining>limit ? limit : remaining
           remaining = (remaining-limit)>0 ? remaining-limit : 0
           puts "Archiving #{offset} - #{offset+next_set} (#{model})"
@@ -126,7 +124,7 @@ class Importer < Instance
           Sh::mkdir(path)
           filename = "#{@curation.id}_#{offset}_#{offset+next_set}"
           mysql_section = "mysql -u #{config["user"]} --password='#{config["password"]}' -P #{config["port"]} -h #{config["host"]} #{config["path"].gsub("/", "")} -B -e "
-          mysql_statement = "\"select * from #{model.storage_name} where curation_id = #{@curation.id} limit #{limit} offset #{offset};\""
+          mysql_statement = "\"select * from #{model.storage_name} where curation_id = #{@curation.id} limit #{limit};\""
           file_push = " | sed -n -e 's/^\"//;s/\"$//;s/\",\"/ /;s/\",\"/\\n/;P' > #{path}#{filename}.tsv"
           command = "#{mysql_section}#{mysql_statement}#{file_push}"
           Sh::sh(command)
@@ -139,8 +137,8 @@ class Importer < Instance
           offset += limit
           finished = true if remaining == 0
         end
-      # end
-      # threads.collect{|t| t.join}
+      end
+      threads.collect{|t| t.join}
     end
     @curation.status = "dropped"
     @curation.save!
