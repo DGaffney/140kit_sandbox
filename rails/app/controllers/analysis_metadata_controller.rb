@@ -32,8 +32,6 @@ class AnalysisMetadataController < ApplicationController
     end
   end
 
-  private
-
   def show_cache_path
     if request.accepts[0].to_sym == :html
       "#{request.host_with_port + request.request_uri}.html"
