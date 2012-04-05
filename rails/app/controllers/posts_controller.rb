@@ -5,7 +5,7 @@ class PostsController < ApplicationController
   
   def index
     @posts = Post.where(:status => "regular").paginate(:page => params[:page], :per_page => 10, :order => "created_at desc")
-
+    @page_title = "News"
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: @posts }
@@ -14,11 +14,12 @@ class PostsController < ApplicationController
 
   def show
     @post = Post.find_by_id_and_slug(params[:id], params[:slug])
+    @page_title = "Posts: #{@post.title}"
   end
   
   def new
     @post = Post.new
-
+    @page_title = "New Post"
     respond_to do |format|
       format.html # new.html.erb
       format.json { render json: @post }
@@ -28,6 +29,7 @@ class PostsController < ApplicationController
   # GET /posts/1/edit
   def edit
     @post = Post.find(params[:id])
+    @page_title = "Editing Posts: #{@post.title}"
   end
 
   # POST /posts

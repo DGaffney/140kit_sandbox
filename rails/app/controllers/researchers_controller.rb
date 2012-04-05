@@ -9,6 +9,7 @@ class ResearchersController < ApplicationController
   end
 
   def dashboard
+    @page_title = "Dashboard"
     @researcher = Researcher.find(current_user.id)
     @curations = @researcher.curations.paginate(:page => params[:page], :per_page => 10, :order => "id desc")
     # @curations = @researcher.curations.order(:created_at)
@@ -16,11 +17,13 @@ class ResearchersController < ApplicationController
 
   def show
     @researcher = Researcher.where(user_name: params[:user_name]).first
+    @page_title = @researcher.name
     @curations = @researcher.curations.paginate(:page => params[:page], :per_page => 20, :order => "id desc", :limit => 10)
   end
 
   def edit
     @researcher = Researcher.find_by_user_name(params[:user_name])
+    @page_title = "Editing "+@researcher.name
   end
 
   def new

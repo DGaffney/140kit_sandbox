@@ -1,19 +1,23 @@
 class SettingsController < ApplicationController
   before_filter :admin_required
   def index
+    @page_title = "Settings"
     @settings = Setting.paginate(:page => params[:page], :per_page => 20)
   end
 
   def show
     @setting = Setting.find(params[:id])
+    @page_title = "Settings: #{@setting.name}"
   end
 
   def new
     @setting = Setting.new
+    @page_title = "New Setting"
   end
 
   def edit
     @setting = Setting.find(params[:id])
+    @page_title = "Editing #{@setting.name} Setting"
   end
 
   def create

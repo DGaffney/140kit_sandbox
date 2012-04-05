@@ -2,14 +2,17 @@ class InstancesController < ApplicationController
   before_filter :admin_required
   def index_instance
     @instances = Instance.paginate(:page => params[:page], :per_page => 16)
+    @page_title = "Instances"
   end
 
   def index_machine
     @machines = Machine.all
+    @page_title = "Machines"
   end
   
   def edit
     @machine = Machine.find(params[:id])
+    @page_title = "Editing Machines: #{@machine.user} (#{@machine.ip})"
   end
   
   def update
@@ -43,12 +46,14 @@ class InstancesController < ApplicationController
   
   def show_instance
     @instance = Instance.find(params[:id])
+    @page_title = "Instances: #{@instance.hostname} (#{@instance.instance_id})"
     @locks = Lock.find_all_by_instance_id(@instance.instance_id)
   end
 
   def show_machine
     @machine = Machine.find(params[:id])
     @instances = Instance.find_all_by_hostname(@machine.user)
+    @page_title = "Machines: #{@machine.user} (#{@machine.ip})"
   end
   
 end

@@ -5,14 +5,17 @@ class AnalyticalOfferingsController < ApplicationController
     @analytical_offering = AnalyticalOffering.find(params[:id])
     @dependencies = AnalyticalOfferingRequirement.where(:analytical_offering_id => @analytical_offering.id).order(:position).paginate(:page => params[:requirement_page], :per_page => 4)
     @analytical_offering_variables = AnalyticalOfferingVariableDescriptor.where(:analytical_offering_id => @analytical_offering.id).order(:position).paginate(:page => params[:variable_page], :per_page => 1)
+    @page_title = "Analytics: #{@analytical_offering.title}"
   end
   
   def index
     @analytical_offerings = AnalyticalOffering.where(:enabled => true).paginate(:page => params[:page], :per_page => 10)
+    @page_title = "Analytics"
   end
 
   def new
     @analytical_offering = AnalyticalOffering.new
+    @page_title = "New Analytic"
   end
   
   def create
@@ -31,6 +34,7 @@ class AnalyticalOfferingsController < ApplicationController
 
   def edit
     @analytical_offering = AnalyticalOffering.find(params[:id])
+    @page_title = "Analytics: Editing #{@analytical_offering.title}"
   end
   
   def update

@@ -2,26 +2,30 @@ class CurationsController < ApplicationController
   before_filter :login_required, except: [:index, :researcher, :show, :search]
   def index
     @curations = Curation.where(:privatized => false).paginate(:page => params[:page], :per_page => 20, :order => "id desc")
+    @page_title = "Datasets"
   end
   
   def search
     @curations = Curation.where(:privatized => false, :id => AnalysisMetadata.where(:analytical_offering_id => params[:analytic_id]).collect(&:curation_id)).paginate(:page => params[:page], :per_page => 20) if params[:analytic_id]
-    @curations = []
+    @page_title = "Search"
   end
   
   def researcher
     @researcher = Researcher.find_by_user_name(params[:user_name])
     @curations = @researcher.curations
+    @page_title = "#{@researcher.user_name}'s Datasets"
   end
   
   def show
     @curation = Curation.find_by_id(params[:id])
     @curation.touch if !["needs_drop", "dropped"].include?(@curation.status)
+    @page_title = "#{@curation.researcher.user_name}'s #{@curation.name} Dataset"
   end
 
   def new
     @curation = Curation.new
     @researcher = Researcher.find(current_user.id)
+    @page_title = "New Dataset"
   end
 
   def create
