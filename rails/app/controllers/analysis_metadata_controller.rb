@@ -18,7 +18,7 @@ class AnalysisMetadataController < ApplicationController
     @analysis_metadata = AnalysisMetadata.find(params[:id])
     @graph = Graph.find(params[:graph_id])
     if @analysis_metadata.finished
-      cache("am_#{@analysis_metadata.id}_graph_#{@graph.id}", :expires_in => 10.year) do
+      Rails.cache.fetch("am_#{@analysis_metadata.id}_graph_#{@graph.id}", :expires_in => 10.year) do
         respond_to do |format|
           format.js { render :template => analysis_metadata_partial_path(@analysis_metadata), :layout => false }
         end
