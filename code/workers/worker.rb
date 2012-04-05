@@ -7,7 +7,9 @@ class Worker < Instance
   
   @@words = File.open(File.dirname(__FILE__)+"/../analyzer/resources/words.txt", "r").read.split
   @@rest_analytics = ["retweet_graph"]
-  
+  $drop_interval = lambda{Setting.first(:name => "drop_interval").value} rescue 60*60*24
+  $hide_interval = lambda{Setting.first(:name => "hide_interval").value} rescue 60*60*24*7*4
+  $clean_orphan_interval = lambda{Setting.first(:name => "clean_orphan_interval").value} rescue 900
   def initialize
     super
     self.instance_type = "worker"
@@ -61,12 +63,23 @@ class Worker < Instance
         curation.save!
       end
     end
-    Curation.all(:updated_at.lte => Time.now-60*60*24, :status => "imported").each do |curation|
+    Curation.all(:updated_at.lte => Time.now-$drop_interval.call, :status => "imported").each do |curation|
       analysis_metadatas = curation.analysis_metadatas
       if AnalysisMetadata.all(:id => analysis_metadatas.collect(&:id)).unlocked.length == analysis_metadatas.length
         curation.status = "needs_drop"
         curation.datasets.each do |dataset|
           dataset.status = "needs_drop"
+          dataset.save!
+        end
+        curation.save!
+      end
+    end
+    Curation.all(:updated_at.lte => Time.now-$hide_interval.call, :status => "dropped").each do |curation|
+      analysis_metadatas = curation.analysis_metadatas
+      if AnalysisMetadata.all(:id => analysis_metadatas.collect(&:id)).unlocked.length == analysis_metadatas.length
+        curation.status = "hidden"
+        curation.datasets.each do |dataset|
+          dataset.status = "hidden"
           dataset.save!
         end
         curation.save!
@@ -84,7 +97,7 @@ class Worker < Instance
   end
   
   def clean_orphans
-    return if !self.last_system_check.nil? && (Time.now-self.last_system_check) < 900
+    return if !self.last_system_check.nil? && (Time.now-self.last_system_check) < $clean_orphan_interval.call
     Instance.all.each do |instance|
       process_report = Sh::bt("ssh #{instance.hostname} 'ps -p #{instance.pid}'").split("\n")
       if process_report.length == 1 || process_report.last && process_report.last.scan(/(.*#{instance.pid}.*pts\/.*\d\d:\d\d:\d\d (ruby|rdebug))/).flatten.first != process_report.last

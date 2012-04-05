@@ -44,6 +44,8 @@ class Curation < ActiveRecord::Base
       return "Archived"
     when "zero_data"
       return "No Tweets Found!"
+    when "hidden"
+      return "In Deep Archive"
     else
       return "Unknown"
     end
@@ -85,6 +87,12 @@ class Curation < ActiveRecord::Base
         return "No Tweets Found!"
       else
         return "No Tweets Found!"
+      end
+    when "hidden"
+      if self.tweets_count == 0
+        return "No Tweets"
+      else
+        return "<a href='/datasets/#{self.id}/import'>Bring it live</a>"
       end
     else
       return "Sit tight..."

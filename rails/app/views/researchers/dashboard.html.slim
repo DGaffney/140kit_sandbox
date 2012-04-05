@@ -12,3 +12,7 @@
   // .span5
     p.align-center
       = link_to "Add a Dataset", new_dataset_path, class: 'btn btn-large btn-primary'
+- hidden_curations = Curation.where(:researcher_id => @researcher.id, :status => "hidden").count
+- if hidden_curations!=0 && @researcher.id == current_user.id
+  p You currently have #{hidden_curations} hidden #{hidden_curations == 1 ? "dataset" : "datasets"}, as you, and no other users, have not looked at the dataset in a month. 
+  = link_to "Would you like two review these?", search_datasets_path(:hidden => true, :researcher_id => @researcher.id)

@@ -59,7 +59,7 @@ puts "Starting #{ENV['E']} environment..."
 
 database = YAML.load(File.read(File.dirname(__FILE__)+'/config/database.yml'))
 if !database.has_key?(ENV['E'])
-  env = "development"
+  env = "production"
 end
 database = database[ENV['E']]
 database.inspect

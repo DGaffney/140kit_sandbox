@@ -85,7 +85,17 @@ module CurationsHelper
         end
       else
         return "This dataset has been archived. At this point, you can't take any actions. To re-import the dataset and bring it live again, just select that option."
-      end      
+      end   
+    when "hidden"
+      if current_user
+        if current_user.id == curation.researcher_id
+          return "Your dataset has been deep archived. At this point, you can't take any actions. To re-import the dataset and bring it live again, just select that option."
+        else
+          return "This dataset has been deep archived. At this point, you can't take any actions. To re-import the dataset and bring it live again, just select that option."
+        end
+      else
+        return "This dataset has been deep archived. At this point, you can't take any actions. To re-import the dataset and bring it live again, just select that option."
+      end   
     when "zero_data"
       if current_user
         if current_user.id == curation.researcher_id
@@ -115,6 +125,8 @@ module CurationsHelper
       return "Bring it live"
     when "zero_data"
       return "Remove"
+    when "hidden"
+      return "Bring it live"
     end
   end
 
@@ -134,6 +146,8 @@ module CurationsHelper
       return link_to next_step_badge_text(curation), import_dataset_url(curation), {:class => "btn btn-primary btn-large"}
     when "zero_data"
       return link_to next_step_badge_text(curation), dataset_path(curation), {:method => :delete, :class => "btn btn-primary btn-large"}
+    when "hidden"
+      return link_to next_step_badge_text(curation), import_dataset_url(curation), {:class => "btn btn-primary btn-large"}
     end
   end
 end
