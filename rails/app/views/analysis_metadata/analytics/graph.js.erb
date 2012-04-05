@@ -1,5 +1,5 @@
 <% if @analysis_metadata.finished %>
-    <% cache(:action => 'graph_render', :action_suffix => "#{@analysis_metadata.id}_#{@graph.id}") do %>
+    <% cache(:action => 'graph', :action_suffix => "#{@analysis_metadata.id}_#{@graph.id}") do %>
         $("#graph").html("<%=escape_javascript(render(:partial => analysis_metadata_partial_view_path(@analysis_metadata), :locals => {:graph => @graph}))%>");
     <% end %>
 <% else %>
