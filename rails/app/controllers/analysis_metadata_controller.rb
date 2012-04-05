@@ -1,5 +1,6 @@
 class AnalysisMetadataController < ApplicationController
-  
+  caches_action :graph, :if => lambda{AnalysisMetadata.find(request.params[:id]).finished}
+
   def show
     @analysis_metadata = AnalysisMetadata.find(params[:id])
     if ["needs_dropped", "dropped"].include?(@analysis_metadata.curation.status)
