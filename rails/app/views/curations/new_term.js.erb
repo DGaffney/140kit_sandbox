@@ -4,7 +4,7 @@ $('#time-slider').slider({
     min: 60,
     max: 604800,
     slide: function(event, ui) {
-        $('#time_output').html(exact_time(reasonableIncrement(ui.value)));
+        $('#time_output').html(exact_time(ui.value));
         $('#end_time').val(ui.value);
       }
 });
