@@ -136,7 +136,7 @@ class Importer < Instance
           Sh::rm(path+filename+".tsv.zip")
           DataMapper.repository.adapter.execute("delete quick from #{model.storage_name} where curation_id = #{@curation.id} order by id limit #{limit}")
           offset += limit
-          finished = true if remaining != 0
+          finished = true if remaining == 0
         end
       # end
       threads.collect{|t| t.join}
