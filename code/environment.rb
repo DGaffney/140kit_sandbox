@@ -57,7 +57,7 @@ ENV['E'] = ARGV.include?("e") ? ARGV[ARGV.index("e")+1]||"production" : "product
 
 puts "Starting #{ENV['E']} environment..."
 
-database = YAML.load(File.read(File.dirname(__FILE__)+'/config/database.yml'))
+database = YAML.load(File.read(DIR+'/config/database.yml'))
 if !database.has_key?(ENV['E'])
   env = "production"
 end
