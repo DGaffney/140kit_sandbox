@@ -1,5 +1,5 @@
 class AnalysisMetadataController < ApplicationController
-  caches_page :graph, :if => lambda{AnalysisMetadata.find(request.params[:id]).finished}
+  # caches :graph, :if => lambda{AnalysisMetadata.find(request.params[:id]).finished}
 
   def show
     @analysis_metadata = AnalysisMetadata.find(params[:id])
@@ -34,4 +34,3 @@ class AnalysisMetadataController < ApplicationController
   end
 
 end
-# caches_action :index, :cache_path => Proc.new {|c| c.request.url }
