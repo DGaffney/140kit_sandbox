@@ -53,7 +53,7 @@ require DIR+'/utils/entity_helper'
 require DIR+'/utils/u'
 # require DIR+'/lib/tweetstream'
 
-ENV['E'] = ARGV.include?("e") ? ARGV[ARGV.index("e")+1]||"development" : "development"
+ENV['E'] = ARGV.include?("e") ? ARGV[ARGV.index("e")+1]||"production" : "production"
 
 puts "Starting #{ENV['E']} environment..."
 
