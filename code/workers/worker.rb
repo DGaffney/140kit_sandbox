@@ -51,7 +51,7 @@ class Worker < Instance
     unflippable_statuses = Setting.first(:name => "unflippable_statuses", :var_type => "Dataset Settings").value
     Curation.all(:status.not => unflippable_statuses).unlocked.each do |curation|
       datasets = curation.datasets
-      if curation.tweets_count == 0 && curation.status == "tsv_storing" && curation.finished? && curation.status != "tsv_storing"
+      if curation.tweets_count == 0 && curation.finished? && curation.status != "tsv_storing"
         datasets.each do |dataset|
           dataset.status = "zero_data"
           dataset.save!

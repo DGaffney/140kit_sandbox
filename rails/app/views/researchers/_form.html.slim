@@ -28,14 +28,14 @@
         .controls
           = f.label :location, class: 'control-label'
           = f.text_field :location, class: 'input-xlarge'
-        .controls
-          = f.check_box :share_email, class: 'input-xlarge pull-left'
-          = f.label :share_email, "Turn on email notifications?", class: 'control-label'
+        // .controls
+        //   = f.check_box :share_email, class: 'input-xlarge pull-left'
+        //   = f.label :share_email, "Turn on email notifications?", class: 'control-label'
         .controls
           = f.check_box :private_data, class: 'input-xlarge pull-left'
-          = f.label :private_data, "Make my datasets private?", class: 'control-label'
+          = f.label :private_data, " Make my datasets private?", class: 'control-label'
         .controls
           = f.check_box :hidden_account, class: 'input-xlarge pull-left'
-          = f.label :hidden_account, "Make my account private?", class: 'control-label'
+          = f.label :hidden_account, " Make my account private?", class: 'control-label'
         .form-actions
           = f.submit 'Update', class: 'btn btn-primary'
