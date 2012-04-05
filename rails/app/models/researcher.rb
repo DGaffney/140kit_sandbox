@@ -7,7 +7,7 @@ class Researcher < ActiveRecord::Base
   validates :uid, :oauth_token, :oauth_token_secret, presence: true, uniqueness: true,  on: :create
   validates :user_name, uniqueness: true
   validates :email, uniqueness: true, email: true, presence: true, on: :update
-  validates :website_url, :affiliation_url, format: { with: URI::regexp(%w(http https)), message: "Invalid URL! Try adding 'http://'" }
+  # validates :website_url, :affiliation_url, format: { with: URI::regexp(%w(http https)), message: "Invalid URL! Try adding 'http://'" }
 
   def self.create_with_omniauth(auth)
     create! do |user|
