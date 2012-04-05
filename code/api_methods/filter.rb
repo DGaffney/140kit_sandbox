@@ -331,7 +331,9 @@ class Filter < Instance
   end
    
   def update_datasets(datasets)
-    @datasets = @datasets|datasets
+    datasets.each do |dataset|
+      @datasets << dataset if !@datasets.include?(dataset) && dataset.owned_by_me?
+    end
     if @datasets.length > $max_track_ids.call
       denied_datasets = []
       @datasets -= (denied_datasets = @datasets[$max_track_ids.call-1..datasets.length])
