@@ -1,5 +1,5 @@
 class AnalysisMetadataController < ApplicationController
-  caches_action :graph, :if => lambda{AnalysisMetadata.find(request.params[:id]).finished}, :cache_path => :show_cache_path.to_proc
+  caches_page :graph, :if => lambda{AnalysisMetadata.find(request.params[:id]).finished}
 
   def show
     @analysis_metadata = AnalysisMetadata.find(params[:id])
@@ -33,12 +33,5 @@ class AnalysisMetadataController < ApplicationController
     end
   end
 
-  def show_cache_path
-    if request.accepts[0].to_sym == :html
-      "#{request.host_with_port + request.path}.html"
-    else
-      "#{request.host_with_port + request.path}.js"
-    end
-  end
 end
 # caches_action :index, :cache_path => Proc.new {|c| c.request.url }
