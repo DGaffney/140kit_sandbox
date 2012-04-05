@@ -118,6 +118,7 @@ class Importer < Instance
         remaining = model.count(:curation_id => @curation.id)
         finished = false
         while !finished
+          debugger if model == GraphPoint
           next_set = remaining>limit ? limit : remaining
           remaining = (remaining-limit)>0 ? remaining-limit : 0
           puts "Archiving #{offset} - #{offset+next_set} (#{model})"
