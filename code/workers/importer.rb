@@ -139,7 +139,7 @@ class Importer < Instance
           finished = true if remaining == 0
         end
       # end
-      threads.collect{|t| t.join}
+      # threads.collect{|t| t.join}
     end
     @curation.status = "dropped"
     @curation.save!
