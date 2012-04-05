@@ -16,7 +16,6 @@ class AnalysisMetadataController < ApplicationController
   end
   
   def graph
-    debugger
     @analysis_metadata = AnalysisMetadata.find(params[:id])
     @graph = Graph.find(params[:graph_id])
     flash[:notice] = "Be aware - the results shown here are partial and may not function properly, as the analysis is still running." if !@analysis_metadata.finished
