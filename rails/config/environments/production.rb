@@ -20,6 +20,7 @@ WWW140kit::Application.configure do
   config.assets.compile = false
 
   # Generate digests for assets URLs
+  config.assets.initialize_on_precompile = true
   config.assets.digest = true
 
   # Defaults to Rails.root.join("public/assets")
