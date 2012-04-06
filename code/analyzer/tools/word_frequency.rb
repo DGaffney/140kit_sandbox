@@ -32,6 +32,7 @@ class WordFrequency < AnalysisMetadata
     end
     word_percentile.sort!{|x,y| x[:value]<=>y[:value]}
     highest_words = []
+    debugger
     if percentile == 0
       highest_words = word_percentile
     else
