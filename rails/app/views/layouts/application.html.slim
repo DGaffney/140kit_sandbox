@@ -43,7 +43,7 @@ html
                   = link_to "Dashboard", dashboard_path
                 li class=('active' if (current_route?('researchers#show') && current_user.user_name == params[:user_name]))
                   = link_to "Me", researcher_path(current_user)
-                - if current_user.admin?
+                - if current_user && current_user.admin?
                   li class=('active' if current_route?('admin#panel'))
                     = link_to 'Admin', admin_panel_path
                 li

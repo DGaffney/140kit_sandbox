@@ -34,7 +34,7 @@
     @dataset = @dataset.reverse
     @dataset.collect{|d| d[:label] = "Empty Field" if d[:label].nil? || d[:label].empty?}
     @dataset.collect{|d| d[:label] = "Blank Field" if d[:label]=="NULL"}
-    @dataset.collect{|d| d[:label] = d[:label].gsub("rel=\"nofollow\">", " target=\"_blank\">")}
+    @dataset.collect{|d| d[:label] = d[:label].gsub("rel=\"nofollow\">", " target=\"_blank\">").gsub("'", "\\'")}
   end
   def yAxis(title)
     {"tweets_language" => nil,
