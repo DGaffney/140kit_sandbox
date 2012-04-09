@@ -67,4 +67,8 @@ class Researcher < ActiveRecord::Base
   def self.highest_role
     return Setting.find_by_name("roles").actual_value[-2]
   end
+  
+  def self.roles
+    return Setting.find_by_name("roles").actual_value
+  end
 end
