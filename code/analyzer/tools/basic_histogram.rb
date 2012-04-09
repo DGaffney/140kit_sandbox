@@ -70,8 +70,8 @@ class BasicHistogram < AnalysisMetadata
         return data
       }
       if fs[:attribute].to_s == "created_at"
-        first = DataMapper.repository.adapter.select("select #{fs[:attribute]} from #{fs[:model].storage_name} #{Analysis.conditions_to_mysql_query(conditional)} order by #{fs[:attribute]} asc limit 1").first.to_time
-        last = DataMapper.repository.adapter.select("select #{fs[:attribute]} from #{fs[:model].storage_name} #{Analysis.conditions_to_mysql_query(conditional)} order by #{fs[:attribute]} desc limit 1").first.to_time
+        first = fs[:model].first(conditional.merge({:order => fs[:attribute].to_sym})).send(fs[:attribute])
+        last = fs[:model].last(conditional.merge({:order => fs[:attribute].to_sym})).send(fs[:attribute])
         length = (first-last).abs
         date_format = Pretty.time_interval(length, DataMapper.repository.adapter.options["adapter"])
         results = DataMapper.repository.adapter.select("select count(distinct(twitter_id)) as value,date_format(#{fs[:attribute].to_s}, '#{date_format}') as #{fs[:attribute]} from #{fs[:model].storage_name} #{Analysis.conditions_to_mysql_query(conditional)} group by date_format(#{fs[:attribute].to_s}, '#{date_format}') order by count(distinct(twitter_id)) asc limit #{limit} offset #{offset}")
