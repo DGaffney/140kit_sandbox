@@ -28,4 +28,16 @@ h2 Analytics:
   - if current_user
     #{link_to "Add Analytic", analyze_dataset_path(@curation)}
 hr
+h2 Tags:
+- if @tags.empty?
+    p No tags added yet. 
+    - if current_user
+      == render partial: '/tags/form', locals: {tag: @tag, classname: "Curation", with_id: @curation.id}
+- else
+  == render partial: '/tags/table', locals: {tags: @tags, classname: "Curation", with_id: @curation.id}
+  - if current_user
+    hr
+    == render partial: '/tags/form', locals: {tag: @tag, classname: "Curation", with_id: @curation.id}
+hr
 == render partial: '/partials/disqus'
+

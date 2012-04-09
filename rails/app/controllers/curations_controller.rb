@@ -10,7 +10,13 @@ class CurationsController < ApplicationController
     if params[:hidden]
       @curations = Curation.where(:status => "hidden", :researcher_id => params[:researcher_id]).paginate(:page => params[:page], :per_page => 20)
     elsif params[:analytic_id]
+      @analytical_offering = AnalyticalOffering.find(params[:analytic_id])
       @curations = Curation.where(:privatized => false, :id => AnalysisMetadata.where(:analytical_offering_id => params[:analytic_id]).collect(&:curation_id)).paginate(:page => params[:page], :per_page => 20)
+      @criteria = "Uses Analytic: #{@analytical_offering.title}"
+    elsif params[:tag_id]
+      @tag = Tag.find(params[:tag_id])
+      @curations = Curation.where(:privatized => false, :id => @tag.curations.collect(&:id)).paginate(:page => params[:page], :per_page => 20)
+      @criteria = "Tagged with: #{@tag.value}"
     end
     @page_title = "Search"
   end
@@ -24,6 +30,8 @@ class CurationsController < ApplicationController
   def show
     @curation = Curation.find_by_id(params[:id])
     @curation.touch if !["needs_drop", "dropped"].include?(@curation.status)
+    @tags = @curation.tags
+    @tag = Tag.new
     @page_title = "#{@curation.researcher.user_name}'s #{@curation.name} Dataset"
   end
 

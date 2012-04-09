@@ -7,5 +7,6 @@ class Post
   property :created_at, Time
   property :status, String
   belongs_to :researcher, Integer, :index => [:dataset_id]
+  has n, :tags, :through => Resource
 end
 

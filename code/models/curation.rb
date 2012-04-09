@@ -13,6 +13,7 @@ class Curation
   property :researcher_id, Integer, :index => [:curation_researcher_id, :researcher_id, :researcher_id_previously_imported, :researcher_id_single_dataset]
   belongs_to :researcher, :child_key => :researcher_id
   has n, :datasets, :through => Resource
+  has n, :tags, :through => Resource
   has n, :analysis_metadatas
   has n, :graphs
   has n, :tweets, :through => :datasets

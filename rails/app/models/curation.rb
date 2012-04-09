@@ -1,6 +1,7 @@
 class Curation < ActiveRecord::Base
   belongs_to :researcher
   has_and_belongs_to_many :datasets, :join_table => "curation_datasets"
+  has_and_belongs_to_many :tags, :join_table => "curation_tags"
   has_many :analysis_metadatas
   has_many :graphs
   

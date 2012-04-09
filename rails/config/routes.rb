@@ -1,7 +1,5 @@
 WWW140kit::Application.routes.draw do
 
-  resources :settings
-
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
@@ -45,6 +43,7 @@ WWW140kit::Application.routes.draw do
   get '/datasets/new/location' => 'curations#new_location', as: :new_location_dataset
   get '/datasets/new/term' => 'curations#new_term', as: :new_term_dataset
   get '/datasets/:id/alter/:stream_type' => 'curations#new', as: :alter_dataset
+  get '/tags/drop_relation' => 'tags#drop_relation', as: :drop_tag_relation
   resources :curations, only: [:index, :create, :new, :show, :validate, :analyze, :alter, :import, :verify, :destroy], path: '/datasets', as: :datasets do
     member do
       get 'verify'
@@ -80,6 +79,7 @@ WWW140kit::Application.routes.draw do
   get 'dashboard' => 'researchers#dashboard', as: :dashboard
 
   resources :posts, except: [:show]
+  get '/posts/search' => 'posts#index', as: :search_posts
 
   get '/posts/:id/:slug' => 'posts#show', as: :post
   get '/about' => 'posts#about', as: :about
@@ -93,6 +93,8 @@ WWW140kit::Application.routes.draw do
   get '/dependencies/:id/new' => 'analytical_offering_requirements#new', as: :new_dependency
   resources :analytical_offering_requirements, path: '/dependencies'
   get '/variables/:id/new' => 'analytical_offering_variable_descriptors#new', as: :new_variable
+  resources :tags
+  resources :settings
 
   # Sample of regular route:
   #   match 'products/:id' => 'catalog#view'

@@ -1,0 +1,3 @@
+$('#tags').prepend('<%= escape_javascript(render(@tag)) %>');
+$('#tags > li:first').effect('highlight', {}, 3000);
+$('#tags_form > form')[0].reset();

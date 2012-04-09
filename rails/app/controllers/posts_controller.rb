@@ -3,7 +3,11 @@ class PostsController < ApplicationController
   before_filter :admin_required, only: [:update, :create, :edit, :destroy, :panel]
   
   def index
-    @posts = Post.where(:status => "regular").paginate(:page => params[:page], :per_page => 10, :order => "created_at desc")
+    if params[:tag_id]
+      @posts = Tag.find(params[:tag_id]).posts.where(:status => "regular").paginate(:page => params[:page], :per_page => 10, :order => "created_at desc")
+    else
+      @posts = Post.where(:status => "regular").paginate(:page => params[:page], :per_page => 10, :order => "created_at desc")
+    end
     @page_title = "News"
     respond_to do |format|
       format.html # index.html.erb
@@ -13,6 +17,7 @@ class PostsController < ApplicationController
 
   def show
     @post = Post.find_by_id_and_slug(params[:id], params[:slug])
+    @tags = @post.tags
     @page_title = "Posts: #{@post.title}"
   end
   

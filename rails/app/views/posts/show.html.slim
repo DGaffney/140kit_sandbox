@@ -6,4 +6,12 @@ p.byline
 
 - if current_user && current_user.admin?
   = link_to "Edit", edit_post_path(@post)
+
+- if !@tags.empty?
+  h4 Tags:
+  == render partial: '/tags/table', locals: {tags: @tags, classname: "Post", with_id: @post.id}
+  hr
+- if current_user && current_user.admin?
+  == render partial: '/tags/form', locals: {tag: Tag.new, classname: "Post", with_id: @post.id}
+
 == render partial: '/partials/disqus'

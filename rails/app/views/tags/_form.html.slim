@@ -1,0 +1,5 @@
+= form_for(tag) do |f|
+  = f.text_field :value, class: 'input-xlarge'
+  = f.hidden_field :classname, :value => classname
+  = f.hidden_field :with_id, :value => with_id
+  = submit_tag 'Add', class: 'btn btn-primary', :style => "margin-left: 20px;"

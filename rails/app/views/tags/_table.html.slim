@@ -1,0 +1,8 @@
+- if current_user && current_user.admin?
+  - for tag in @tags
+    = link_to tag.value, search_datasets_path(:tag_id => tag.id), :class => 'btn btn-small'
+    = link_to "Drop Relation", classname == "Post" ? search_posts_path(:tag_id => tag.id) : drop_tag_relation_path(:tag_id => tag.id, :classname => classname, :with_id => with_id), :class => 'btn btn-primary btn-small'
+    = link_to 'Delete', tag, :confirm => 'Are you sure?', :method => :delete, :class => 'btn btn-primary btn-small'
+- else
+  - for tag in @tags
+    = link_to tag.value, classname == "Post" ? search_posts_path(:tag_id => tag.id) : search_datasets_path(:tag_id => tag.id), :class => 'btn btn-small'
