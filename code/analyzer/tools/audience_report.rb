@@ -7,7 +7,7 @@ class AudienceReport
     audience_overview_graph = Graph.first_or_create(:title => "audience_overview", :style => "table", :analysis_metadata_id => @analysis_metadata.id, :curation_id => curation.id)
     top_impressioning_users = Graph.first_or_create(:title => "top_impression_generating_users", :style => "table", :analysis_metadata_id => @analysis_metadata.id, :curation_id => curation.id)
     impressions = User.sum(:followers_count, conditional)
-    top_20_impressioning_users = User.all(conditional.merge({:order => :followers_count, :limit => 20, :fields => [:screen_name, :followers_count]}))
+    top_20_impressioning_users = User.all(conditional.merge({:order => :followers_count.desc, :limit => 20, :fields => [:screen_name, :followers_count]}))
     total_retweets = Tweet.count(conditional.merge({:in_reply_to_status_id.not => nil}))
     total_replies = Tweet.count(conditional.merge({:in_reply_to_status_id => nil, :in_reply_to_screen_name.not => nil}))
     total_regulars = Tweet.count(conditional.merge({:in_reply_to_status_id => nil, :in_reply_to_screen_name => nil}))
