@@ -59,4 +59,20 @@ class ResearchersController < ApplicationController
   
   def panel
   end
+  
+  def upgrade
+    @researcher = Researcher.find_by_user_name(params[:user_name])
+    roles = Setting.find_by_name("roles").actual_value
+    @researcher.role = roles[roles.index(@researcher.role)+1]
+    @researcher.upgrade_requested = false
+    @researcher.save!
+    redirect_to request.referer
+  end
+
+  def request_upgrade
+    @researcher = Researcher.find_by_user_name(params[:user_name])
+    @researcher.upgrade_requested = true
+    @researcher.save!
+    redirect_to request.referer
+  end
 end

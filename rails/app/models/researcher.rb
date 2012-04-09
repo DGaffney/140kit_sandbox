@@ -45,7 +45,7 @@ class Researcher < ActiveRecord::Base
   end
   
   def self.roles
-    return ["Inactive", "Suspended", "User", "Academic", "Admin"]
+    return Setting.find_by_name("roles").value
   end
   
   def admin?
@@ -62,5 +62,9 @@ class Researcher < ActiveRecord::Base
     else 
       return self.website_url
     end
+  end
+  
+  def self.highest_role
+    return Setting.find_by_name("roles").actual_value[-2]
   end
 end

@@ -24,12 +24,22 @@
   .row
     - for researcher in slice
       .span3.researcher
-        .well
-          img.pull-left.twitter-pic src=researcher.twitter_pic(:normal)
-          h4 = link_to researcher.name, researcher
-          p = link_to_twitter researcher
-          p
-            strong #{researcher.curations_count}
-            |  Dataset#{'s' if researcher.curations_count != 1}
+        - if current_user && current_user.admin? && researcher.upgrade_requested
+          .well.upgrade_requested
+            img.pull-left.twitter-pic src=researcher.twitter_pic(:normal)
+            h4 = link_to researcher.name, researcher
+            p = link_to_twitter researcher
+            p
+              strong #{researcher.curations_count}
+              |  Dataset#{'s' if researcher.curations_count != 1}
+        - else
+          .well
+            img.pull-left.twitter-pic src=researcher.twitter_pic(:normal)
+            h4 = link_to researcher.name, researcher
+            p = link_to_twitter researcher
+            p
+              strong #{researcher.curations_count}
+              |  Dataset#{'s' if researcher.curations_count != 1}
+
 
 = will_paginate(@researchers)

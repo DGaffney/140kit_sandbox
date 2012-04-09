@@ -22,7 +22,10 @@
           li
             | Access Level: 
             = @researcher.role+" "
-            a href="mailto:140kit@gmail.com?subject=Upgrade my account! (#{@researcher.user_name})" (Request Upgrade)
+            - if !@researcher.upgrade_requested && @researcher.role != Researcher.highest_role
+              span (
+              = link_to "Request Upgrade", request_upgrade_researcher_path(@researcher)
+              span )
         - if @researcher.location
           li 
             | Hailing from: 
@@ -33,8 +36,11 @@
             = @researcher.human_join_date
       - if @researcher == current_user
         a href=edit_researcher_path(@researcher) Edit
+      - if current_user && current_user.admin? && @researcher.upgrade_requested
+        = link_to "Upgrade Account", upgrade_researcher_path(@researcher)
   .span8
     h3 Most Recent Datasets
     == render partial: 'curations/table'
   /* .span4*/
     == render partial: 'curations/table'
+  

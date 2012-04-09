@@ -72,6 +72,8 @@ WWW140kit::Application.routes.draw do
     get '' => 'researchers#show', as: :researcher
     get 'edit' => 'researchers#edit', as: :edit_researcher
     get 'new' => 'researchers#new', as: :new_researcher
+    get 'upgrade' => 'researchers#upgrade', as: :upgrade_researcher
+    get 'request_upgrade' => 'researchers#request_upgrade', as: :request_upgrade_researcher
     put '' => 'researchers#update'
     delete '' => 'researchers#destroy'
   end
