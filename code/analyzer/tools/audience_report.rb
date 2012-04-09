@@ -28,5 +28,6 @@ class AudienceReport
       offset+=limit
       results = DataMapper.repository.adapter.select("select date_format(tweets.created_at, '%Y-%m-%d %H:%i:00') as time,sum(users.followers_count) as impressions from tweets inner join users on users.twitter_id = tweets.user_id where tweets.dataset_id = 16 group by date_format(tweets.created_at, '%Y-%m-%d %H:%i:00') limit #{limit} offset #{offset}")      
     end
+    return true
   end
 end
