@@ -1,0 +1,120 @@
+<%
+  @dataset = @graph.graph_points.collect{|gp| {:label => gp.label, :value => gp.value}}
+  if ["impressions_over_time"].include?(@graph.title)
+    @total = @dataset.select{|x| x[:label] == "total_impressions"}.first
+    @dataset = @dataset.select{|x| x[:label] != "total_impressions"}
+    @dataset.collect{|x| x[:label] = Time.parse(x[:label])}
+    start_time = @dataset.first[:label]
+    end_time = @dataset.last[:label]
+    @end_time_string = start_time.strftime("Date.UTC(%Y,%m,%d,%H,%M,%S)")
+    @dataset.sort!{|x,y| x[:label].to_i<=>y[:label].to_i}
+    @dataset.collect{|x| x[:label] = x[:label].strftime("Date.UTC(%Y,%m,%d,%H,%M,%S)")}
+    @dataset.collect{|x| x[:value] = x[:value].to_i}
+    @dataset = @dataset.collect{|x| [x[:label], x[:value]]}
+    results = "["
+    @dataset.each do |row|
+      results << "[#{row.first},#{row.last}],\n"
+    end
+    results.chop!.chop!
+    results << "]"
+    @dataset = results
+  elsif ["top_impression_generating_users"].include?(@graph.title)
+    @dataset.sort!{|x,y| x[:value].to_i<=>y[:value].to_i}
+    @dataset = @dataset.reverse
+    @dataset.collect{|d| d[:label] = "Empty Field" if d[:label].nil? || d[:label].empty?}
+    @dataset.collect{|d| d[:label] = "Blank Field" if d[:label]=="NULL"}
+    @dataset.collect{|d| d[:label] = "<a href='http://twitter.com/#{d[:label]}'>#{d[:label]}</a>".html_safe}
+  else
+    @dataset.sort!{|x,y| x[:value].to_i<=>y[:value].to_i}
+    @dataset = @dataset.collect{|x| [x[:label].split("_").collect(&:capitalize).join(" "), x[:value].to_f]}
+    @dataset = @dataset.inspect.html_safe
+  end
+  def yAxis(title)
+    {"impressions_over_time" => "{title: {text: 'Maximum Number of Impressions'},min: 0},", "tweet_type_breakdown" => "{title: {text: 'Total'},plotLines: [{value: 0,width: 1,color: '#808080'}]},"}[title]
+  end
+  def xAxis(title)
+    {"impressions_over_time" => "{type: 'datetime',dateTimeLabelFormats: {month: '%e. %b',year: '%b'}},", "tweet_type_breakdown" => "{title: {text: 'Total'},plotLines: [{value: 0,width: 1,color: '#808080'}]},"}[title]
+  end
+  def chart(title)
+    {"impressions_over_time" => "{renderTo: 'container',type: 'spline'},", "tweet_type_breakdown" => "{renderTo: 'container',plotBackgroundColor: null,plotBorderWidth: null,plotShadow: false},"}[title]
+  end
+  def series(title)
+    {"impressions_over_time" => "type: 'spline',", "tweet_type_breakdown" => "type: 'pie',"}[title]
+  end
+  def plotOptions(title)
+    {"impressions_over_time" => "{spline: {lineWidth: 4,states: {hover: {lineWidth: 5}},marker: {enabled: false,states: {hover: {enabled: true,symbol: 'circle',radius: 5,lineWidth: 1}}}}},", "tweet_type_breakdown" => "{pie: {allowPointSelect: true,cursor: 'pointer',dataLabels: {enabled: false},showInLegend: true}},"}[title]
+  end
+  def tooltip(title)
+    {"impressions_over_time" => "{formatter: function() {return 'Time:' + dateSet(this.x) + '; Number of Tweets: '+ this.y;}},", "tweet_type_breakdown" => "{formatter: function() {return this.point.name +': '+ Math.round(this.percentage) +' % ('+ this.point.y + ')';}},"}[title]
+  end
+  def google_number(title)
+    {"top_impression_generating_users" => "'number', 'Audience Size'"}[title] || "'number', 'Number'"
+  end
+  def google_string(title)
+    {"top_impression_generating_users" => "'string', 'User'"}[title] || "'string', 'String'"
+  end
+  def google_table_type(title)
+    {"top_impression_generating_users" => 'Table'}[title] || "Number"
+  end
+  def google_params(title)
+    {"top_impression_generating_users" => "{showRowNumber: true, page: 'enable', width: 680, height: 800, pageSize: 100, allowHtml: true}"}[title] || "{}"
+  end
+%>
+<% if ["impressions_over_time", "tweet_type_breakdown"].include?(@graph.title) %>
+  <script type="text/javascript">
+    $(function () {
+        var chart;
+        function dateSet(value){
+          var date = new Date(value);
+          date.setMonth(date.getMonth() - 1);
+          return date;
+        }
+        function boolToYesNo(value){
+          if (value == 0 || value == "0"){
+            return "No";
+          } else if (value == 1 || value == "1"){
+            return "Yes";            
+          };
+        }
+        $(document).ready(function() {
+            chart = new Highcharts.Chart({
+                chart: <%= chart(@graph.title) %>
+                yAxis: <%= yAxis(@graph.title) %>
+                xAxis: <%= xAxis(@graph.title) %>
+                legend: {enabled: false},
+                title: {text: '<%= @graph.pretty_title %>',x: -20},
+                tooltip: <%= tooltip(@graph.title) %>
+            		plotOptions: <%= plotOptions(@graph.title) %>
+            		series: [{
+            			<%= series(@graph.title) %>
+            			data: <%= @dataset %>
+            		}]
+            });
+        });
+    
+    });
+  </script>
+<% elsif ["top_impression_generating_users"].include?(@graph.title) %>
+  <script type='text/javascript'>
+    var data = new google.visualization.DataTable();
+    data.addColumn(<%= google_string(@graph.title) %>);
+    <% count = 0 %>
+    data.addColumn(<%= google_number(@graph.title) %>);
+    data.addRows(<%= @dataset.length %>);
+    <% @dataset.each do |row| %>
+      data.setCell(<%= count %>, 0, '<%= escape_javascript(row[:label]) %>');
+      data.setCell(<%= count %>, 1, <%= row[:value].to_i %>);
+      <% count+=1 %>
+    <% end %>
+    var table = new google.visualization.<%= google_table_type(@graph.title) %>(document.getElementById('container'));
+    table.draw(data, <%= google_params(@graph.title) %>);
+  </script>
+  <h1><%= @graph.pretty_title %></h1>
+<% end %>
+<div id="container" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+<% if @graph.title == "tweet_type_breakdown" %>
+Above is a chart showing the tweets that occurred in this dataset broken down by type (retweet, reply, regular-old tweet).<br />
+<% elsif @graph.title == "impressions_over_time"%>
+<b><%= @total[:label].split("_").collect(&:capitalize).join(" ") %> for this dataset</b>: <%= number_with_delimiter(@total[:value].to_i) %>
+<% end %>
+<!-- {startOnTick: true, endOnTick: true, showLastLabel: true}, -->
