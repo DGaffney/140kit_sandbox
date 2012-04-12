@@ -11,6 +11,8 @@ class Dataset < ActiveRecord::Base
       return "Bounding Box"
     when "track"
       return "Streaming Term"
+    when "track"
+      return "User Stream"
     end
   end
   
@@ -24,6 +26,10 @@ class Dataset < ActiveRecord::Base
       params = self.params.split(",")
       timed_seconds = distance_of_time_in_words(self.seconds, 0, true)
       return "Term: #{params.first}<br /> Length: #{timed_seconds} (#{number_with_delimiter(self.seconds)} seconds)"
+    when "follow"
+      params = self.params.split(",")
+      timed_seconds = distance_of_time_in_words(self.seconds, 0, true)
+      return "User: #{params[1]}<br /> Length: #{timed_seconds} (#{number_with_delimiter(self.seconds)} seconds)"
     end
   end
   
@@ -33,6 +39,8 @@ class Dataset < ActiveRecord::Base
       return self.created_at+self.seconds
     when "track"
       return self.created_at+self.seconds
+    when "follow"
+      return self.created_at+self.seconds
     end
   end
   
@@ -41,6 +49,8 @@ class Dataset < ActiveRecord::Base
     when "locations"
       return self.params.split(",").last.to_i
     when "track"
+      return self.params.split(",").last.to_i
+    when "follow"
       return self.params.split(",").last.to_i
     end
   end
