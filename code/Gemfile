@@ -33,6 +33,7 @@ group :core do
   gem 'twitter'
   gem 'unicode'
   gem 'yajl-ruby'
+  gem 'josephwilk-rsemantic'
 end
 
 group :raw_csv do
