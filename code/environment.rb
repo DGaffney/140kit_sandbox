@@ -24,7 +24,7 @@ require 'useful_class_extensions'
 #Encoding.default_external = Encoding::ISO_8859_1
 #Encoding.default_internal = Encoding::ISO_8859_1
 DIR = File.dirname(__FILE__)
-
+THIS_DIR = ARGV.include?("e") ? ARGV[ARGV.index("d")+1]||DIR : DIR
 require DIR+'/extensions/inflectors'
 
 require DIR+'/utils/git'
@@ -35,7 +35,7 @@ ENV['TZ'] = "UTC"
 ENV['HOSTNAME'] = Sh::hostname.strip
 ENV['PID'] = Process.pid.to_s #because ENV only allows strings.
 ENV['INSTANCE_ID'] = Digest::SHA1.hexdigest("#{ENV['HOSTNAME']}#{ENV['PID']}")
-ENV['TMP_PATH'] = DIR+"/tmp_files/#{ENV['INSTANCE_ID']}/scratch_processes/"
+ENV['TMP_PATH'] = THIS_DIR+"/tmp_files/#{ENV['INSTANCE_ID']}/scratch_processes/"
 
 require DIR+'/model'
 models = [
@@ -54,7 +54,6 @@ require DIR+'/utils/u'
 # require DIR+'/lib/tweetstream'
 
 ENV['E'] = ARGV.include?("e") ? ARGV[ARGV.index("e")+1]||"production" : "production"
-
 puts "Starting #{ENV['E']} environment..."
 
 database = YAML.load(File.read(DIR+'/config/database.yml'))
