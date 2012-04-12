@@ -243,14 +243,18 @@ class Filter < Instance
       if @params[d.scrape_type]
         if d.scrape_type == "locations"
           @params[d.scrape_type] << {:params => d.params.split(",")[0..d.params.split(",").length-2].join(","), :dataset_id => d.id}
-        else
+        elsif d.scrape_type == "track"
+          @params[d.scrape_type] << {:params => d.params.split(",").first, :dataset_id => d.id}
+        elsif d.scrape_type == "follow"
           @params[d.scrape_type] << {:params => d.params.split(",").first, :dataset_id => d.id}
         end
       else
         if d.scrape_type == "locations"
           @params[d.scrape_type] = [{:params => d.params.split(",")[0..d.params.split(",").length-2].join(","), :dataset_id => d.id}]
-        else
+        elsif d.scrape_type == "track"
           @params[d.scrape_type] = [{:params => d.params.split(",").first, :dataset_id => d.id}]
+        elsif d.scrape_type == "follow"
+          @params[d.scrape_type] = {:params => d.params.split(",").first, :dataset_id => d.id}
         end
       end
     end

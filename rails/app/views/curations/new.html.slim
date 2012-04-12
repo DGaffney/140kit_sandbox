@@ -4,17 +4,23 @@
       h1 New Dataset
 
 #curation-form.hide
-#terms-or-location
+#term-or-location-or-user
   .row
-    .span5.offset1
+    .span4
       .well
         h2 Track terms
         p Collect all tweets that contain a given word or words.
         p.align-center
           = link_to 'Select', new_term_dataset_path, class: 'btn btn-large btn-primary', remote: true
-    .span5
+    .span4
       .well
         h2 Track location
         p Collect all geotagged tweets originating from a location.
         p.align-center
           = link_to 'Select', new_location_dataset_path, class: 'btn btn-large btn-primary', remote: true
+    .span4
+      .well
+        h2 Track Users
+        p Collect all tweets posted by a set of given users
+        p.align-center
+          = link_to 'Select', new_user_dataset_path, class: 'btn btn-large btn-primary', remote: true

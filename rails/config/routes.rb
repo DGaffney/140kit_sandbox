@@ -42,6 +42,8 @@ WWW140kit::Application.routes.draw do
 
   get '/datasets/new/location' => 'curations#new_location', as: :new_location_dataset
   get '/datasets/new/term' => 'curations#new_term', as: :new_term_dataset
+  get '/datasets/new/user' => 'curations#new_user', as: :new_user_dataset
+  get '/datasets/validate/users' => 'curations#validate_users', as: :validate_user_dataset
   get '/datasets/:id/alter/:stream_type' => 'curations#new', as: :alter_dataset
   get '/tags/drop_relation' => 'tags#drop_relation', as: :drop_tag_relation
   resources :curations, only: [:index, :create, :new, :show, :validate, :analyze, :alter, :import, :verify, :destroy], path: '/datasets', as: :datasets do

@@ -89,7 +89,8 @@ html
         // $('.comma-separated-input').tagsInput({ height:'20px', defaultText: 'add a term', placeholderColor: '#999' });
         $('#main').on('click', '#review-curation-params', function() {
           if ( !$('#new-curation-form').valid() ) return false;
-          var params = $('#params').val()
+          var terms = $('#terms').val()
+            , users = $('#users').val()
             , latlon = $('#latlon').val()
             , name = $('#name').val()
             , humanTime = $('#time_output').text()
@@ -105,10 +106,13 @@ html
           modal += '<ul>';
           if (streamType == 'terms') {
             modal += '<li>Name: ' + (name || params) + '</li>';
-            modal += '<li>Tracking tweets matching terms: ' + params + '</li>';
-          } else {
+            modal += '<li>Tracking tweets matching terms: ' + terms + '</li>';
+          } else if (streamType == 'location') {
             modal += '<li>Name: ' + (name || latlon) + '</li>';
             modal += '<li>Tracking geotagged tweets matching coordinates in: ' + latlon + '</li>';
+          } else if (streamType == 'users') {
+            modal += '<li>Name: ' + (name) + '</li>';
+            modal += '<li>Tracking tweets from users: ' + users + '</li>';
           }
           modal += '<li>Collect for: ' + humanTime + '</li>';
           modal += '</ul>';
@@ -126,7 +130,16 @@ html
         });
 
       });
-
+      function validate_users(value){
+        $('a#review-curation-params').text("Waiting on Validation...");
+        $('a#review-curation-params').attr("id", "review-curation-params-hold");
+        $.get('/datasets/validate/users?screen_names='+value, function(data) {
+          $('.result').html(data);
+          $('input#users').val(data);
+          $('a#review-curation-params-hold').attr("id", "review-curation-params");
+          $('a#review-curation-params').text("Submit");
+        });
+      }
       var _gaq = _gaq || [];
       _gaq.push(['_setAccount', 'UA-16471158-1']);
       _gaq.push(['_setDomainName', '140kit.com']);

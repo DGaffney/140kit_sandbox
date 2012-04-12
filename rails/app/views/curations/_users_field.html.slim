@@ -1,0 +1,5 @@
+.controls
+  label.control-label Users To Track (For this field, simply put in all the screen names you want to track, separated by commas).
+  | 
+  = "As you are currently registered at the #{@role=Researcher.find(current_user.id).role} level of access, you are limited to tracking #{Setting.find_by_name_and_var_type("maximum_user_search", @role).actual_value} simultaneous accounts per dataset."
+  = text_field_tag :users, params[:params], :class => "input-xlarge comma-separated-input required", required: true, :onchange => "validate_users(this.value)"

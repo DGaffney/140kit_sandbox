@@ -54,6 +54,7 @@ class CurationsController < ApplicationController
       name = params[:name].empty? ? params[:params] : params[:name]
       @curation.name = name || params[:params]
       @curation.researcher_id = session[:researcher_id]
+      debugger
       if params[:stream_type] =~ /^locations?/i
         d = Dataset.new
         d.scrape_type = "locations"
@@ -70,7 +71,7 @@ class CurationsController < ApplicationController
         d.save!
         @datasets << d
       elsif params[:stream_type] =~ /^terms?/i
-        params[:params].split(",").each do |term|
+        params[:terms].split(",").each do |term|
           d = Dataset.new
           d.scrape_type = "track"
           d.params = "#{term},#{params[:end_time]}"
@@ -80,6 +81,18 @@ class CurationsController < ApplicationController
           d.updated_at = Time.now
           d.save!
           @datasets << d
+        end
+      elsif params[:stream_type] =~ /^users?/i
+        params[:users].split(",").each do |user|
+          d = Dataset.new
+          d.scrape_type = "follow"
+          d.params = "#{Twit.client.user(user).id},#{user},#{params[:end_time]}"
+          d.status = "tsv_storing"
+          d.instance_id = nil
+          d.created_at = Time.now
+          d.updated_at = Time.now
+          d.save!
+          @datasets << d          
         end
       end
       @curation.save!
@@ -92,53 +105,6 @@ class CurationsController < ApplicationController
     redirect_to dataset_url(@curation), flash: { success:  success}
   end
 
-  def validate
-    if !curation_is_same?
-      @curation = Curation.new
-      @datasets = []
-      @curation.created_at = Time.now
-      @curation.updated_at = @curation.created_at
-      @curation.privatized = !params[:privatized].nil?
-      @curation.status = "tsv_storing"
-      @curation.single_dataset = false
-      name = params[:name].empty? ? params[:params] : params[:name]
-      @curation.name = name || params[:params]
-      @curation.researcher_id = session[:researcher_id]
-      if params[:stream_type] == "locations"
-        d = Dataset.new
-        d.scrape_type = "locations"
-        coords = params[:params].split(",").collect(&:to_f)
-        north = coords[1] > coords[3] ? coords[1] : coords[3]
-        south = coords[1] > coords[3] ? coords[3] : coords[1]
-        east = coords[0] > coords[2] ? coords[0] : coords[2]
-        west = coords[0] > coords[2] ? coords[2] : coords[0]
-        d.params = "#{west},#{south},#{east},#{north},#{params[:end_time]}"
-        d.status = "tsv_storing"
-        d.instance_id = "system"
-        d.created_at = Time.now
-        d.updated_at = Time.now
-        d.save!
-        @datasets << d
-      elsif params[:stream_type] == "term"
-        params[:params].split(",").each do |term|
-          d = Dataset.new
-          d.scrape_type = "track"
-          d.params = "#{term},#{params[:end_time]}"
-          d.status = "tsv_storing"
-          d.instance_id = "system"
-          d.created_at = Time.now
-          d.updated_at = Time.now
-          d.save!
-          @datasets << d
-        end
-      end
-      @curation.save!
-      @datasets.collect{|d| d.curations << @curation}
-    else
-      @datasets = @curation.datasets
-    end
-  end
-  
   def alter
     #this could probably be done in a much better way.
     @curation = Curation.find(params[:id])
@@ -211,6 +177,23 @@ class CurationsController < ApplicationController
       redirect_to datasets_path, :notice => "Hrm... You tried to delete a curation but don't have the permission to delete it."
     end
   end
+  
+  def validate_users
+    users = params[:screen_names].split(",")
+    cleaned_users = []
+    users.each do |user|
+      begin
+        client = Twit.client
+        cleaned_users << client.user(user).screen_name
+      rescue
+        next
+      end
+    end
+    @researcher = Researcher.find(current_user.id)
+    maximum = Setting.find_by_name_and_var_type("maximum_user_search", @researcher.role).actual_value-1
+    render :text => cleaned_users[0..maximum].join(",")
+  end
+  
 
   private
 
