@@ -1,0 +1,51 @@
+<%
+  @dataset = @graph.graph_points.collect{|gp| {:label => gp.label, :value => gp.value}}
+
+  @dataset.sort!{|x,y| x[:value].to_i<=>y[:value].to_i}
+  @dataset = @dataset.reverse
+  def google_number(title)
+    {"fast_semantic_results" => "'number', 'Number of Users'"}[title] || "'number', 'Number'"
+  end
+  def google_string(title)
+    {"fast_semantic_results" => "'string', 'Term'"}[title] || "'string', 'String'"
+  end
+  def google_table_type(title)
+    {"fast_semantic_results" => 'Table'}[title] || "Number"
+  end
+  def google_params(title)
+    {"fast_semantic_results" => "{showRowNumber: true, page: 'enable', width: 680, height: 800, pageSize: 100}"}[title] || "{}"
+  end
+%>
+<script type='text/javascript'>
+  var data = new google.visualization.DataTable();
+  data.addColumn(<%= google_string(@graph.title) %>);
+  <% count = 0 %>
+  <% if ["tweets_language", "tweets_location", "users_time_zone"].include?(@graph.title) %>
+    data.addColumn(<%= google_number(@graph.title) %>);
+    data.addRows(<%= @dataset.length %>);
+    <% @dataset.each do |row| %>
+      data.setCell(<%= count %>, 0, '<%= escape_javascript(row[:label]) %>');
+      data.setCell(<%= count %>, 1, <%= row[:value].to_i %>);
+      <% count+=1 %>
+    <% end %>
+  <% elsif ["tweets_source"].include?(@graph.title) %>
+    data.addColumn(<%= google_number(@graph.title) %>);
+    data.addRows(<%= @dataset.length %>);
+    <% @dataset.each do |row| %>
+      data.setCell(<%= count %>, 0, '<%= row[:label].html_safe %>');
+      data.setCell(<%= count %>, 1, <%= row[:value].to_i %>);
+      <% count+=1 %>
+    <% end %>
+  <% else %>
+    data.addRows([
+    <% @dataset.each do |row| %>
+      [<%= escape_javascript(row[:label]) %>],
+    <% end %>
+    ]);
+  <% end %>
+  var table = new google.visualization.<%= google_table_type(@graph.title) %>(document.getElementById('container'));
+  table.draw(data, <%= google_params(@graph.title) %>);
+</script>
+<h1><%= @graph.pretty_title %></h1>
+<div id="container" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+<!-- {startOnTick: true, endOnTick: true, showLastLabel: true}, -->
