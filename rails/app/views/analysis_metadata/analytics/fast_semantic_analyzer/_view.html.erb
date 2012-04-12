@@ -3,7 +3,7 @@
   @dataset.sort!{|x,y| x[:value].to_i<=>y[:value].to_i}
   @dataset = @dataset.reverse
   def google_number(title)
-    {"fast_semantic_results" => "'number', 'Number of Users'"}[title] || "'number', 'Number'"
+    {"fast_semantic_results" => "'number', 'TF*IDF Score'"}[title] || "'number', 'Number'"
   end
   def google_string(title)
     {"fast_semantic_results" => "'string', 'Term'"}[title] || "'string', 'String'"
