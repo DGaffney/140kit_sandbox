@@ -25,5 +25,9 @@ module Analysis::Dependencies
   def self.semantic_analyzer_dependencies
     ['stemmer', 'semantic']
   end
+  
+  def self.fast_semantic_analyzer_dependencies
+    ['tf_idf']
+  end
     
 end

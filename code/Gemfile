@@ -46,3 +46,7 @@ group :semantic_analyzer do
   gem 'josephwilk-rsemantic'
   gem 'stemmer'
 end
+
+group :fast_semantic_analyzer do
+  gem 'tf_idf'
+end
