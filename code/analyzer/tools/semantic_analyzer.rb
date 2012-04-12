@@ -18,6 +18,7 @@ class SemanticAnalyzer < AnalysisMetadata
       tweets = Tweet.all({:limit => limit, :offset => offset}.merge(conditional))
     end
     terms = corpus.join(" ").split(" ").uniq
+    debugger
     search = Semantic::Search.new(corpus, :transforms => [analysis_type])
     semantic_set = []
     terms.each_pair do |term|
