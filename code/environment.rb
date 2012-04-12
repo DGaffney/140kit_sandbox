@@ -24,7 +24,7 @@ require 'useful_class_extensions'
 #Encoding.default_external = Encoding::ISO_8859_1
 #Encoding.default_internal = Encoding::ISO_8859_1
 DIR = File.dirname(__FILE__)
-THIS_DIR = ARGV.include?("e") ? ARGV[ARGV.index("d")+1]||DIR : DIR
+THIS_DIR = ARGV.include?("d") ? ARGV[ARGV.index("d")+1]||DIR : DIR
 require DIR+'/extensions/inflectors'
 
 require DIR+'/utils/git'
