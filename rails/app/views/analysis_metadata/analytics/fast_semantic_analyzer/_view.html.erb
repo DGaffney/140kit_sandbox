@@ -1,6 +1,5 @@
 <%
   @dataset = @graph.graph_points.collect{|gp| {:label => gp.label, :value => gp.value}}
-
   @dataset.sort!{|x,y| x[:value].to_i<=>y[:value].to_i}
   @dataset = @dataset.reverse
   def google_number(title)
@@ -20,28 +19,12 @@
   var data = new google.visualization.DataTable();
   data.addColumn(<%= google_string(@graph.title) %>);
   <% count = 0 %>
-  <% if ["tweets_language", "tweets_location", "users_time_zone"].include?(@graph.title) %>
-    data.addColumn(<%= google_number(@graph.title) %>);
-    data.addRows(<%= @dataset.length %>);
-    <% @dataset.each do |row| %>
-      data.setCell(<%= count %>, 0, '<%= escape_javascript(row[:label]) %>');
-      data.setCell(<%= count %>, 1, <%= row[:value].to_i %>);
-      <% count+=1 %>
-    <% end %>
-  <% elsif ["tweets_source"].include?(@graph.title) %>
-    data.addColumn(<%= google_number(@graph.title) %>);
-    data.addRows(<%= @dataset.length %>);
-    <% @dataset.each do |row| %>
-      data.setCell(<%= count %>, 0, '<%= row[:label].html_safe %>');
-      data.setCell(<%= count %>, 1, <%= row[:value].to_i %>);
-      <% count+=1 %>
-    <% end %>
-  <% else %>
-    data.addRows([
-    <% @dataset.each do |row| %>
-      [<%= escape_javascript(row[:label]) %>],
-    <% end %>
-    ]);
+  data.addColumn(<%= google_number(@graph.title) %>);
+  data.addRows(<%= @dataset.length %>);
+  <% @dataset.each do |row| %>
+    data.setCell(<%= count %>, 0, '<%= escape_javascript(row[:label]) %>');
+    data.setCell(<%= count %>, 1, <%= row[:value].to_f %>);
+    <% count+=1 %>
   <% end %>
   var table = new google.visualization.<%= google_table_type(@graph.title) %>(document.getElementById('container'));
   table.draw(data, <%= google_params(@graph.title) %>);
