@@ -254,7 +254,7 @@ class Filter < Instance
         elsif d.scrape_type == "track"
           @params[d.scrape_type] = [{:params => d.params.split(",").first, :dataset_id => d.id}]
         elsif d.scrape_type == "follow"
-          @params[d.scrape_type] = {:params => d.params.split(",").first, :dataset_id => d.id}
+          @params[d.scrape_type] = [{:params => d.params.split(",").first, :dataset_id => d.id}]
         end
       end
     end

@@ -54,7 +54,6 @@ class CurationsController < ApplicationController
       name = params[:name].empty? ? params[:params] : params[:name]
       @curation.name = name || params[:params]
       @curation.researcher_id = session[:researcher_id]
-      debugger
       if params[:stream_type] =~ /^locations?/i
         d = Dataset.new
         d.scrape_type = "locations"
