@@ -3,11 +3,11 @@
   - field_options[:readonly] = true
 - if params["aov_#{aovd.name}_error"]
   .control-group.error
-    label <b>#{aovd.description}</b>
+    label <b>#{aovd.description.html_safe}</b>
   .control-group.warning
     label #{params["aov_#{aovd.name}_error"]}
 - else
-  label.control-label <b>#{aovd.description}</b>
+  label.control-label <b>#{aovd.description.html_safe}</b>
 .controls
   - if aovd.kind == "enum"
     - select_set = aovd.values.split(",").collect{|x| [x,x]}

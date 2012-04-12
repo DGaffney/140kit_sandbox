@@ -9,7 +9,7 @@ class SemanticAnalyzer < AnalysisMetadata
     offset = 0
     limit = 1000
     tweets = Tweet.all({:limit => limit, :offset => offset}.merge(conditional))
-    corpus << []
+    corpus = []
     while !tweets.empty?
       tweets.each do |tweet|
         corpus << tweet.text
