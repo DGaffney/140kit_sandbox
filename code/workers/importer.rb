@@ -85,7 +85,7 @@ class Importer < Instance
           puts "Archiving #{offset} - #{offset+next_set} (#{model})"
           path = ENV["TMP_PATH"]
           Sh::mkdir(path, {"type" => "local"})
-          filename = "#{@curation.id}_#{offset}_#{offset+next_set}"
+          filename = "#{dataset.id}_#{offset}_#{offset+next_set}"
           mysql_section = "mysql -u #{config["user"]} --password='#{config["password"]}' -P #{config["port"]} -h #{config["host"]} #{config["path"].gsub("/", "")} -B -e "
           mysql_statement = "\"select * from #{model.storage_name} where dataset_id = #{dataset.id} limit #{limit};\""
           file_push = " | sed -n -e 's/^\"//;s/\"$//;s/\",\"/ /;s/\",\"/\\n/;P' > #{path}#{filename}.tsv"
@@ -117,7 +117,7 @@ class Importer < Instance
         puts "Archiving #{offset} - #{offset+next_set} (#{model})"
         path = ENV["TMP_PATH"]
         Sh::mkdir(path, {"type" => "local"})
-        filename = "#{@curation.id}_#{offset}_#{offset+next_set}"
+        filename = "#{dataset.id}_#{offset}_#{offset+next_set}"
         mysql_section = "mysql -u #{config["user"]} --password='#{config["password"]}' -P #{config["port"]} -h #{config["host"]} #{config["path"].gsub("/", "")} -B -e "
         mysql_statement = "\"select * from #{model.storage_name} where curation_id = #{@curation.id} limit #{limit};\""
         file_push = " | sed -n -e 's/^\"//;s/\"$//;s/\",\"/ /;s/\",\"/\\n/;P' > #{path}#{filename}.tsv"
@@ -184,7 +184,7 @@ class Importer < Instance
     if import_type == "reimportable"
       storage = Machine.first(:id => @curation.datasets.first.storage_machine_id).machine_storage_details
       models.each do |model|
-        files = Sh::storage_ls("raw_catalog/#{model}", storage).select{|x| @curation.id == x.split("_").first.to_i}
+        files = Sh::storage_ls("raw_catalog/#{model}", storage).select{|x| dataset.id == x.split("_").first.to_i}
         files.each do |file|
           mysql_filename = "mysql_tmp_#{Time.now.to_i}_#{rand(10000)}.sql"
           mysql_file = File.open("#{ENV['TMP_PATH']}/#{mysql_filename}", "w+")
