@@ -1,7 +1,7 @@
 class FilePathing
   ERROR_THRESHOLD=4
   def self.tmp_folder(curation, sub_folder="")
-    ENV['TMP_PATH'] = DIR+"/tmp_files/#{ENV['INSTANCE_ID']}/#{curation.stored_folder_name}/#{sub_folder}"
+    ENV['TMP_PATH'] = THIS_DIR+"/tmp_files/#{ENV['INSTANCE_ID']}/#{curation.stored_folder_name}/#{sub_folder}"
     Sh::mkdir(ENV['TMP_PATH'])
     return ENV['TMP_PATH'].gsub(/\/+/, "/")
   end
