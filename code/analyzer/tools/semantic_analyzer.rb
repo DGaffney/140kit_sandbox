@@ -21,7 +21,7 @@ class SemanticAnalyzer < AnalysisMetadata
     debugger
     search = Semantic::Search.new(corpus, :transforms => [analysis_type])
     semantic_set = []
-    terms.each_pair do |term|
+    terms.each do |term|
       semantic_set << {:label => term, :value => search.search([term]).sum}
     end
     semantic_set.sort!{|x,y| x[:value]<=>y[:value]}
