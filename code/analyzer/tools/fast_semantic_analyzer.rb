@@ -16,7 +16,7 @@ class FastSemanticAnalyzer < AnalysisMetadata
       offset += limit
       tweets = Tweet.all({:limit => limit, :offset => offset}.merge(conditional))
     end
-    results = TfIdf.new(corpus.collect{|x| x.split(" ")}).tf_idf
+    results = TfIdf.new(corpus).tf_idf
     flattened_set = {}
     results.each do |result|
       result.each_pair do |term, value|
