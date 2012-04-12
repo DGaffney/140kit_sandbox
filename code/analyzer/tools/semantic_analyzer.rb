@@ -19,11 +19,11 @@ class SemanticAnalyzer < AnalysisMetadata
     end
     terms = corpus.join(" ").split(" ").uniq
     search = Semantic::Search.new(corpus, :transforms => [analysis_type])
-    semantic_set2 = []
+    semantic_set = []
     terms.each do |term|
-      semantic_set2 << {:label => term, :value => search.search([term]).sum}
+      semantic_set << {:label => term, :value => search.search([term]).sum}
     end
-    semantic_set2.sort!{|x,y| x[:value].to_s.to_f<=>y[:value].to_s.to_f}
+    semantic_set.sort!{|x,y| x[:value].to_s.to_f<=>y[:value].to_s.to_f}
     highest_matches = []
     if percentile.to_f == 0
       highest_matches = semantic_set
