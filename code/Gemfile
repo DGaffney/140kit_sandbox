@@ -27,15 +27,22 @@ group :core do
   gem 'RedCloth'
   gem 'rdebug'
   gem 'rspec', '1.3.1'
-  gem 'cld'
   gem 'useful_class_extensions'
   gem 'tweetstream', '1.1.2'
   gem 'twitter'
   gem 'unicode'
   gem 'yajl-ruby'
-  gem 'josephwilk-rsemantic'
 end
 
 group :raw_csv do
   gem 'fastercsv'
+end
+
+group :compact_language_detection do
+  gem 'cld'
+end
+
+group :semantic_analyzer do
+  gem 'josephwilk-rsemantic'
+  gem 'stemmer'
 end

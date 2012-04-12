@@ -21,60 +21,9 @@ module Analysis::Dependencies
   def self.compact_language_detection_dependencies
     ['cld']
   end
-
-  def self.bitly_api_chart_dependencies
-    ['open-uri', 'nokogiri', 'json']
-  end
-
-  def self.click_tweet_count_comparison_dependencies
-    ['csv']
-  end  
-
-  def self.centrality_differentials_dependencies
-    ['csv']
-  end  
-
-  def self.jaccard_to_csv_dependencies
-    ['csv']
-  end
-
-  def self.raw_csv_dependencies
-    ['csv']
-  end
   
-  def self.advanced_histogram_dependencies
-    ['csv']
+  def self.semantic_analyzer_dependencies
+    ['stemmer', 'semantic']
   end
-
-  def self.advanced_histogram_a_dependencies
-    ['csv']
-  end
-
-  def self.advanced_histogram_b_dependencies
-    ['csv']
-  end
-
-  def self.advanced_histogram_c_dependencies
-    ['csv']
-  end
-
-  def self.basic_histogram_dependencies
-    ['csv']
-  end
-
-  def self.size_counter_dependencies
-    ['csv']
-  end
-  
-  def self.time_based_summary_dependencies
-    ['csv']
-  end
-  
-  def self.word_frequency_dependencies
-    ['csv']
-  end
-  
-  def self.csv_export_dependencies
-    ['csv']
-  end  
+    
 end
