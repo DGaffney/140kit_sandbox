@@ -1,6 +1,6 @@
 class FastSemanticAnalyzer < AnalysisMetadata
 
-  def self.run(analysis_metadata_id, percentile, analysis_type)
+  def self.run(analysis_metadata_id, percentile)
     analysis_type = analysis_type.upcase.to_sym
     @analysis_metadata = AnalysisMetadata.first(:id => analysis_metadata_id)
     curation = @analysis_metadata.curation
