@@ -24,6 +24,7 @@ class SemanticAnalyzer < AnalysisMetadata
       semantic_set << {:label => term, :value => search.search([term]).sum}
     end
     semantic_set.sort!{|x,y| x[:value].to_s.to_f<=>y[:value].to_s.to_f}
+    semantic_set.collect{|x| x[:value] = x[:value].to_s.to_f}
     highest_matches = []
     if percentile.to_f == 0
       highest_matches = semantic_set
