@@ -105,7 +105,7 @@ html
           modal += '<div class="modal-body">';
           modal += '<ul>';
           if (streamType == 'terms') {
-            modal += '<li>Name: ' + (name || params) + '</li>';
+            modal += '<li>Name: ' + (name || terms)  + '</li>';
             modal += '<li>Tracking tweets matching terms: ' + terms + '</li>';
           } else if (streamType == 'location') {
             modal += '<li>Name: ' + (name || latlon) + '</li>';
