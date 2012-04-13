@@ -1,5 +1,7 @@
 Setting up the front end: 
 
+0. Set up your environment: cd code;bundle install, cd rails;bundle install. Work through the numerous issues you'll probably have in getting set up to our environment.
+
 1. Create the following local config files: 
 
 	code/config/database.yml
