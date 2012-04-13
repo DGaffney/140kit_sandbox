@@ -2,37 +2,33 @@ Setting up the front end:
 
 1. Create the following local config files: 
 
-			api/config/database.yml
-			front-end/config/database.yml
-			back-end/config/config.yml
-		
-	 You will find examples of each file in the same directory as the file to be created. Sorry we have so many config files, we're planning to centralize them soon. 	
-	
-2. Create the production, development, and test databases you specify in the configs above
+	code/config/database.yml
+	rails/config/database.yml
 
-3. cd front-end
+(The settings in these fiels should be identical.)
+(Also, you need to make sure that you're mysql configuration is all UTF8'd out, or else you'll run into problems with many of the analytics)
 
-4. rake db:migrate
+2. Create the production, development, and test databases you specify in the configs above:
+  a. cd code
+  b. rake db:migrate (default env is production)
+  c. rake db:seed
 
-5. rake db:seed (This step will add an admin account for you to play with.)
+3. Startup the site and create your account:
+	a. cd rails
+	b. rails s
+	c. Open 127.0.0.1:3000
+	d. Sign in with your twitter account - the first researcher created is automatically made an admin.
+	e. Create your first dataset
 
-6. run script/server to serve up a local instance of 140kit.com
-	
+4. Startup worker tasks:
 
-Collecting and analyzing your first dataset: 
+  - To start term pulls: cd code/api_methods;ruby filter.rb track
+  - To start location pulls: cd code/api_methods;ruby filter.rb locations
+  - To start user pulls: cd code/api_methods;ruby filter.rb follow
+  (append a "d /some/dir/path" to define a non-default location for tmp data storage)
+  (define machines on the site to add non-default final data locations as well; default goes to code/raw_catalog and code/rendered_output)
+  
+  - To start worker: cd code/workers;ruby worker.rb
+  - To start importer: cd code/workers;ruby importer.rb
 
-1. Go to localhost:3000 on your favorite browser
-
-2. Login at "username", "password" (the default admin account created above)
-
-3. 140kit needs at least one Twitter Account to use for streaming data collection. To specify an account, click on "Twitter Accounts Management" and create a new auth_user with an existing Twitter account and password. For testing and such, you can probably just use your personal twitter account (you ARE on Twitter, right??)
-
-4. Now you need to create a new streaming instance on your machine--streaming instances continuously run, checking for data collection and analysis jobs ('scrapes') that need to be completed. To create an instance: 
-
-		a) 
-
-	
-		
-			
-	
-	
+5. 140kit needs at least one Twitter Account to use for streaming data collection. To specify an account, click on "Twitter Accounts Management" and create a new auth_user with an existing Twitter account and password. For testing and such, you can probably just use your personal twitter account (you ARE on Twitter, right??)
