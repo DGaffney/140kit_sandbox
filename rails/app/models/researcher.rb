@@ -21,7 +21,7 @@ class Researcher < ActiveRecord::Base
       user.website_url = auth.extra.raw_info.url
       user.info = auth.extra.raw_info.description
       user.affiliation_url = "http://140kit.com"
-      user.role = "User"
+      user.role = Researcher.count == 0 ? "Admin" : "User"
       user.join_date = Time.now
       user.first_time = true
     end

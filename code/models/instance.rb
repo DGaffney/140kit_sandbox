@@ -22,7 +22,6 @@ class Instance
   
   def initialize
     super
-    connect_to_db
     self.rest_allowed = whitelisted?
     self.tmp_data = {}
     self.instance_id = ENV['INSTANCE_ID']

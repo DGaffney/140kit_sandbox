@@ -10,6 +10,7 @@ group :core do
   gem 'dm-sweatshop'
   gem 'dm-types'
   gem 'dm-zone-types'  
+  gem 'daemons'
   gem 'dm-validations'
   gem 'eventmachine', '1.0.0.beta.4'
   gem 'em-http-request', :require => 'em-http'

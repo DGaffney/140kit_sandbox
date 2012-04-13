@@ -110,10 +110,14 @@ class Worker < Instance
   def clean_orphans
     return if !self.last_system_check.nil? && (Time.now-self.last_system_check) < $clean_orphan_interval.call
     Instance.all.each do |instance|
-      process_report = Sh::bt("ssh #{instance.hostname} 'ps -p #{instance.pid}'").split("\n")
+      process_report = self.hostname == instance.hostname ? Sh::bt("ps -p #{instance.pid}").split("\n") : Sh::bt("ssh #{instance.hostname} 'ps -p #{instance.pid}'").split("\n")
       if process_report.length == 1 || process_report.last && process_report.last.scan(/(.*#{instance.pid}.*pts\/.*\d\d:\d\d:\d\d (ruby|rdebug))/).flatten.first != process_report.last
         puts "Cleaning Orphan..."
-        Sh::bt("ssh #{instance.hostname} 'rm -r 140kit_sandbox/code/tmp_files/#{instance.instance_id}'")
+        if self.hostname == instance.hostname
+          Sh::bt("rm -r #{ENV["PWD"]}/../tmp_files/#{instance.instance_id}")
+        else
+          Sh::bt("ssh #{instance.hostname} 'rm -r 140kit_sandbox/code/tmp_files/#{instance.instance_id}'")
+        end
         Lock.all(:instance_id => instance.instance_id).destroy
         instance.destroy
       end
@@ -169,4 +173,3 @@ end
 
 worker = Worker.new
 worker.work
-

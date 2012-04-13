@@ -31,11 +31,53 @@ task :set_up do
   Rake::Task["db:seed"].execute
 end
 
+desc "Kick up a bare number of workers (variables are, in order, number of terms, locations, users, worker, and importer instances to start, and the tmp_file location (code/tmp_files/ is default))"
+task :start => :environment do
+  require 'daemons'
+  args = ARGV[1..ARGV.length-1]
+  (puts "Must specify number of workers for all workers";exit) if args.length<=4
+  terms = args[0].to_i
+  locations = args[1].to_i
+  users = args[2].to_i
+  workers = args[3].to_i
+  importers = args[4].to_i
+  necessary_auth_users = terms+locations+users
+  available_auth_users = AuthUser.unlocked.count
+  (puts "Must have an equal number of unlocked auth users in order to run this many streams. Go to /auth_users in your browser when logged in as admin to change this.";exit) if necessary_auth_users>available_auth_users
+  tmp_file = args[5] || "#{File.dirname(__FILE__)}/tmp_files/"
+  terms.downto(0) do |t|
+    Thread.new{
+    `ruby #{File.dirname(__FILE__)}/api_methods/filter.rb track d #{tmp_file}` 
+    }
+  end
+  locations.downto(0) do |t|
+    Thread.new{
+    `ruby #{File.dirname(__FILE__)}/api_methods/filter.rb locations d #{tmp_file}`      
+    }
+  end
+  users.downto(0) do |t|
+    Thread.new{
+    `ruby #{File.dirname(__FILE__)}/api_methods/filter.rb follow d #{tmp_file}`      
+    }
+  end
+  workers.downto(0) do |t|
+    Thread.new{
+    `ruby #{File.dirname(__FILE__)}/workers/worker.rb d #{tmp_file}`      
+    }
+  end
+  importers.downto(0) do |t|
+    Thread.new{
+    `ruby #{File.dirname(__FILE__)}/workers/importer.rb d #{tmp_file}`      
+    }
+  end
+end
+
 desc "Load up environment and start a console"
 task :load => :environment do
   require 'irb'
   ARGV.clear
   IRB.start
 end
+
 
 task :environment => "environment:load"

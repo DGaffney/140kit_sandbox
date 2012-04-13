@@ -4,6 +4,7 @@ namespace :environment do
   task :load do 
     require File.dirname(__FILE__)+'/../environment'
   end
+
   # task :default => Rake::Task["environment:load"].execute  
 
   def load_settings

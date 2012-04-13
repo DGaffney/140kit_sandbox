@@ -36,7 +36,7 @@ ENV['HOSTNAME'] = Sh::hostname.strip
 ENV['PID'] = Process.pid.to_s #because ENV only allows strings.
 ENV['INSTANCE_ID'] = Digest::SHA1.hexdigest("#{ENV['HOSTNAME']}#{ENV['PID']}")
 ENV['TMP_PATH'] = THIS_DIR+"/tmp_files/#{ENV['INSTANCE_ID']}/scratch_processes/"
-
+ENV['QUIET'] = "false"
 require DIR+'/model'
 models = [
   "analysis_metadata", "analytical_offering", "analytical_offering_requirement", "analytical_offering_variable", "analytical_offering_variable_descriptor", "auth_user", "coordinate", "curation",
@@ -52,8 +52,8 @@ require DIR+'/utils/entity_helper'
 
 require DIR+'/utils/u'
 # require DIR+'/lib/tweetstream'
-
-ENV['E'] = ARGV.include?("e") ? ARGV[ARGV.index("e")+1]||"production" : "production"
+DEFAULT_ENV = "production"
+ENV['E'] = ARGV.include?("e") ? ARGV[ARGV.index("e")+1]||DEFAULT_ENV : DEFAULT_ENV
 puts "Starting #{ENV['E']} environment..."
 
 database = YAML.load(File.read(DIR+'/config/database.yml'))
@@ -64,7 +64,7 @@ database = database[ENV['E']]
 database.inspect
 DataMapper.setup(:default, "#{database["adapter"]}://#{database["username"]}:#{database["password"]}@#{database["host"]}:#{database["port"] || 3000}/#{database["database"]}?encoding=UTF8").inspect
 DataMapper.finalize
-STORAGE = Machine.determine_storage
+STORAGE = Machine.determine_storage rescue {"type" => "local", "path" => THIS_DIR, "user" => Sh::whoami.strip, "hostname" => Sh::hostname.strip}
 require DIR+'/extensions/dm-extensions'
 
 #require DIR+'/analyzer/analysis'
@@ -75,7 +75,6 @@ Twit = Twitter::Client.new
 at_exit { do_at_exit }
 
 def do_at_exit
-  puts "Exiting..."
   safe_close
   puts "Safely exited."
 end

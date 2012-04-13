@@ -12,7 +12,7 @@ class Filter < Instance
     @datasets = []
     @queue = []
     @start_time = Time.now
-    @scrape_type = ARGV[0] || "track"
+    @scrape_type = @scrape_type || ARGV[0] || "track"
     self.instance_type = "filter"
     self.save
     at_exit { do_at_exit }
@@ -206,7 +206,7 @@ class Filter < Instance
         Sh::mkdir("#{STORAGE["path"]}/raw_catalog/#{model}")
         if File.exists?("#{dir(model, dataset.id, time)}.tsv")
           Sh::compress("#{dir(model, dataset.id, time)}.tsv")
-          machine = Machine.first(:id => dataset.storage_machine_id).machine_storage_details
+          machine = Machine.first(:id => dataset.storage_machine_id).machine_storage_details rescue STORAGE
           Sh::store_to_disk("#{dir(model, dataset.id, time)}.tsv.zip", "raw_catalog/#{model}/#{dataset.id}_#{time.strftime("%Y-%m-%d_%H-%M-%S")}.tsv.zip", machine)
   	      files << dir(model, dataset.id, time)+".tsv"
   	      files << dir(model, dataset.id, time)+".tsv.zip"
@@ -316,7 +316,7 @@ class Filter < Instance
      claimed_datasets = Dataset.lock(datasets_to_claim)
      if !claimed_datasets.empty?
        claimed_datasets.each do |dataset|
-         dataset.storage_machine_id = Machine.first(:user => STORAGE["hostname"]).id
+         dataset.storage_machine_id = Machine.first(:user => STORAGE["hostname"]).id rescue 0
          dataset.save!
        end
        # maybe?

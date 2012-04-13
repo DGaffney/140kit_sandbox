@@ -117,8 +117,10 @@ GEM
     sexp_processor (3.0.7)
     simple_oauth (0.1.5)
     spicycode-rcov (0.8.2.1)
+    stemmer (1.0.1)
     stringex (1.3.0)
     term-ansicolor (1.0.7)
+    tf_idf (0.0.2)
     tweetstream (1.1.2)
       daemons (~> 1.1.4)
       multi_json (~> 1.0.3)
@@ -148,6 +150,7 @@ PLATFORMS
 DEPENDENCIES
   RedCloth
   cld
+  daemons
   dm-aggregates
   dm-chunked_query
   dm-core
@@ -175,6 +178,8 @@ DEPENDENCIES
   rdebug
   rspec (= 1.3.1)
   spicycode-rcov
+  stemmer
+  tf_idf
   tweetstream (= 1.1.2)
   twitter
   unicode

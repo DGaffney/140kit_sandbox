@@ -7,5 +7,6 @@ class AnalyticalOfferingVariableDescriptor
   property :position, Integer, :unique_index => [:unique_analytical_offering_variable_descriptor]
   property :kind, String, :unique_index => [:unique_analytical_offering_variable_descriptor]
   property :analytical_offering_id, Integer, :unique_index => [:unique_analytical_offering_variable_descriptor]
+  property :values, String
   belongs_to :analytical_offering, :child_key => :analytical_offering_id
 end

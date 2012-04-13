@@ -1,0 +1,10 @@
+= form_for(@auth_user) do |f|
+  fieldset
+    label.control-label Screen Name
+    .controls
+      = f.text_field :screen_name, class: 'input-xlarge'
+    label.control-label Password
+    .controls
+      = f.text_field :password, class: 'input-xlarge'
+    .form-actions
+      = submit_tag 'Submit', class: 'btn btn-primary'

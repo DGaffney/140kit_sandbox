@@ -1,0 +1,17 @@
+h1 Auth Users
+table.table.table-striped.table-bordered
+  thead
+    tr
+      th Screen Name
+      th Password
+      th Options
+  tbody
+    - for auth_user in @auth_users
+      tr
+        td = auth_user.screen_name
+        td = auth_user.password
+        td = link_to 'Destroy', auth_user, confirm: 'Are you sure?', method: :delete
+        td = link_to 'Edit', edit_auth_user_path(auth_user)
+
+= link_to 'New Auth user', new_auth_user_path
+= will_paginate(@analytical_offerings)

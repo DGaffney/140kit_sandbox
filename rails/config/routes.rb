@@ -1,5 +1,7 @@
 WWW140kit::Application.routes.draw do
 
+  resources :auth_users
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

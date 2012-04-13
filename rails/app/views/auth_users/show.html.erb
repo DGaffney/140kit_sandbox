@@ -1,0 +1,15 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Screen name:</b>
+  <%= @auth_user.screen_name %>
+</p>
+
+<p>
+  <b>Password:</b>
+  <%= @auth_user.password %>
+</p>
+
+
+<%= link_to 'Edit', edit_auth_user_path(@auth_user) %> |
+<%= link_to 'Back', auth_users_path %>

@@ -4,6 +4,9 @@ module Sh
     return bt "hostname"
   end
   
+  def self.whoami
+    return bt "whoami"
+  end
   def self.sh(command, chomped=true, silence_errors=true)
     if silence_errors
       result = Open3.popen3(command)[1].readlines.to_s
@@ -125,7 +128,7 @@ module Sh
     case credentials["type"]
     when "local"
       Sh::mkdir("#{ENV["TMP_PATH"]}/#{path.split("/")[0..-2].join("/")}", {"type"=>"local"})
-      Sh::sh("cp #{path} #{ENV["TMP_PATH"]}/#{path.split("/").last}")
+      Sh::sh("cp #{credentials["path"]}/#{path} #{ENV["TMP_PATH"]}/#{path.split("/").last}")
       location = "#{ENV["TMP_PATH"]}/#{path.split("/").last}"
     when "remote"
       Sh::mkdir("#{ENV["TMP_PATH"]}/#{path.split("/")[0..-2].join("/")}", {"type"=>"local"})

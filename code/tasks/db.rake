@@ -1,5 +1,4 @@
 namespace :db do
-  require File.dirname(__FILE__)+'/../utils/sh'
   
   desc "Migrate the database up from current location to either specified migration or to latest"
   task :migrate => :environment do

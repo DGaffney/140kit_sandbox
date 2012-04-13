@@ -71,7 +71,7 @@ class Importer < Instance
     return nil if @curation.nil?
     puts "Archiving curation #{@curation.id}..."
     primary_models = [Tweet, User, Entity, Geo, Coordinate, Location, TrendingTopic, Friendship]
-    storage = Machine.first(:id => @curation.datasets.first.storage_machine_id).machine_storage_details
+    storage = Machine.first(:id => @curation.datasets.first.storage_machine_id).machine_storage_details rescue STORAGE
     config = DataMapper.repository.adapter.options
     @curation.datasets.each do |dataset|
       primary_models.each do |model|
@@ -149,7 +149,7 @@ class Importer < Instance
     line_separator_escaped = import_type == "importable" ? "\\0" : "\\n"
     line_separator = import_type == "importable" ? "\0" : "\n"
     @curation.datasets.each do |dataset|
-      storage = Machine.first(:id => dataset.storage_machine_id).machine_storage_details
+      storage = Machine.first(:id => dataset.storage_machine_id).machine_storage_details rescue STORAGE
       models.each do |model|
         files = Sh::storage_ls("raw_catalog/#{model}", storage).select{|x| dataset.id == x.split("_").first.to_i}
         files.each do |file|
@@ -182,7 +182,7 @@ class Importer < Instance
     end
     models = [Graph, GraphPoint, Edge]
     if import_type == "reimportable"
-      storage = Machine.first(:id => @curation.datasets.first.storage_machine_id).machine_storage_details
+      storage = Machine.first(:id => @curation.datasets.first.storage_machine_id).machine_storage_details rescue STORAGE
       models.each do |model|
         files = Sh::storage_ls("raw_catalog/#{model}", storage).select{|x| @curation.id == x.split("_").first.to_i}
         files.each do |file|
