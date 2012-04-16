@@ -27,7 +27,7 @@ class AudienceReport
     date_format = Pretty.time_interval(length, DataMapper.repository.adapter.options["adapter"])
     limit = 10000
     offset = 0
-    results = DataMapper.repository.adapter.select("select date_format(tweets.created_at, '%Y-%m-%d %H:%i:00') as time,sum(users.followers_count) as impressions from tweets inner join users on users.twitter_id = tweets.user_id where tweets.dataset_id = 16 group by date_format(tweets.created_at, '%Y-%m-%d %H:%i:00') limit #{limit} offset #{offset}")
+    results = DataMapper.repository.adapter.select("select date_format(tweets.created_at, '%Y-%m-%d %H:%i:00') as time,sum(users.followers_count) as impressions from tweets inner join users on users.twitter_id = tweets.user_id where tweets.dataset_id in (#{[conditional[:dataset_id]].flatten.join(",")}) group by date_format(tweets.created_at, '%Y-%m-%d %H:%i:00') limit #{limit} offset #{offset}")
     while !results.empty?
       graph_points = []
       results.each do |result|
@@ -36,7 +36,7 @@ class AudienceReport
       GraphPoint.save_all(graph_points.collect{|w| w.merge({:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :graph_id => impressions_over_time.id})})
       graph_points = []
       offset+=limit
-      results = DataMapper.repository.adapter.select("select date_format(tweets.created_at, '%Y-%m-%d %H:%i:00') as time,sum(users.followers_count) as impressions from tweets inner join users on users.twitter_id = tweets.user_id where tweets.dataset_id = 16 group by date_format(tweets.created_at, '%Y-%m-%d %H:%i:00') limit #{limit} offset #{offset}")      
+    results = DataMapper.repository.adapter.select("select date_format(tweets.created_at, '%Y-%m-%d %H:%i:00') as time,sum(users.followers_count) as impressions from tweets inner join users on users.twitter_id = tweets.user_id where tweets.dataset_id in (#{[conditional[:dataset_id]].flatten.join(",")}) group by date_format(tweets.created_at, '%Y-%m-%d %H:%i:00') limit #{limit} offset #{offset}")
     end
     return true
   end

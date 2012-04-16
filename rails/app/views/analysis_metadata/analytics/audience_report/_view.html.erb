@@ -4,6 +4,7 @@
     @total = @dataset.select{|x| x[:label] == "total_impressions"}.first
     @dataset = @dataset.select{|x| x[:label] != "total_impressions"}
     @dataset.collect{|x| x[:label] = Time.parse(x[:label])}
+    debugger
     start_time = @dataset.first[:label]
     end_time = @dataset.last[:label]
     @end_time_string = start_time.strftime("Date.UTC(%Y,%m,%d,%H,%M,%S)")
