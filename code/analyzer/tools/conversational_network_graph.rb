@@ -32,6 +32,7 @@ class ConversationalNetworkGraph < AnalysisMetadata
     end
     offset = 0
     limit = 20000
+    time = Edge.last(:order => :time, :graph_id => graph_ids).time-Edge.first(:order => :time, :graph_id => graph_ids).time rescue 3600
     options = {
       :dynamic => true, 
       :formats => ["gexf", "graphml"], 
@@ -41,7 +42,7 @@ class ConversationalNetworkGraph < AnalysisMetadata
       :style => network_type+"_graph", 
       :title => "curation_#{curation.id}_#{@analysis_metadata.id}",
       :edge_conditional => edge_conditional,
-      :total_range => Edge.last(:order => :time, :graph_id => graph_ids).time-Edge.first(:order => :time, :graph_id => graph_ids).time
+      :total_range => time
     }
     Graphml::Writer::initialize_temp_data(options)
     Gexf::Writer::initialize_temp_data(options)
