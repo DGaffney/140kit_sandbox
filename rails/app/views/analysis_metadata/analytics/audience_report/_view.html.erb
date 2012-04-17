@@ -115,7 +115,6 @@
 <% if @graph.title == "tweet_type_breakdown" %>
 Above is a chart showing the tweets that occurred in this dataset broken down by type (retweet, reply, regular-old tweet).<br />
 <% elsif @graph.title == "impressions_over_time"%>
-<% debugger %>
 <b><%= @total[:label].split("_").collect(&:capitalize).join(" ") %> for this dataset</b>: <%= number_with_delimiter(@total[:value].to_i) %>
 <% end %>
 <!-- {startOnTick: true, endOnTick: true, showLastLabel: true}, -->

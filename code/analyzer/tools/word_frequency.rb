@@ -36,7 +36,6 @@ class WordFrequency < AnalysisMetadata
       highest_words = word_percentile
     else
       this_index = word_percentile.index(word_percentile.percentile(percentile.to_f))
-      debugger
       highest_words = word_percentile[this_index..word_percentile.length-1]      
     end
     chunking = highest_words.length > 1000 ? highest_words.length/1000 : 1
