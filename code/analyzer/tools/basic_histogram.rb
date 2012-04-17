@@ -83,7 +83,6 @@ class BasicHistogram < AnalysisMetadata
         end
       else
         results = records.call(limit, offset)
-        debugger if fs[:attribute] == :source
         while !results.empty?
           results.each do |result|
             if result.first.nil?

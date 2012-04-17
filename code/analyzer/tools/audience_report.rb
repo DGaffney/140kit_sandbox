@@ -8,9 +8,9 @@ class AudienceReport
     top_impressioning_users = Graph.first_or_create(:title => "top_impression_generating_users", :style => "table", :analysis_metadata_id => @analysis_metadata.id, :curation_id => curation.id)
     impressions = User.sum(:followers_count, conditional)
     top_20_impressioning_users = User.all(conditional.merge({:order => :followers_count.desc, :limit => 20, :fields => [:screen_name, :followers_count]}))
-    total_retweets = Tweet.count(conditional.merge({:in_reply_to_status_id.not => nil}))
-    total_replies = Tweet.count(conditional.merge({:in_reply_to_status_id => nil, :in_reply_to_screen_name.not => nil}))
-    total_regulars = Tweet.count(conditional.merge({:in_reply_to_status_id => nil, :in_reply_to_screen_name => nil}))
+    total_retweets = Tweet.count(conditional.merge({:in_reply_to_status_id.not => 0}))
+    total_replies = Tweet.count(conditional.merge({:in_reply_to_status_id => 0, :in_reply_to_user_id.not => 0}))
+    total_regulars = Tweet.count(conditional.merge({:in_reply_to_status_id => 0, :in_reply_to_user_id => 0}))
     graph_points = []
     graph_points << {:label => "total_retweets", :value => total_retweets, :curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :graph_id => audience_overview_graph.id}
     graph_points << {:label => "total_replies", :value => total_replies, :curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :graph_id => audience_overview_graph.id}
@@ -27,7 +27,7 @@ class AudienceReport
     date_format = Pretty.time_interval(length, DataMapper.repository.adapter.options["adapter"])
     limit = 10000
     offset = 0
-    results = DataMapper.repository.adapter.select("select date_format(tweets.created_at, '%Y-%m-%d %H:%i:00') as time,sum(users.followers_count) as impressions from tweets inner join users on users.twitter_id = tweets.user_id where tweets.dataset_id in (#{[conditional[:dataset_id]].flatten.join(",")}) group by date_format(tweets.created_at, '%Y-%m-%d %H:%i:00') limit #{limit} offset #{offset}")
+    results = DataMapper.repository.adapter.select("select date_format(tweets.created_at, '#{date_format}') as time,sum(users.followers_count) as impressions from tweets inner join users on users.twitter_id = tweets.user_id where tweets.dataset_id in (#{[conditional[:dataset_id]].flatten.join(",")}) group by date_format(tweets.created_at, '%Y-%m-%d %H:%i:00') limit #{limit} offset #{offset}")
     while !results.empty?
       graph_points = []
       results.each do |result|
@@ -36,8 +36,9 @@ class AudienceReport
       GraphPoint.save_all(graph_points.collect{|w| w.merge({:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :graph_id => impressions_over_time.id})})
       graph_points = []
       offset+=limit
-    results = DataMapper.repository.adapter.select("select date_format(tweets.created_at, '%Y-%m-%d %H:%i:00') as time,sum(users.followers_count) as impressions from tweets inner join users on users.twitter_id = tweets.user_id where tweets.dataset_id in (#{[conditional[:dataset_id]].flatten.join(",")}) group by date_format(tweets.created_at, '%Y-%m-%d %H:%i:00') limit #{limit} offset #{offset}")
+      results = DataMapper.repository.adapter.select("select date_format(tweets.created_at, '#{date_format}') as time,sum(users.followers_count) as impressions from tweets inner join users on users.twitter_id = tweets.user_id where tweets.dataset_id in (#{[conditional[:dataset_id]].flatten.join(",")}) group by date_format(tweets.created_at, '%Y-%m-%d %H:%i:00') limit #{limit} offset #{offset}")
     end
+    GraphPoint.save_all(graph_points.collect{|w| w.merge({:curation_id => curation.id, :analysis_metadata_id => @analysis_metadata.id, :graph_id => impressions_over_time.id})})
     return true
   end
 
