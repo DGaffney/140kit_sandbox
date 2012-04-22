@@ -1,7 +1,11 @@
 class CurationsController < ApplicationController
   before_filter :login_required, except: [:index, :researcher, :show, :search]
   def index
-    @curations = Curation.where("privatized = 0 and status != 'hidden'").paginate(:page => params[:page], :per_page => 20, :order => "id desc")
+    if current_user && current_user.admin?
+      @curations = Curation.paginate(:page => params[:page], :per_page => 20, :order => "id desc")
+    else
+      @curations = Curation.where("privatized = 0 and status != 'hidden'").paginate(:page => params[:page], :per_page => 20, :order => "id desc")
+    end
     @page_title = "Datasets"
   end
   
