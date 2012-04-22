@@ -5,7 +5,7 @@ class ResearchersController < ApplicationController
   def index
     @page_title = "Researchers"
     #removed dope-ass join because paginate wouldn't play nice.
-    @researchers = Researcher.where(:hidden_account => false).paginate(:page => params[:page], :per_page => 16)
+    @researchers = Researcher.where(:hidden_account => false).paginate(:page => params[:page], :per_page => 16, :order => "id desc")
   end
 
   def dashboard
