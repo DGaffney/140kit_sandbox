@@ -12,14 +12,14 @@ class CurationsController < ApplicationController
   def search
     @curations = []
     if params[:hidden]
-      @curations = Curation.where(:status => "hidden", :researcher_id => params[:researcher_id]).paginate(:page => params[:page], :per_page => 20)
+      @curations = Curation.where(:status => "hidden", :researcher_id => params[:researcher_id]).paginate(:page => params[:page], :per_page => 20, :order => "id desc")
     elsif params[:analytic_id]
       @analytical_offering = AnalyticalOffering.find(params[:analytic_id])
-      @curations = Curation.where(:privatized => false, :id => AnalysisMetadata.where(:analytical_offering_id => params[:analytic_id]).collect(&:curation_id)).paginate(:page => params[:page], :per_page => 20)
+      @curations = Curation.where(:privatized => false, :id => AnalysisMetadata.where(:analytical_offering_id => params[:analytic_id]).collect(&:curation_id)).paginate(:page => params[:page], :per_page => 20, :order => "id desc")
       @criteria = "Uses Analytic: #{@analytical_offering.title}"
     elsif params[:tag_id]
       @tag = Tag.find(params[:tag_id])
-      @curations = Curation.where(:privatized => false, :id => @tag.curations.collect(&:id)).paginate(:page => params[:page], :per_page => 20)
+      @curations = Curation.where(:privatized => false, :id => @tag.curations.collect(&:id)).paginate(:page => params[:page], :per_page => 20, :order => "id desc")
       @criteria = "Tagged with: #{@tag.value}"
     end
     @page_title = "Search"
