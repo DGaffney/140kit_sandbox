@@ -79,13 +79,13 @@ class InteractionList < AnalysisMetadata
     overview[:average_coretweets] = overview[:average_coretweets]/overview[:total_distinct_retweets].to_f
     overview[:average_comentions] = overview[:average_comentions]/overview[:total_distinct_mentions].to_f
     graph = Graph.first(:title => "retweet_out_degrees", :analysis_metadata_id => @analysis_metadata.id, :curation_id => curation.id)
-    overview[:most_retweeting] = DataMapper.repository.adapter.select("select * from graph_points where graph_id = #{graph.id} order by cast(value as signed) desc limit 1;").first.label
+    overview[:most_retweeting] = DataMapper.repository.adapter.select("select * from graph_points where graph_id = #{graph.id} order by cast(value as signed) desc limit 1;").first.label rescue "None found."
     graph = Graph.first(:title => "retweet_in_degrees", :analysis_metadata_id => @analysis_metadata.id, :curation_id => curation.id)
-    overview[:most_retweeted] = DataMapper.repository.adapter.select("select * from graph_points where graph_id = #{graph.id} order by cast(value as signed) desc limit 1;").first.label
+    overview[:most_retweeted] = DataMapper.repository.adapter.select("select * from graph_points where graph_id = #{graph.id} order by cast(value as signed) desc limit 1;").first.label rescue "None found."
     graph = Graph.first(:title => "mention_out_degrees", :analysis_metadata_id => @analysis_metadata.id, :curation_id => curation.id)
-    overview[:most_mentioning] = DataMapper.repository.adapter.select("select * from graph_points where graph_id = #{graph.id} order by cast(value as signed) desc limit 1;").first.label
+    overview[:most_mentioning] = DataMapper.repository.adapter.select("select * from graph_points where graph_id = #{graph.id} order by cast(value as signed) desc limit 1;").first.label rescue "None found."
     graph = Graph.first(:title => "mention_in_degrees", :analysis_metadata_id => @analysis_metadata.id, :curation_id => curation.id)
-    overview[:most_mentioned] = DataMapper.repository.adapter.select("select * from graph_points where graph_id = #{graph.id} order by cast(value as signed) desc limit 1;").first.label
+    overview[:most_mentioned] = DataMapper.repository.adapter.select("select * from graph_points where graph_id = #{graph.id} order by cast(value as signed) desc limit 1;").first.label rescue "None found."
     graph_points = []
     overview.each_pair do |label, value|
       graph_points << {:label => label, :value => value, :graph_id  => overview_graph.id, :analysis_metadata_id => @analysis_metadata.id, :curation_id => curation.id}
