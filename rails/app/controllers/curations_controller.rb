@@ -46,7 +46,6 @@ class CurationsController < ApplicationController
   end
 
   def create
-    debugger
     success = ""
     if !curation_is_same?
       @curation = Curation.new
@@ -57,7 +56,7 @@ class CurationsController < ApplicationController
       @curation.status = "tsv_storing"
       @curation.single_dataset = false
       empty = params[:name].empty? || params[:name].nil?
-      name = empty ? params[:params] : params[:name]
+      name = empty ? (params[:params]||params[:terms]||params[:users]) : params[:name]
       @curation.name = name || params[:params]
       @curation.researcher_id = session[:researcher_id]
       if params[:stream_type] =~ /^locations?/i
