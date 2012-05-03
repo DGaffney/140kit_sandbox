@@ -46,6 +46,7 @@ class CurationsController < ApplicationController
   end
 
   def create
+    debugger
     success = ""
     if !curation_is_same?
       @curation = Curation.new
