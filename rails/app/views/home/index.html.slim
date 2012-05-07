@@ -8,10 +8,15 @@
 hr
 .row
   .span4
-    h2 Analytics
-    p The real power behind 140kit is not that it collects your data - its that it provides a simple, transparent, analytical process. To see what we currently offer, go ahead and look at our analytics.
+    h2 How we're doing
+    br
+    ul 
+      li = "#{number_with_delimiter(@tweets_count)} Tweets captured with 140kit"
+      li = "#{number_with_delimiter(@users_count)} total Users Archived"
+      li = "#{number_with_delimiter(@count)} terms, locations, and users tracked"
+      li = "#{number_with_delimiter(@researchers_count)} happy Researchers using 140kit"
     p
-      a.btn href='/analytics' View details &raquo;
+      a.btn href="/auth/twitter" Join us &raquo;
   .span4
     h2 Browse datasets
     p Check it out for yourself! View our currently listed datasets to get a sense of the types of things you can do with 140kit. Once you sign in to our system, you'll be able to start creating and analyzing your own datasets.
