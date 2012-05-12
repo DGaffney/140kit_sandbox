@@ -113,6 +113,7 @@ class Filter < Instance
         if time+$rsync_interval.call < Time.now
           Thread.new do
             print "[]"
+            save_queue(tmp_queue)
             rsync_previous_files(datasets, time)
           end
           @start_time = Time.now
