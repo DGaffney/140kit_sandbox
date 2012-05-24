@@ -34,6 +34,8 @@ class CurationsController < ApplicationController
   def show
     @curation = Curation.find_by_id(params[:id])
     @curation.touch if !["needs_drop", "dropped"].include?(@curation.status)
+    @dataset_ids = @curation.datasets.collect(&:id)
+    @tweets = Tweet.where(:dataset_id => @dataset_ids).paginate(:page => params[:tweets_page], :per_page => 10, :order => "created_at desc")
     @tags = @curation.tags
     @tag = Tag.new
     @page_title = "#{@curation.researcher.user_name}'s #{@curation.name} Dataset"
