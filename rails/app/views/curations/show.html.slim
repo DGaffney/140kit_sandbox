@@ -48,12 +48,13 @@ div#tags style="display:none"
       hr
       == render partial: '/tags/form', locals: {tag: @tag, classname: "Curation", with_id: @curation.id}
 hr
-h2 
-  a#data-header href="#" Data
-  span#data-plus +
-div#data style="display:none"
-  == render partial: '/tweets/table', locals: {tweets: @tweets}
-hr
+- if @curation.status == "imported"
+  h2 
+    a#data-header href="#" Data
+    span#data-plus +
+  div#data style="display:none"
+    == render partial: '/tweets/table', locals: {tweets: @tweets}
+  hr
 h2
   a#discussion-header href="#" Discussion
   span#discussion-plus +
