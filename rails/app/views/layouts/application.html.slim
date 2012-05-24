@@ -85,7 +85,12 @@ html
                 $('#end_time').val(ui.value);
               }
         });
-        $('#main').on('click', '#back-to-new-curation', function() { $('#curation-form').slideUp(); $('#terms-or-location').slideDown(); });
+        $('#main').on('click', '#back-to-new-curation', function() { $('#curation-form').slideUp(); $('#term-or-location-or-user').slideDown(); });
+        $('#main').on('click', '#overview-header', function() { $('#overview').slideToggle()});
+        $('#main').on('click', '#analytics-header', function() { $('#analytics').slideToggle()});
+        $('#main').on('click', '#tags-header', function() { $('#tags').slideToggle()});
+        $('#main').on('click', '#data-header', function() { $('#data').slideToggle()});
+        $('#main').on('click', '#discussion-header', function() { $('#discussion').slideToggle()});
         // $('.comma-separated-input').tagsInput({ height:'20px', defaultText: 'add a term', placeholderColor: '#999' });
         $('#main').on('click', '#review-curation-params', function() {
           if ( !$('#new-curation-form').valid() ) return false;

@@ -13,31 +13,44 @@
 br
 p = current_status(@curation)
 hr
-h2 Overview:
-== render partial: '/datasets/table', locals: {datasets: @curation.datasets.paginate(:page => params[:datasets_page], :per_page => 4)}  
+h2 
+  a#overview-header href="#" Overview:
+div#overview style="display:none"
+  == render partial: '/datasets/table', locals: {datasets: @curation.datasets.paginate(:page => params[:datasets_page], :per_page => 4)}  
 hr
-h2 Analytics:
-- if @curation.analysis_metadatas.empty? && @curation.tweets_count != 0
-    p No analytics added yet. 
+h2 
+  a#analytics-header href="#" Analytics:
+div#analytics style="display:none"
+  - if @curation.analysis_metadatas.empty? && @curation.tweets_count != 0
+      p No analytics added yet. 
+      - if current_user
+        #{link_to "Add Analytic", analyze_dataset_path(@curation)}
+  - elsif @curation.tweets_count == 0
+    p You can't add any analytics until we have received at least one tweet.
+  - else
+    == render partial: 'analytics', locals: {analysis_metadatas: @curation.analysis_metadatas.paginate(:page => params[:analysis_page], :per_page => 4)}
     - if current_user
       #{link_to "Add Analytic", analyze_dataset_path(@curation)}
-- elsif @curation.tweets_count == 0
-  p You can't add any analytics until we have received at least one tweet.
-- else
-  == render partial: 'analytics', locals: {analysis_metadatas: @curation.analysis_metadatas.paginate(:page => params[:analysis_page], :per_page => 4)}
-  - if current_user
-    #{link_to "Add Analytic", analyze_dataset_path(@curation)}
 hr
-h2 Tags:
-- if @tags.empty?
-    p No tags added yet. 
+h2 
+  a#tags-header href="#" Tags:
+div#tags style="display:none"
+  - if @tags.empty?
+      p No tags added yet. 
+      - if current_user
+        == render partial: '/tags/form', locals: {tag: @tag, classname: "Curation", with_id: @curation.id}
+  - else
+    == render partial: '/tags/table', locals: {tags: @tags, classname: "Curation", with_id: @curation.id}
     - if current_user
+      hr
       == render partial: '/tags/form', locals: {tag: @tag, classname: "Curation", with_id: @curation.id}
-- else
-  == render partial: '/tags/table', locals: {tags: @tags, classname: "Curation", with_id: @curation.id}
-  - if current_user
-    hr
-    == render partial: '/tags/form', locals: {tag: @tag, classname: "Curation", with_id: @curation.id}
 hr
-== render partial: '/partials/disqus'
-
+h2 
+  a#data-header href="#" Data:
+div#data style="display:none"
+  == render partial: '/tweets/table', locals: {tweets: @tweets}
+hr
+h2
+  a#discussion-header href="#" Discussion:
+div#discussion style="display:none"
+  == render partial: '/partials/disqus'

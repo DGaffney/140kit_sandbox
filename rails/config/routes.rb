@@ -81,6 +81,8 @@ WWW140kit::Application.routes.draw do
     put '' => 'researchers#update'
     delete '' => 'researchers#destroy'
   end
+  get '/datasets/:curation_id/tweets/' => 'tweets#index', as: :tweets
+  get '/datasets/:curation_id/users/' => 'users#index', as: :users
 
   get 'dashboard' => 'researchers#dashboard', as: :dashboard
 
