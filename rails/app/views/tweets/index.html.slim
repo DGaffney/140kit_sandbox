@@ -1,0 +1,7 @@
+.row
+  .span10.offset1
+    .page-header
+      h1 Tweets
+.row
+  .span12
+    == render partial: 'table', locals: {tweets: @tweets}
