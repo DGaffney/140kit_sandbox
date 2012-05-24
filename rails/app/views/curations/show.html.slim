@@ -14,13 +14,15 @@ br
 p = current_status(@curation)
 hr
 h2 
-  a#overview-header href="#" Overview:
-div#overview style="display:none"
+  a#overview-header href="#" Overview
+  span#overview-plus style="display:none" +
+div#overview
   == render partial: '/datasets/table', locals: {datasets: @curation.datasets.paginate(:page => params[:datasets_page], :per_page => 4)}  
 hr
 h2 
-  a#analytics-header href="#" Analytics:
-div#analytics style="display:none"
+  a#analytics-header href="#" Analytics
+  span#analytics-plus style="display:none" +
+div#analytics
   - if @curation.analysis_metadatas.empty? && @curation.tweets_count != 0
       p No analytics added yet. 
       - if current_user
@@ -33,7 +35,8 @@ div#analytics style="display:none"
       #{link_to "Add Analytic", analyze_dataset_path(@curation)}
 hr
 h2 
-  a#tags-header href="#" Tags:
+  a#tags-header href="#" Tags
+  span#tags-plus +
 div#tags style="display:none"
   - if @tags.empty?
       p No tags added yet. 
@@ -46,11 +49,13 @@ div#tags style="display:none"
       == render partial: '/tags/form', locals: {tag: @tag, classname: "Curation", with_id: @curation.id}
 hr
 h2 
-  a#data-header href="#" Data:
+  a#data-header href="#" Data
+  span#data-plus +
 div#data style="display:none"
   == render partial: '/tweets/table', locals: {tweets: @tweets}
 hr
 h2
-  a#discussion-header href="#" Discussion:
+  a#discussion-header href="#" Discussion
+  span#discussion-plus +
 div#discussion style="display:none"
   == render partial: '/partials/disqus'
