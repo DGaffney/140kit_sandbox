@@ -1,0 +1,7 @@
+- tweets ||= @tweets
+table.table.table-striped.table-bordered
+- for tweet in tweets
+  a href="http://www.twitter.com/#{tweet.screen_name}/status/#{tweet.twitter_id}" = tweet.screen_name
+  = " (#{tweet.created_at}): #{tweet.text} <br/> (via #{tweet.source})".html_safe
+  hr
+= will_paginate(tweets, :param_name => :tweets_page)
