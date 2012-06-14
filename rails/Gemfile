@@ -7,6 +7,7 @@ gem 'rails', '3.2.1'
 gem 'RedCloth'
 gem 'require_all'
 gem 'mysql2'
+gem 'passenger'
 gem 'slim'
 gem 'omniauth-twitter'
 gem "will_paginate", "~> 3.0.pre2"
