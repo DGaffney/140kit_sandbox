@@ -2,6 +2,7 @@ class SessionsController < ApplicationController
   def create
     # raise request.env["omniauth.auth"].to_yaml
     auth = request.env["omniauth.auth"]
+    debugger
     researcher = Researcher.find_by_provider_and_uid(auth["provider"], auth["uid"]) || Researcher.create_with_omniauth(auth)
     session[:researcher_id] = researcher.id
     if researcher.first_time
