@@ -2,10 +2,10 @@ class Notification
   attr_accessor :twitter
 
   def initialize(user_name="140kitRobot")
-    researcher = Researcher.first(:user_name => user_name)
+    researcher = Researcher.first(:conditions => {:user_name => user_name})
     self.twitter = TwitterOAuth::Client.new(
-      :consumer_key => Setting.first(:name => "consumer_key", :var_type => "Site Consumer Key").value,
-      :consumer_secret => Setting.first(:name => "consumer_secret", :var_type => "Site Consumer Secret").value,
+      :consumer_key => Setting.first(:conditions => {:name => "consumer_key", :var_type => "Site Consumer Key"}).value,
+      :consumer_secret => Setting.first(:conditions => {:name => "consumer_secret", :var_type => "Site Consumer Secret"}).value,
       :token => researcher.oauth_token,
       :secret => researcher.oauth_token_secret
     )
