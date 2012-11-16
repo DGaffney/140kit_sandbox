@@ -149,6 +149,10 @@ class AnalysisMetadata < ActiveRecord::Base
   def self.view(curation, params)
     return {:response => "<h1>Sorry!</h1><p>It looks like this developer has not created a viewable result for this analytic yet</p>", :found => false}
   end
+  
+  def researcher
+    return Researcher.get(self.requesting_researcher_id)
+  end
 
 end
 
