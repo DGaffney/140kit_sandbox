@@ -57,6 +57,7 @@ class Worker < Instance
           dataset.save!
         end
         curation.status = "zero_data"
+        Notification.post("@#{curation.researcher.user_name}: Your data is now ready for import on #140kit: http://140kit.com/datasets/#{curation.id}") if curation.researcher.share_email
         curation.save!
       end
     end
@@ -72,11 +73,11 @@ class Worker < Instance
       elsif datasets.length == datasets.collect{|x| x.status if x.status == statuses[statuses.index(curation.status)+1]}.compact.length
         curation.status = statuses[statuses.index(curation.status)+1] 
         curation.save!
-        if statuses[statuses.index(curation.status)+1] == "imported"
-          Notification.post("@#{curation.researcher.user_name}: Your data is now live on #140kit: http://140kit.com/datasets/#{curation.id}") if curation.researcher.share_email
-        elsif statuses[statuses.index(curation.status)+1] == "tsv_stored"
+        if curation.status == "imported"
+          Notification.post("@#{curation.researcher.user_name}: Your data is now ready for import on #140kit: http://140kit.com/datasets/#{curation.id}") if curation.researcher.share_email
+        elsif curation.status == "tsv_stored"
           Notification.post("@#{curation.researcher.user_name}: Your data is now stored on #140kit: http://140kit.com/datasets/#{curation.id}") if curation.researcher.share_email
-        elsif statuses[statuses.index(curation.status)+1] == "dropped"
+        elsif curation.status == "dropped"
           Notification.post("@#{curation.researcher.user_name}: Your data is now archived on #140kit: http://140kit.com/datasets/#{curation.id}") if curation.researcher.share_email
         end
       end

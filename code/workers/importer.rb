@@ -209,7 +209,7 @@ class Importer < Instance
       end
     end
     @curation.status = "imported"
-    Notification.post("@#{@curation.researcher.user_name}: Your data is now live on #140kit: http://140kit.com/datasets/#{@curation.id}") if curation.researcher.share_email
+    Notification.post("@#{@curation.researcher.user_name}: Your data is now ready for import on #140kit: http://140kit.com/datasets/#{@curation.id}") if curation.researcher.share_email
     @curation.previously_imported = true if import_type == "importable"
     @curation.save!
     @curation.unlock
