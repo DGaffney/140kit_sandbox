@@ -72,6 +72,13 @@ class Worker < Instance
       elsif datasets.length == datasets.collect{|x| x.status if x.status == statuses[statuses.index(curation.status)+1]}.compact.length
         curation.status = statuses[statuses.index(curation.status)+1] 
         curation.save!
+        if statuses[statuses.index(curation.status)+1] == "imported"
+          Notification.content("@#{metadata.curation.researcher.user_name}: Your data is now live on #140kit: http://140kit.com/datasets/#{curation.id}")
+        elsif statuses[statuses.index(curation.status)+1] == "tsv_stored"
+          Notification.content("@#{metadata.curation.researcher.user_name}: Your data is now stored on #140kit: http://140kit.com/datasets/#{curation.id}")
+        elsif statuses[statuses.index(curation.status)+1] == "dropped"
+          Notification.content("@#{metadata.curation.researcher.user_name}: Your data is now archived on #140kit: http://140kit.com/datasets/#{curation.id}")
+        end
       end
     end
     Curation.all(:updated_at.lte => Time.now-$drop_interval.call, :status => "imported").each do |curation|
@@ -164,6 +171,7 @@ class Worker < Instance
       end
       metadata.finished = finished
       metadata.save
+      Notification.content("@#{metadata.curation.researcher.user_name}: A job just finished on #140kit: http://140kit.com/analytics/#{metadata.id}")
     else 
       raise "Language #{metadata.language} is not currently supported for analytical routing!"
     end
