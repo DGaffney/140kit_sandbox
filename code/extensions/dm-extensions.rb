@@ -66,7 +66,7 @@ module DataMapperExtensions
     return false if objs.empty?
     objs = objs.sth if objs.first.class != self && objs.first.class != Hash
     keys = self.attributes.collect(&:to_s).sort
-    f = File.open(file+".tsv", "a+") 
+    f = File.open(file+".tsv", "ab") 
     csv_header = CSV.generate_line(keys, :col_sep => "\t", :row_sep => "\0", :quote_char => '"')
     f.write(csv_header) if f.size==0
     objs.each do |elem|

@@ -9,7 +9,12 @@ class SessionsController < ApplicationController
     logger.info(request.env["omniauth.auth"].uid)
     logger.info(request.env["omniauth.auth"].provider)
     auth = request.env["omniauth.auth"]
+<<<<<<< HEAD
     researcher = Researcher.find_by_provider_and_uid(auth.provider, auth.uid) || Researcher.create_with_omniauth(auth)
+=======
+    debugger
+    researcher = Researcher.find_by_provider_and_uid(auth["provider"], auth["uid"]) || Researcher.create_with_omniauth(auth)
+>>>>>>> 28794456d6912022c7d9a9f9c48254277687f6ec
     session[:researcher_id] = researcher.id
     if researcher.first_time
       redirect_to new_researcher_url(researcher), flash: { success: "Welcome, #{researcher.name}!" }

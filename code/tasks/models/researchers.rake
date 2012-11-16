@@ -9,15 +9,6 @@ namespace :researchers do
     puts "What is the username for this account?"
     answer = Sh::clean_gets
     researcher.user_name = answer
-    while !researcher.validate_on_create.first
-      answer = Sh::clean_gets
-      researcher.user_name = answer
-      researcher.validate_on_create.last
-    end
-    puts "What is the password for this account?"
-    answer = Sh::clean_gets
-    researcher.password = answer
-    researcher.send("encrypt_password")
     researcher.save
     researcher
   end

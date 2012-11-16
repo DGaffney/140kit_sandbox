@@ -31,6 +31,7 @@ group :core do
   gem 'useful_class_extensions'
   gem 'tweetstream', '1.1.2'
   gem 'twitter'
+  gem 'twitter_oauth'
   gem 'unicode'
   gem 'yajl-ruby'
 end

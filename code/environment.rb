@@ -21,6 +21,7 @@ require 'iconv'
 require 'unicode'
 require 'csv'
 require 'useful_class_extensions'
+require 'twitter_oauth'
 #Encoding.default_external = Encoding::ISO_8859_1
 #Encoding.default_internal = Encoding::ISO_8859_1
 DIR = File.dirname(__FILE__)
@@ -29,6 +30,7 @@ require DIR+'/extensions/inflectors'
 
 require DIR+'/utils/git'
 require DIR+'/utils/sh'
+require DIR+'/utils/notification'
 require DIR+'/extensions/string'
 require DIR+'/extensions/array'
 ENV['TZ'] = "UTC"
