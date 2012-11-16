@@ -1,5 +1,4 @@
 class Setting < ActiveRecord::Base
-  property :name, String
   def actual_value
     return  Marshal.load(value.unpack('m').first)
   end
