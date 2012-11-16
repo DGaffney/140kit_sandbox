@@ -136,6 +136,7 @@ html
 
       });
       function validate_users(value){
+        //hello
         $('a#review-curation-params').text("Waiting on Validation...");
         $('a#review-curation-params').attr("id", "review-curation-params-hold");
         $.get('/datasets/validate/users?screen_names='+value, function(data) {

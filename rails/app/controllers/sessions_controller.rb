@@ -1,8 +1,15 @@
 class SessionsController < ApplicationController
   def create
-    # raise request.env["omniauth.auth"].to_yaml
+    logger.info("HELLO")
+#    logger.info(request.env.provider)
+#    logger.info(request.env.uid)
+    logger.info(Researcher.first.provider)
+    logger.info(Researcher.first.uid)
+    logger.info(request.env["omniauth.auth"])
+    logger.info(request.env["omniauth.auth"].uid)
+    logger.info(request.env["omniauth.auth"].provider)
     auth = request.env["omniauth.auth"]
-    researcher = Researcher.find_by_provider_and_uid(auth["provider"], auth["uid"]) || Researcher.create_with_omniauth(auth)
+    researcher = Researcher.find_by_provider_and_uid(auth.provider, auth.uid) || Researcher.create_with_omniauth(auth)
     session[:researcher_id] = researcher.id
     if researcher.first_time
       redirect_to new_researcher_url(researcher), flash: { success: "Welcome, #{researcher.name}!" }

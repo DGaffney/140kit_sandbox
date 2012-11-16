@@ -26,7 +26,10 @@
       .span3.researcher
         - if current_user && current_user.admin? && researcher.upgrade_requested
           .well.upgrade_requested
-            img.pull-left.twitter-pic src=researcher.twitter_pic(:normal)
+            - if researcher.user_name == "saumar"
+              img.pull-left.twitter-pic src=Researcher.first(:conditions => {:user_name => "yleoyleo"}).twitter_pic(:normal)
+            - else
+              img.pull-left.twitter-pic src=researcher.twitter_pic(:normal)
             h4 = link_to researcher.name, researcher
             p = link_to_twitter researcher
             p
@@ -34,7 +37,10 @@
               |  Dataset#{'s' if researcher.curations_count != 1}
         - else
           .well
-            img.pull-left.twitter-pic src=researcher.twitter_pic(:normal)
+            - if researcher.user_name == "saumar"
+              img.pull-left.twitter-pic src=Researcher.first(:conditions => {:user_name => "yleoyleo"}).twitter_pic(:normal)
+            - else
+              img.pull-left.twitter-pic src=researcher.twitter_pic(:normal)
             h4 = link_to researcher.name, researcher
             p = link_to_twitter researcher
             p
