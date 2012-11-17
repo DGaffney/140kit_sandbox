@@ -7,7 +7,7 @@ class AnalysisMetadata
   property :curation_id, Integer
   property :analytical_offering_id, Integer
   property :ready, Boolean
-  property :requesting_researcher_id, Boolean
+  property :requesting_researcher_id, Integer
   belongs_to :curation, :child_key => :curation_id
   belongs_to :analytical_offering, :child_key => :analytical_offering_id
   has n, :analytical_offering_variables
