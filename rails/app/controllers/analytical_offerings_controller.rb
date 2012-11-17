@@ -62,16 +62,15 @@ class AnalyticalOfferingsController < ApplicationController
   end
 
   def add
-    current_user
     @curation = Curation.find(params[:curation_id])
     @analytical_offering = AnalyticalOffering.find(params[:id])
-    @analysis_metadata = AnalysisMetadata.new(:curation_id => params[:curation_id], :analytical_offering_id => params[:id], :ready => false)
+    @analysis_metadata = AnalysisMetadata.new(:curation_id => params[:curation_id], :analytical_offering_id => params[:id], :ready => false, :requesting_researcher_id => current_user.id)
   end
   
   def validate
     @curation = Curation.find(params[:curation_id])
     @analytical_offering = AnalyticalOffering.find(params[:id])
-    @analysis_metadata = AnalysisMetadata.new(:curation_id => params[:curation_id], :analytical_offering_id => params[:id], :ready => false)
+    @analysis_metadata = AnalysisMetadata.new(:curation_id => params[:curation_id], :analytical_offering_id => params[:id], :ready => false, :requesting_researcher_id => current_user.id)
     @analysis_metadata.save!
     redirect_url = []
     validation_results = {}
