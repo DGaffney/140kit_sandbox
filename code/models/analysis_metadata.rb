@@ -267,4 +267,9 @@ class AnalysisMetadata
   def zip_download_url
     "http://"+STORAGE["path"]+"/"+self.curation.stored_folder_name
   end
+  
+  def researcher
+    return Researcher.get(self.requesting_researcher_id)
+  end
+
 end
