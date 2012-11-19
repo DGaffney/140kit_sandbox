@@ -31,6 +31,6 @@ module Analysis::Dependencies
   end
 
   def self.network_visualizer
-    ['rest_client']
+    ['rest-client']
   end
 end
