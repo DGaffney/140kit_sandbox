@@ -1,4 +1,5 @@
 class ConversationalNetworkGraph < AnalysisMetadata
+
   def self.verify_variable(metadata, analytical_offering_variable, answer)
     case analytical_offering_variable.name
     when "network_type"
@@ -40,7 +41,7 @@ class ConversationalNetworkGraph < AnalysisMetadata
       :edge_attributes => [:style],
       :analysis_metadata_id => @analysis_metadata.id, 
       :style => network_type+"_graph", 
-      :title => "curation_#{curation.id}_#{@analysis_metadata.id}",
+      :title => "curation_#{curation.id}_#{@analysis_metadata.id}_#{network_type}",
       :edge_conditional => edge_conditional,
       :total_range => time
     }
