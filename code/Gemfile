@@ -54,5 +54,5 @@ group :fast_semantic_analyzer do
 end
 
 group :network_visualizer do
-  gem 'rest_client'
+  gem 'rest-client'
 end
