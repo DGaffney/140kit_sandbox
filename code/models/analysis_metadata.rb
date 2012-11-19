@@ -172,11 +172,12 @@ class AnalysisMetadata
         possibly_unfinished_analysis_metadatas = AnalysisMetadata.all(:curation_id => curation.id, :analytical_offering_id => analytical_offering.id, :finished => false)
         matches = !possibly_unfinished_analysis_metadatas.select{|puam| puam.run_vars == dependency[:with_options]}.empty?
         if !matches
-          analysis_metadata = AnalysisMetadata.new(:curation_id => curation.id, :analytical_offering_id => analytical_offering.id, :finished => false, :ready => false)
+          analysis_metadata = AnalysisMetadata.new(:curation_id => curation.id, :analytical_offering_id => analytical_offering.id, :finished => false, :ready => false, :requesting_researcher_id => analysis_metadata.requesting_researcher_id)
+          analysis_metadata.save!
           with_options_iterator = 0
           analytical_offering.analytical_offering_variable_descriptors.each do |descriptor|
             analytical_offering_variable = AnalyticalOfferingVariable.new
-            analytical_offering_variable.analysis_metadata_id = analysis_metadata.id
+            analytical_offering_variable.analysis_metadata_id = analysis_metadata.reload.id
             analytical_offering_variable.analytical_offering_variable_descriptor_id = descriptor.id
             analytical_offering_variable.value = dependency[:with_options][with_options_iterator]
             analytical_offering_variable.save!
