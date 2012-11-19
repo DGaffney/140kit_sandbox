@@ -55,6 +55,13 @@ module Sh
     Sh::bt("rsync #{from}/#{filename} #{credentials["user"]}@#{credentials["hostname"]}:#{credentials["path"]}/#{to}/#{filename}")
   end
 
+  def self.filestore_get(from, to, filename)
+    machine = Machine.first(:is_filestore => 1)
+    credentials = machine.machine_storage_details
+    Sh::bt("mkdir -p #{to}")
+    Sh::bt("rsync #{credentials["user"]}@#{credentials["hostname"]}:#{credentials["path"]}/#{from}/#{filename} #{to}/#{filename} ")
+  end
+
   def self.bt(command)
     return `#{command}`
   end

@@ -160,6 +160,7 @@ class Worker < Instance
   
   def route(metadata)
     puts "Routing Analysis..."
+    finished = false
     case metadata.language
     when "ruby"
       Analysis::Dependencies.send(metadata.function)
@@ -172,11 +173,13 @@ class Worker < Instance
       end
       metadata.finished = finished
       metadata.save
-      Notification.post("@#{metadata.curation.researcher.user_name}: A job just finished on your #140kit dataset: http://140kit.com/analytics/#{metadata.id}") if metadata.curation.researcher.share_email
-      if metadata.researcher.share_email && metadata.curation.researcher.share_email
-        Notification.post("@#{metadata.researcher.user_name}: A job you requested on @#{metadata.curation.researcher.user_name}'s dataset just finished on #140kit: http://140kit.com/analytics/#{metadata.id}") 
-      elsif metadata.researcher.share_email
-        Notification.post("@#{metadata.researcher.user_name}: A job you requested just finished on #140kit: http://140kit.com/analytics/#{metadata.id}") 
+      if finished
+        Notification.post("@#{metadata.curation.researcher.user_name}: A job just finished on your #140kit dataset: http://140kit.com/analytics/#{metadata.id}") if metadata.curation.researcher.share_email
+        if metadata.researcher.share_email && metadata.curation.researcher.share_email
+          Notification.post("@#{metadata.researcher.user_name}: A job you requested on @#{metadata.curation.researcher.user_name}'s dataset just finished on #140kit: http://140kit.com/analytics/#{metadata.id}") 
+        elsif metadata.researcher.share_email
+          Notification.post("@#{metadata.researcher.user_name}: A job you requested just finished on #140kit: http://140kit.com/analytics/#{metadata.id}") 
+        end
       end
     else 
       raise "Language #{metadata.language} is not currently supported for analytical routing!"

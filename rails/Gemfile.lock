@@ -144,6 +144,10 @@ GEM
       faraday (~> 0.7)
       multi_json (~> 1.0)
       simple_oauth (~> 0.1)
+    twitter_oauth (0.4.3)
+      json (>= 1.1.9)
+      mime-types (>= 1.16)
+      oauth (>= 0.4.1)
     tzinfo (0.3.31)
     uglifier (1.2.3)
       execjs (>= 0.3.0)
@@ -165,5 +169,6 @@ DEPENDENCIES
   ruby-debug19
   slim
   twitter
+  twitter_oauth
   uglifier (>= 1.0.3)
   will_paginate (~> 3.0.pre2)

@@ -29,5 +29,8 @@ module Analysis::Dependencies
   def self.fast_semantic_analyzer_dependencies
     ['tf_idf']
   end
-    
+
+  def self.network_visualizer
+    ['rest_client']
+  end
 end
