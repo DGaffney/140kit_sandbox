@@ -52,3 +52,7 @@ end
 group :fast_semantic_analyzer do
   gem 'tf_idf'
 end
+
+group :network_visualizer do
+  gem 'rest_client'
+end
