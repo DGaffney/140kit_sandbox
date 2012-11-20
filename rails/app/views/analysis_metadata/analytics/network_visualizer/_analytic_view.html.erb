@@ -1,0 +1,314 @@
+<link rel="stylesheet" href="http://sigmajs.org/css/style.css">
+<link rel="stylesheet" href="http://sigmajs.org/css/prettify.css">
+
+<script src="http://sigmajs.org/js/prettify.js"></script>
+<script src="http://sigmajs.org/js/sigma.min.js"></script>
+<script type="text/javascript">
+// Mathieu Jacomy @ Sciences Po MÃ©dialab & WebAtlas
+// (requires sigma.js to be loaded)
+sigma.publicPrototype.parseGexf = function(gexfPath) {
+  // Load XML file:
+  var gexfhttp, gexf;
+  var sigmaInstance = this;
+  gexfhttp = window.XMLHttpRequest ?
+    new XMLHttpRequest() :
+    new ActiveXObject('Microsoft.XMLHTTP');
+
+  gexfhttp.overrideMimeType('text/xml');
+  gexfhttp.open('GET', gexfPath, false);
+  gexfhttp.send();
+  gexf = gexfhttp.responseXML;
+
+  var viz='http://www.gexf.net/1.2draft/viz'; // Vis namespace
+  var i, j, k;
+
+  // Parse Attributes
+  // This is confusing, so I'll comment heavily
+  var nodesAttributes = [];   // The list of attributes of the nodes of the graph that we build in json
+  var edgesAttributes = [];   // The list of attributes of the edges of the graph that we build in json
+  var attributesNodes = gexf.getElementsByTagName('attributes');  // In the gexf (that is an xml), the list of xml nodes 'attributes' (note the plural 's')
+  
+  for(i = 0; i<attributesNodes.length; i++){
+    var attributesNode = attributesNodes[i];  // attributesNode is each xml node 'attributes' (plural)
+    if(attributesNode.getAttribute('class') == 'node'){
+      var attributeNodes = attributesNode.getElementsByTagName('attribute');  // The list of xml nodes 'attribute' (no 's')
+      for(j = 0; j<attributeNodes.length; j++){
+        var attributeNode = attributeNodes[j];  // Each xml node 'attribute'
+        
+        var id = attributeNode.getAttribute('id'),
+          title = attributeNode.getAttribute('title'),
+          type = attributeNode.getAttribute('type');
+        
+        var attribute = {id:id, title:title, type:type};
+        nodesAttributes.push(attribute);
+        
+      }
+    } else if(attributesNode.getAttribute('class') == 'edge'){
+      var attributeNodes = attributesNode.getElementsByTagName('attribute');  // The list of xml nodes 'attribute' (no 's')
+      for(j = 0; j<attributeNodes.length; j++){
+        var attributeNode = attributeNodes[j];  // Each xml node 'attribute'
+        
+        var id = attributeNode.getAttribute('id'),
+          title = attributeNode.getAttribute('title'),
+          type = attributeNode.getAttribute('type');
+          
+        var attribute = {id:id, title:title, type:type};
+        edgesAttributes.push(attribute);
+        
+      }
+    }
+  }
+  
+  var nodes = []; // The nodes of the graph
+  var nodesNodes = gexf.getElementsByTagName('nodes') // The list of xml nodes 'nodes' (plural)
+  
+  for(i=0; i<nodesNodes.length; i++){
+    var nodesNode = nodesNodes[i];  // Each xml node 'nodes' (plural)
+    var nodeNodes = nodesNode.getElementsByTagName('node'); // The list of xml nodes 'node' (no 's')
+
+    for(j=0; j<nodeNodes.length; j++){
+      var nodeNode = nodeNodes[j];  // Each xml node 'node' (no 's')
+      
+      window.NODE = nodeNode;
+
+      var id = nodeNode.getAttribute('id');
+      var label = nodeNode.getAttribute('label') || id;
+      
+      //viz
+      var size = 1;
+      var x = 100 - 200*Math.random();
+      var y = 100 - 200*Math.random();
+      var color;
+      
+      var sizeNodes = nodeNode.getElementsByTagName('size');
+      sizeNodes = sizeNodes.length ? 
+                  sizeNodes : 
+                  nodeNode.getElementsByTagNameNS('*','size');
+      if(sizeNodes.length>0){
+        sizeNode = sizeNodes[0];
+        size = parseFloat(sizeNode.getAttribute('value'));
+      }
+
+      var positionNodes = nodeNode.getElementsByTagName('position');
+      positionNodes = positionNodes.length ? 
+                      positionNodes : 
+                      nodeNode.getElementsByTagNameNS('*','position');
+      if(positionNodes.length>0){
+        var positionNode = positionNodes[0];
+        x = parseFloat(positionNode.getAttribute('x'));
+        y = parseFloat(positionNode.getAttribute('y'));
+      }
+
+      var colorNodes = nodeNode.getElementsByTagName('color');
+      colorNodes = colorNodes.length ? 
+                   colorNodes : 
+                   nodeNode.getElementsByTagNameNS('*','color');
+      if(colorNodes.length>0){
+        colorNode = colorNodes[0];
+        color = '#'+sigma.tools.rgbToHex(parseFloat(colorNode.getAttribute('r')),
+                                         parseFloat(colorNode.getAttribute('g')),
+                                         parseFloat(colorNode.getAttribute('b')));
+      }
+      
+      // Create Node
+      var node = {label:label, size:size, x:x, y:y, attributes:[], color:color};  // The graph node
+      
+      // Attribute values
+      var attvalueNodes = nodeNode.getElementsByTagName('attvalue');
+      for(k=0; k<attvalueNodes.length; k++){
+        var attvalueNode = attvalueNodes[k];
+        var attr = attvalueNode.getAttribute('for');
+        var val = attvalueNode.getAttribute('value');
+        node.attributes.push({attr:attr, val:val});
+      }
+
+      sigmaInstance.addNode(id,node);
+    }
+  }
+
+  var edges = [];
+  var edgeId = 0;
+  var edgesNodes = gexf.getElementsByTagName('edges');
+  for(i=0; i<edgesNodes.length; i++){
+    var edgesNode = edgesNodes[i];
+    var edgeNodes = edgesNode.getElementsByTagName('edge');
+    for(j=0; j<edgeNodes.length; j++){
+      var edgeNode = edgeNodes[j];
+      var source = edgeNode.getAttribute('source');
+      var target = edgeNode.getAttribute('target');
+      var label = edgeNode.getAttribute('label');
+      var edge = {
+        id:         j,
+        sourceID:   source,
+        targetID:   target,
+        label:      label,
+        attributes: []
+      };
+
+      var weight = edgeNode.getAttribute('weight');
+      if(weight!=undefined){
+        edge['weight'] = weight;
+      }
+
+      var attvalueNodes = edgeNode.getElementsByTagName('attvalue');
+      for(k=0; k<attvalueNodes.length; k++){
+        var attvalueNode = attvalueNodes[k];
+        var attr = attvalueNode.getAttribute('for');
+        var val = attvalueNode.getAttribute('value');
+        edge.attributes.push({attr:attr, val:val});
+      }
+
+      sigmaInstance.addEdge(edgeId++,source,target,edge);
+    }
+  }
+};
+</script>
+<div class="span9 sigma-parent" id="sigma-example-parent">
+  <div class="sigma-expand" id="sigma-example">Hey</div>
+</div>
+<script type="text/javascript">
+function init() {
+  /**
+   * First, let's instanciate sigma.js :
+   */
+  // (requires "sigma.parseGexf.js" to be executed)
+  var sigInst = sigma.init(document.getElementById('sigma-example')).drawingProperties({
+    defaultLabelColor: '#fff',
+    defaultLabelSize: 14,
+    defaultLabelBGColor: '#fff',
+    defaultLabelHoverColor: '#000',
+    labelThreshold: 6,
+    defaultEdgeType: 'curve'
+  }).graphProperties({
+    minNodeSize: 0.5,
+    maxNodeSize: 5,
+    minEdgeSize: 1,
+    maxEdgeSize: 1
+  }).mouseProperties({
+    maxRatio: 32
+  });
+  sigInst.parseGexf('http://140kit.com/files/gexf_layouts/curation_<%= @analysis_metadata.curation.id %>_<%= @analysis_metadata.id %>.gexf');
+ 
+  /**
+   * Now, here is the code that shows the popup :
+   */
+  function cleanKey(key){
+    return key.split("_").map(function(element){ return element.charAt(0).toUpperCase() + element.slice(1) }).join(" ")
+  };
+  (function(){ 
+    var popUp;
+
+    function attributesToString(attr) {
+      return '' +
+        attr.map(function(o){
+          return '<b>' + cleanKey(o.attr) + '</b> : ' + parseInt(o.val) + '<br />';
+        }).join('') +
+        '';
+    }
+
+    function showNodeInfo(event) {
+      popUp && popUp.remove();
+
+      var node;
+      sigInst.iterNodes(function(n){
+        node = n;
+      },[event.content[0]]);
+
+      popUp = $(
+        '<div class="node-info-popup"></div>'
+      ).append(
+        attributesToString( node['attr']['attributes'] )
+      ).attr(
+        'id',
+        'node-info'+sigInst.getID()
+      ).css({
+        'display': 'inline-block',
+        'border-radius': 3,
+        'padding': 5,
+        'background': '#fff',
+        'color': '#000',
+        'box-shadow': '0 0 4px #666',
+        'position': 'absolute',
+        'left': node.displayX,
+        'top': node.displayY+15
+      });
+      $('ul',popUp).css('margin','0 0 0 20px');
+      $('#sigma-example').append(popUp);
+    }
+    function hideNodeInfo(event) {
+      popUp && popUp.remove();
+      popUp = false;
+    }
+    var greyColor = '#666';
+    sigInst.bind('overnodes',function(event){
+    showNodeInfo(event);
+    var nodes = event.content;
+    var neighbors = {};
+    sigInst.iterEdges(function(e){
+      if(nodes.indexOf(e.source)<0 && nodes.indexOf(e.target)<0){
+        if(!e.attr['grey']){
+          e.attr['true_color'] = e.color;
+          e.color = greyColor;
+          e.attr['grey'] = 1;
+        }
+      }else{
+        e.color = e.attr['grey'] ? e.attr['true_color'] : e.color;
+        e.attr['grey'] = 0;
+ 
+        neighbors[e.source] = 1;
+        neighbors[e.target] = 1;
+      }
+    }).iterNodes(function(n){
+      if(!neighbors[n.id]){
+        if(!n.attr['grey']){
+          n.attr['true_color'] = n.color;
+          n.color = greyColor;
+          n.attr['grey'] = 1;
+        }
+      }else{
+        n.color = n.attr['grey'] ? n.attr['true_color'] : n.color;
+        n.attr['grey'] = 0;
+      }
+    }).draw(2,2,2);
+  }).bind('outnodes',function(){
+    hideNodeInfo(event);
+    sigInst.iterEdges(function(e){
+      e.color = e.attr['grey'] ? e.attr['true_color'] : e.color;
+      e.attr['grey'] = 0;
+    }).iterNodes(function(n){
+      n.color = n.attr['grey'] ? n.attr['true_color'] : n.color;
+      n.attr['grey'] = 0;
+    }).draw(2,2,2);
+  });
+  })();
+  sigInst.draw();//activateFishEye().draw();
+}
+ 
+if (document.addEventListener) {
+  document.addEventListener('DOMContentLoaded', init, false);
+} else {
+  window.onload = init;
+}
+</script>
+
+<style type="text/css">
+  /* sigma.js context : */
+  .sigma-parent {
+    position: relative;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    background: #222;
+  }
+  .sigma-expand {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+  }
+  .buttons-container{
+    padding-bottom: 8px;
+    padding-top: 12px;
+  }
+</style>
