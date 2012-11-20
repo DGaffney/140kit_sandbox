@@ -13,6 +13,7 @@ class NetworkVisualizer < AnalysisMetadata
   end
   
   def self.run(analysis_metadata_id, network_type)
+    require 'rest-client'
     @analysis_metadata = AnalysisMetadata.first(:id => analysis_metadata_id)
     return false if !self.requires(@analysis_metadata, {:function => "conversational_network_graph", :with_options => [network_type]})
     curation = @analysis_metadata.curation
