@@ -64,7 +64,7 @@ if !database.has_key?(ENV['E'])
 end
 database = database[ENV['E']]
 database.inspect
-DataMapper.setup(:default, "#{database["adapter"]}://#{database["username"]}:#{database["password"]}@#{database["host"]}:#{database["port"] || 3000}/#{database["database"]}?encoding=UTF8").inspect
+DataMapper.setup(:default, "#{database["adapter"]}://#{database["username"]}:#{database["password"]}@#{database["host"]}:#{database["port"] || 3000}/#{database["database"]}?encoding=UTF-8").inspect
 DataMapper.finalize
 STORAGE = Machine.determine_storage rescue {"type" => "local", "path" => THIS_DIR, "user" => Sh::whoami.strip, "hostname" => Sh::hostname.strip}
 require DIR+'/extensions/dm-extensions'
