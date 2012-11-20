@@ -194,8 +194,9 @@ function init() {
    */
 
   function cleanKey(key){
-    var titles = {"closenesscentrality": "Closeness Centrality", "betweennesscentrality": "Betweenness Centrality", "modularity_class": "Modularity Class", "eccentricity": "Eccentricity"}
+    var titles = {"closnesscentrality": "Closeness Centrality", "betweenesscentrality": "Betweenness Centrality", "modularity_class": "Modularity Class", "eccentricity": "Eccentricity"}
     return titles[key];
+    // return key
     //return key.split("_").map(function(element){ return element.charAt(0).toUpperCase() + element.slice(1) }).join(" ")
   };
   (function(){ 
@@ -305,10 +306,12 @@ if (document.addEventListener) {
     -webkit-border-radius: 4px;
     background: #222;
     display:block;
-    width:650px;
-    height:650px;
+    width:916px;
+    height:916px;
     font-size: 0px;
     line-height:0px;
+    margin-left: 0px;
+    margin-bottom: 20px;
   }
   .sigma-expand {
     position: absolute;

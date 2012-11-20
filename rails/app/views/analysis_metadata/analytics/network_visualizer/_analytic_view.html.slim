@@ -1,10 +1,11 @@
-= javascript_include_tag "https://www.google.com/jsapi"
-
-script type='text/javascript' google.load('visualization', '1', {packages:['table', 'annotatedtimeline']})
-
 h2 Analytical Process: #{link_to @analysis_metadata.title, analytical_offering_path(@analysis_metadata.analytical_offering)}
 hr
 .row#graph_view
+  .span12
+    div#graph
+      == render partial: '/analysis_metadata/analytics/network_visualizer/view'
+    .well
+    
   .span3
     .well
       h3 Details
@@ -30,9 +31,12 @@ hr
           = @analysis_metadata.analytical_offering.enabled ? "Online" : "Offline"
         li 
           | Raw GEXF:
-          = link_to "Download GEXF", "/files/gexf/curation_#{@analysis_metadata.curation.id}_#{@analysis_metadata.id}.gexf"
+          = link_to "Download GEXF", "/files/gexf_layouts/curation_#{@analysis_metadata.curation.id}_#{@analysis_metadata.id}.gexf"
   .span9
-    div#graph
-      == render partial: '/analysis_metadata/analytics/network_visualizer/view'
+    p The above chart is a sized, colored, and layed-out Gephi rendering of your conversational network graph. In its current iteration, there are several points to be made:
+    p <b>Size</b> is determined by the <a href="http://en.wikipedia.org/wiki/Betweenness_centrality" target="_blank">Betweenness Centrality</a> of an actor in the network. In short, this is a metric you can use to determine the degree to which people are at the center of the conversation.
+    p <b>Color</b> indicates the modularity class, or <a href="http://en.wikipedia.org/wiki/Community_structure" target="_blank">community</a>, that a set of nodes belong to. While the colors are indeed vibrant, they do not necessarily indicate anything in and of themselves - the only importance is <em>differences</em> of colors.
+    p <b>Layout</b> is determined by <a href="http://www.gephi.org" target="_blank">Gephi's</a> Yifan-Hu Proportional method of layout. In short, more tightly-knit nodes are placed in closer proximity. Pretty, right?
+
 hr
 == render partial: '/partials/disqus'
