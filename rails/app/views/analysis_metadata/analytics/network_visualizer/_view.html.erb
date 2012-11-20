@@ -35,7 +35,7 @@ sigma.publicPrototype.parseGexf = function(gexfPath) {
       for(j = 0; j<attributeNodes.length; j++){
         var attributeNode = attributeNodes[j];  // Each xml node 'attribute'
         
-        var id = attributeNode.getAttribute('id'),
+        var id = attributeNode.getAttribute('title'),
           title = attributeNode.getAttribute('title'),
           type = attributeNode.getAttribute('type');
         
@@ -48,7 +48,7 @@ sigma.publicPrototype.parseGexf = function(gexfPath) {
       for(j = 0; j<attributeNodes.length; j++){
         var attributeNode = attributeNodes[j];  // Each xml node 'attribute'
         
-        var id = attributeNode.getAttribute('id'),
+        var id = attributeNode.getAttribute('title'),
           title = attributeNode.getAttribute('title'),
           type = attributeNode.getAttribute('type');
           
@@ -229,6 +229,8 @@ function init() {
         'color': '#000',
         'box-shadow': '0 0 4px #666',
         'position': 'absolute',
+        'font-size': 12,
+        'line-height': 16,
         'left': node.displayX,
         'top': node.displayY+15
       });
