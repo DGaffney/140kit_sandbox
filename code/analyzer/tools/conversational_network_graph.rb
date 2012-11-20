@@ -41,7 +41,7 @@ class ConversationalNetworkGraph < AnalysisMetadata
       :edge_attributes => [:style],
       :analysis_metadata_id => @analysis_metadata.id, 
       :style => network_type+"_graph", 
-      :title => "curation_#{curation.id}_#{@analysis_metadata.id}_#{network_type}",
+      :title => "curation_#{curation.id}_#{@analysis_metadata.id}",
       :edge_conditional => edge_conditional,
       :total_range => time
     }

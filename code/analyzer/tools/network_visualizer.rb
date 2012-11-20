@@ -17,15 +17,18 @@ class NetworkVisualizer < AnalysisMetadata
     @analysis_metadata = AnalysisMetadata.first(:id => analysis_metadata_id)
     return false if !self.requires(@analysis_metadata, {:function => "conversational_network_graph", :with_options => [network_type]})
     curation = @analysis_metadata.curation
-    Sh::filestore_get("/gexf/", ENV["TMP_PATH"], "curation_#{curation.id}_#{@analysis_metadata.id}_#{network_type}.gexf")
+    conversational_network_graph_analytical_offering = AnalyticalOffering.first(:function => "conversational_network_graph", :language => "ruby")
+    dependent_analysis_metadata = AnalysisMetadata.all(:curation_id => curation.id, :analytical_offering_id => conversational_network_graph_analytical_offering.id).select{|x| x.variables.collect(&:value).include?(network_type)}.first
+    Sh::filestore_get("/gexf/", ENV["TMP_PATH"], "curation_#{curation.id}_#{dependent_analysis_metadata.id}.gexf")
     resource = RestClient::Resource.new(
       "http://178.79.169.159:23672/gephi_export",
       :timeout => -1)
-    response = resource.post :data =>  File.new(ENV["TMP_PATH"]+"curation_#{curation.id}_#{@analysis_metadata.id}_#{network_type}.gexf")
+    response = resource.post :data =>  File.new(ENV["TMP_PATH"]+"curation_#{curation.id}_#{dependent_analysis_metadata.id}.gexf")
     file = File.open(ENV["TMP_PATH"]+"curation_#{curation.id}_#{@analysis_metadata.id}.gexf", "w")
     file.write(response)
     file.close
-    Sh::filestore_send(ENV["TMP_PATH"], "/gexf_layouts/", "curation_#{curation.id}_#{@analysis_metadata.id}_#{network_type}.gexf")
+    Sh::filestore_send(ENV["TMP_PATH"], "/gexf_layouts/", "curation_#{curation.id}_#{@analysis_metadata.id}.gexf")
+    Sh::rm(ENV["TMP_PATH"]+"curation_#{curation.id}_#{dependent_analysis_metadata.id}.gexf")
     Sh::rm(ENV["TMP_PATH"]+"curation_#{curation.id}_#{@analysis_metadata.id}.gexf")
     return true
   end
